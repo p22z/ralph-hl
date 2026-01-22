@@ -2,7 +2,8 @@
 //!
 //! This module provides high-level methods for authenticated trading actions
 //! on the Hyperliquid exchange, including order placement, cancellation,
-//! and account management.
+//! modification, and account management.
 
 pub mod cancel;
+pub mod modify;
 pub mod orders;
