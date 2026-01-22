@@ -690,6 +690,183 @@ impl WsClient {
         self.subscriptions.clear().await;
     }
 
+    // ========== Market Data Subscription Methods ==========
+
+    /// Subscribe to all mid prices
+    ///
+    /// Subscribes to real-time mid price updates for all trading pairs.
+    ///
+    /// # Example
+    ///
+    /// ```ignore
+    /// use hyperliquid::websocket::WsClient;
+    ///
+    /// let client = WsClient::mainnet();
+    /// client.connect().await?;
+    /// client.subscribe_all_mids().await?;
+    /// ```
+    pub async fn subscribe_all_mids(&self) -> Result<()> {
+        self.subscribe(Subscription::all_mids()).await
+    }
+
+    /// Subscribe to all mid prices for a specific DEX
+    ///
+    /// # Arguments
+    ///
+    /// * `dex` - The DEX identifier (e.g., "perp", "spot")
+    ///
+    /// # Example
+    ///
+    /// ```ignore
+    /// use hyperliquid::websocket::WsClient;
+    ///
+    /// let client = WsClient::mainnet();
+    /// client.connect().await?;
+    /// client.subscribe_all_mids_with_dex("perp").await?;
+    /// ```
+    pub async fn subscribe_all_mids_with_dex(&self, dex: impl Into<String>) -> Result<()> {
+        self.subscribe(Subscription::all_mids_with_dex(dex)).await
+    }
+
+    /// Subscribe to L2 order book updates for a coin
+    ///
+    /// Receives real-time order book snapshots with full depth.
+    ///
+    /// # Arguments
+    ///
+    /// * `coin` - The coin symbol (e.g., "BTC", "ETH")
+    ///
+    /// # Example
+    ///
+    /// ```ignore
+    /// use hyperliquid::websocket::WsClient;
+    ///
+    /// let client = WsClient::mainnet();
+    /// client.connect().await?;
+    /// client.subscribe_l2_book("BTC").await?;
+    /// ```
+    pub async fn subscribe_l2_book(&self, coin: impl Into<String>) -> Result<()> {
+        self.subscribe(Subscription::l2_book(coin)).await
+    }
+
+    /// Subscribe to L2 order book updates with aggregation parameters
+    ///
+    /// # Arguments
+    ///
+    /// * `coin` - The coin symbol
+    /// * `n_sig_figs` - Number of significant figures for price aggregation
+    /// * `mantissa` - Mantissa for price aggregation
+    ///
+    /// # Example
+    ///
+    /// ```ignore
+    /// use hyperliquid::websocket::WsClient;
+    ///
+    /// let client = WsClient::mainnet();
+    /// client.connect().await?;
+    /// client.subscribe_l2_book_with_params("BTC", Some(5), Some(2)).await?;
+    /// ```
+    pub async fn subscribe_l2_book_with_params(
+        &self,
+        coin: impl Into<String>,
+        n_sig_figs: Option<u8>,
+        mantissa: Option<u8>,
+    ) -> Result<()> {
+        self.subscribe(Subscription::l2_book_with_params(coin, n_sig_figs, mantissa))
+            .await
+    }
+
+    /// Subscribe to trade stream for a coin
+    ///
+    /// Receives real-time trade updates as they occur.
+    ///
+    /// # Arguments
+    ///
+    /// * `coin` - The coin symbol (e.g., "BTC", "ETH")
+    ///
+    /// # Example
+    ///
+    /// ```ignore
+    /// use hyperliquid::websocket::WsClient;
+    ///
+    /// let client = WsClient::mainnet();
+    /// client.connect().await?;
+    /// client.subscribe_trades("BTC").await?;
+    /// ```
+    pub async fn subscribe_trades(&self, coin: impl Into<String>) -> Result<()> {
+        self.subscribe(Subscription::trades(coin)).await
+    }
+
+    /// Subscribe to candlestick/OHLCV updates for a coin
+    ///
+    /// Receives real-time candle updates for the specified interval.
+    ///
+    /// # Arguments
+    ///
+    /// * `coin` - The coin symbol (e.g., "BTC", "ETH")
+    /// * `interval` - The candle interval (e.g., OneMinute, FifteenMinutes, OneHour)
+    ///
+    /// # Example
+    ///
+    /// ```ignore
+    /// use hyperliquid::websocket::WsClient;
+    /// use hyperliquid::types::CandleInterval;
+    ///
+    /// let client = WsClient::mainnet();
+    /// client.connect().await?;
+    /// client.subscribe_candle("BTC", CandleInterval::OneHour).await?;
+    /// ```
+    pub async fn subscribe_candle(
+        &self,
+        coin: impl Into<String>,
+        interval: crate::types::CandleInterval,
+    ) -> Result<()> {
+        self.subscribe(Subscription::candle(coin, interval)).await
+    }
+
+    /// Subscribe to best bid/offer updates for a coin
+    ///
+    /// Receives real-time BBO (best bid and offer) updates.
+    ///
+    /// # Arguments
+    ///
+    /// * `coin` - The coin symbol (e.g., "BTC", "ETH")
+    ///
+    /// # Example
+    ///
+    /// ```ignore
+    /// use hyperliquid::websocket::WsClient;
+    ///
+    /// let client = WsClient::mainnet();
+    /// client.connect().await?;
+    /// client.subscribe_bbo("BTC").await?;
+    /// ```
+    pub async fn subscribe_bbo(&self, coin: impl Into<String>) -> Result<()> {
+        self.subscribe(Subscription::bbo(coin)).await
+    }
+
+    /// Subscribe to active asset context updates for a coin
+    ///
+    /// Receives real-time asset context updates including funding rates,
+    /// open interest, and other market metrics.
+    ///
+    /// # Arguments
+    ///
+    /// * `coin` - The coin symbol (e.g., "BTC", "ETH")
+    ///
+    /// # Example
+    ///
+    /// ```ignore
+    /// use hyperliquid::websocket::WsClient;
+    ///
+    /// let client = WsClient::mainnet();
+    /// client.connect().await?;
+    /// client.subscribe_active_asset_ctx("BTC").await?;
+    /// ```
+    pub async fn subscribe_active_asset_ctx(&self, coin: impl Into<String>) -> Result<()> {
+        self.subscribe(Subscription::active_asset_ctx(coin)).await
+    }
+
     /// Receive the next message from the WebSocket
     ///
     /// Returns `None` if the connection is closed.
@@ -1226,6 +1403,258 @@ mod tests {
         assert!(result.is_err());
     }
 
+    // ============ Market Data Subscription Methods Tests (without network) ============
+
+    #[tokio::test]
+    async fn test_subscribe_all_mids_not_connected() {
+        let client = WsClient::mainnet();
+        let result = client.subscribe_all_mids().await;
+        assert!(result.is_err());
+        let err = result.unwrap_err();
+        assert!(err.to_string().contains("Not connected"));
+    }
+
+    #[tokio::test]
+    async fn test_subscribe_all_mids_with_dex_not_connected() {
+        let client = WsClient::mainnet();
+        let result = client.subscribe_all_mids_with_dex("perp").await;
+        assert!(result.is_err());
+        let err = result.unwrap_err();
+        assert!(err.to_string().contains("Not connected"));
+    }
+
+    #[tokio::test]
+    async fn test_subscribe_l2_book_not_connected() {
+        let client = WsClient::mainnet();
+        let result = client.subscribe_l2_book("BTC").await;
+        assert!(result.is_err());
+        let err = result.unwrap_err();
+        assert!(err.to_string().contains("Not connected"));
+    }
+
+    #[tokio::test]
+    async fn test_subscribe_l2_book_with_params_not_connected() {
+        let client = WsClient::mainnet();
+        let result = client.subscribe_l2_book_with_params("BTC", Some(5), Some(2)).await;
+        assert!(result.is_err());
+        let err = result.unwrap_err();
+        assert!(err.to_string().contains("Not connected"));
+    }
+
+    #[tokio::test]
+    async fn test_subscribe_trades_not_connected() {
+        let client = WsClient::mainnet();
+        let result = client.subscribe_trades("BTC").await;
+        assert!(result.is_err());
+        let err = result.unwrap_err();
+        assert!(err.to_string().contains("Not connected"));
+    }
+
+    #[tokio::test]
+    async fn test_subscribe_candle_not_connected() {
+        use crate::types::CandleInterval;
+        let client = WsClient::mainnet();
+        let result = client.subscribe_candle("BTC", CandleInterval::OneHour).await;
+        assert!(result.is_err());
+        let err = result.unwrap_err();
+        assert!(err.to_string().contains("Not connected"));
+    }
+
+    #[tokio::test]
+    async fn test_subscribe_bbo_not_connected() {
+        let client = WsClient::mainnet();
+        let result = client.subscribe_bbo("BTC").await;
+        assert!(result.is_err());
+        let err = result.unwrap_err();
+        assert!(err.to_string().contains("Not connected"));
+    }
+
+    #[tokio::test]
+    async fn test_subscribe_active_asset_ctx_not_connected() {
+        let client = WsClient::mainnet();
+        let result = client.subscribe_active_asset_ctx("BTC").await;
+        assert!(result.is_err());
+        let err = result.unwrap_err();
+        assert!(err.to_string().contains("Not connected"));
+    }
+
+    // ============ Market Data Subscription Methods - Subscription Creation Tests ============
+
+    #[test]
+    fn test_subscription_all_mids_creates_correct_subscription() {
+        let sub = Subscription::all_mids();
+        assert_eq!(sub.channel_name(), "allMids");
+        assert!(sub.is_market_subscription());
+    }
+
+    #[test]
+    fn test_subscription_all_mids_with_dex_creates_correct_subscription() {
+        let sub = Subscription::all_mids_with_dex("perp");
+        assert_eq!(sub.channel_name(), "allMids");
+        if let Subscription::AllMids { dex } = sub {
+            assert_eq!(dex, Some("perp".to_string()));
+        } else {
+            panic!("Expected AllMids subscription");
+        }
+    }
+
+    #[test]
+    fn test_subscription_l2_book_creates_correct_subscription() {
+        let sub = Subscription::l2_book("ETH");
+        assert_eq!(sub.channel_name(), "l2Book");
+        assert_eq!(sub.coin(), Some("ETH"));
+    }
+
+    #[test]
+    fn test_subscription_l2_book_with_params_creates_correct_subscription() {
+        let sub = Subscription::l2_book_with_params("SOL", Some(4), Some(1));
+        assert_eq!(sub.channel_name(), "l2Book");
+        if let Subscription::L2Book { coin, n_sig_figs, mantissa } = sub {
+            assert_eq!(coin, "SOL");
+            assert_eq!(n_sig_figs, Some(4));
+            assert_eq!(mantissa, Some(1));
+        } else {
+            panic!("Expected L2Book subscription");
+        }
+    }
+
+    #[test]
+    fn test_subscription_trades_creates_correct_subscription() {
+        let sub = Subscription::trades("DOGE");
+        assert_eq!(sub.channel_name(), "trades");
+        assert_eq!(sub.coin(), Some("DOGE"));
+    }
+
+    #[test]
+    fn test_subscription_candle_creates_correct_subscription() {
+        use crate::types::CandleInterval;
+        let sub = Subscription::candle("BTC", CandleInterval::FifteenMinutes);
+        assert_eq!(sub.channel_name(), "candle");
+        assert_eq!(sub.coin(), Some("BTC"));
+        if let Subscription::Candle { interval, .. } = sub {
+            assert_eq!(interval, CandleInterval::FifteenMinutes);
+        } else {
+            panic!("Expected Candle subscription");
+        }
+    }
+
+    #[test]
+    fn test_subscription_bbo_creates_correct_subscription() {
+        let sub = Subscription::bbo("AVAX");
+        assert_eq!(sub.channel_name(), "bbo");
+        assert_eq!(sub.coin(), Some("AVAX"));
+    }
+
+    #[test]
+    fn test_subscription_active_asset_ctx_creates_correct_subscription() {
+        let sub = Subscription::active_asset_ctx("MATIC");
+        assert_eq!(sub.channel_name(), "activeAssetCtx");
+        assert_eq!(sub.coin(), Some("MATIC"));
+    }
+
+    // ============ Market Data Subscription JSON Serialization Tests ============
+
+    #[test]
+    fn test_subscribe_all_mids_serializes_correctly() {
+        let request = SubscriptionRequest::subscribe(Subscription::all_mids());
+        let json = serde_json::to_string(&request).unwrap();
+        assert!(json.contains("\"method\":\"subscribe\""));
+        assert!(json.contains("\"type\":\"allMids\""));
+    }
+
+    #[test]
+    fn test_subscribe_all_mids_with_dex_serializes_correctly() {
+        let request = SubscriptionRequest::subscribe(Subscription::all_mids_with_dex("spot"));
+        let json = serde_json::to_string(&request).unwrap();
+        assert!(json.contains("\"method\":\"subscribe\""));
+        assert!(json.contains("\"type\":\"allMids\""));
+        assert!(json.contains("\"dex\":\"spot\""));
+    }
+
+    #[test]
+    fn test_subscribe_l2_book_serializes_correctly() {
+        let request = SubscriptionRequest::subscribe(Subscription::l2_book("BTC"));
+        let json = serde_json::to_string(&request).unwrap();
+        assert!(json.contains("\"method\":\"subscribe\""));
+        assert!(json.contains("\"type\":\"l2Book\""));
+        assert!(json.contains("\"coin\":\"BTC\""));
+    }
+
+    #[test]
+    fn test_subscribe_l2_book_with_params_serializes_correctly() {
+        let request = SubscriptionRequest::subscribe(
+            Subscription::l2_book_with_params("ETH", Some(5), Some(2))
+        );
+        let json = serde_json::to_string(&request).unwrap();
+        assert!(json.contains("\"type\":\"l2Book\""));
+        assert!(json.contains("\"coin\":\"ETH\""));
+        assert!(json.contains("\"nSigFigs\":5"));
+        assert!(json.contains("\"mantissa\":2"));
+    }
+
+    #[test]
+    fn test_subscribe_trades_serializes_correctly() {
+        let request = SubscriptionRequest::subscribe(Subscription::trades("SOL"));
+        let json = serde_json::to_string(&request).unwrap();
+        assert!(json.contains("\"method\":\"subscribe\""));
+        assert!(json.contains("\"type\":\"trades\""));
+        assert!(json.contains("\"coin\":\"SOL\""));
+    }
+
+    #[test]
+    fn test_subscribe_candle_serializes_correctly() {
+        use crate::types::CandleInterval;
+        let request = SubscriptionRequest::subscribe(
+            Subscription::candle("BTC", CandleInterval::OneHour)
+        );
+        let json = serde_json::to_string(&request).unwrap();
+        assert!(json.contains("\"method\":\"subscribe\""));
+        assert!(json.contains("\"type\":\"candle\""));
+        assert!(json.contains("\"coin\":\"BTC\""));
+        assert!(json.contains("\"interval\":\"1h\""));
+    }
+
+    #[test]
+    fn test_subscribe_bbo_serializes_correctly() {
+        let request = SubscriptionRequest::subscribe(Subscription::bbo("LINK"));
+        let json = serde_json::to_string(&request).unwrap();
+        assert!(json.contains("\"method\":\"subscribe\""));
+        assert!(json.contains("\"type\":\"bbo\""));
+        assert!(json.contains("\"coin\":\"LINK\""));
+    }
+
+    #[test]
+    fn test_subscribe_active_asset_ctx_serializes_correctly() {
+        let request = SubscriptionRequest::subscribe(Subscription::active_asset_ctx("ARB"));
+        let json = serde_json::to_string(&request).unwrap();
+        assert!(json.contains("\"method\":\"subscribe\""));
+        assert!(json.contains("\"type\":\"activeAssetCtx\""));
+        assert!(json.contains("\"coin\":\"ARB\""));
+    }
+
+    // ============ Market Data Subscription is_market_subscription Tests ============
+
+    #[test]
+    fn test_all_market_subscriptions_are_market() {
+        use crate::types::CandleInterval;
+
+        let subscriptions = vec![
+            Subscription::all_mids(),
+            Subscription::all_mids_with_dex("perp"),
+            Subscription::l2_book("BTC"),
+            Subscription::l2_book_with_params("BTC", Some(5), None),
+            Subscription::trades("BTC"),
+            Subscription::candle("BTC", CandleInterval::OneMinute),
+            Subscription::bbo("BTC"),
+            Subscription::active_asset_ctx("BTC"),
+        ];
+
+        for sub in subscriptions {
+            assert!(sub.is_market_subscription(), "Expected {:?} to be a market subscription", sub);
+            assert!(!sub.is_user_subscription(), "Expected {:?} to NOT be a user subscription", sub);
+        }
+    }
+
     // ============ Subscription Integration Tests (require network) ============
 
     #[tokio::test]
@@ -1284,6 +1713,151 @@ mod tests {
         // Subscribe again - should succeed (idempotent)
         let result = client.subscribe(sub.clone()).await;
         assert!(result.is_ok());
+
+        client.close().await.unwrap();
+    }
+
+    // ============ Market Data Subscription Integration Tests (require network) ============
+
+    #[tokio::test]
+    #[ignore]
+    async fn test_subscribe_all_mids_integration() {
+        let client = WsClient::mainnet();
+        client.connect().await.unwrap();
+
+        let result = client.subscribe_all_mids().await;
+        assert!(result.is_ok());
+
+        // Check subscription is tracked
+        let sub = Subscription::all_mids();
+        assert!(client.subscription_manager().contains(&sub).await);
+
+        client.close().await.unwrap();
+    }
+
+    #[tokio::test]
+    #[ignore]
+    async fn test_subscribe_all_mids_with_dex_integration() {
+        let client = WsClient::mainnet();
+        client.connect().await.unwrap();
+
+        let result = client.subscribe_all_mids_with_dex("perp").await;
+        assert!(result.is_ok());
+
+        client.close().await.unwrap();
+    }
+
+    #[tokio::test]
+    #[ignore]
+    async fn test_subscribe_l2_book_integration() {
+        let client = WsClient::mainnet();
+        client.connect().await.unwrap();
+
+        let result = client.subscribe_l2_book("BTC").await;
+        assert!(result.is_ok());
+
+        // Check subscription is tracked
+        let sub = Subscription::l2_book("BTC");
+        assert!(client.subscription_manager().contains(&sub).await);
+
+        client.close().await.unwrap();
+    }
+
+    #[tokio::test]
+    #[ignore]
+    async fn test_subscribe_l2_book_with_params_integration() {
+        let client = WsClient::mainnet();
+        client.connect().await.unwrap();
+
+        let result = client.subscribe_l2_book_with_params("ETH", Some(5), Some(2)).await;
+        assert!(result.is_ok());
+
+        client.close().await.unwrap();
+    }
+
+    #[tokio::test]
+    #[ignore]
+    async fn test_subscribe_trades_integration() {
+        let client = WsClient::mainnet();
+        client.connect().await.unwrap();
+
+        let result = client.subscribe_trades("BTC").await;
+        assert!(result.is_ok());
+
+        // Check subscription is tracked
+        let sub = Subscription::trades("BTC");
+        assert!(client.subscription_manager().contains(&sub).await);
+
+        client.close().await.unwrap();
+    }
+
+    #[tokio::test]
+    #[ignore]
+    async fn test_subscribe_candle_integration() {
+        use crate::types::CandleInterval;
+
+        let client = WsClient::mainnet();
+        client.connect().await.unwrap();
+
+        let result = client.subscribe_candle("BTC", CandleInterval::OneHour).await;
+        assert!(result.is_ok());
+
+        // Check subscription is tracked
+        let sub = Subscription::candle("BTC", CandleInterval::OneHour);
+        assert!(client.subscription_manager().contains(&sub).await);
+
+        client.close().await.unwrap();
+    }
+
+    #[tokio::test]
+    #[ignore]
+    async fn test_subscribe_bbo_integration() {
+        let client = WsClient::mainnet();
+        client.connect().await.unwrap();
+
+        let result = client.subscribe_bbo("BTC").await;
+        assert!(result.is_ok());
+
+        // Check subscription is tracked
+        let sub = Subscription::bbo("BTC");
+        assert!(client.subscription_manager().contains(&sub).await);
+
+        client.close().await.unwrap();
+    }
+
+    #[tokio::test]
+    #[ignore]
+    async fn test_subscribe_active_asset_ctx_integration() {
+        let client = WsClient::mainnet();
+        client.connect().await.unwrap();
+
+        let result = client.subscribe_active_asset_ctx("BTC").await;
+        assert!(result.is_ok());
+
+        // Check subscription is tracked
+        let sub = Subscription::active_asset_ctx("BTC");
+        assert!(client.subscription_manager().contains(&sub).await);
+
+        client.close().await.unwrap();
+    }
+
+    #[tokio::test]
+    #[ignore]
+    async fn test_subscribe_multiple_market_data_integration() {
+        use crate::types::CandleInterval;
+
+        let client = WsClient::mainnet();
+        client.connect().await.unwrap();
+
+        // Subscribe to multiple market data streams
+        client.subscribe_all_mids().await.unwrap();
+        client.subscribe_l2_book("BTC").await.unwrap();
+        client.subscribe_trades("ETH").await.unwrap();
+        client.subscribe_candle("SOL", CandleInterval::FifteenMinutes).await.unwrap();
+        client.subscribe_bbo("AVAX").await.unwrap();
+
+        // Verify all subscriptions are tracked
+        assert!(client.subscription_manager().total_count().await >= 5);
 
         client.close().await.unwrap();
     }

@@ -434,8 +434,8 @@
         "Unit tests for connection lifecycle"
       ],
       "priority": 4,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed: WsClient with connect(), disconnect(), close() methods. Connection states: Disconnected, Connecting, Connected, Reconnecting, Closed. ReconnectConfig with exponential backoff (configurable initial delay, max delay, multiplier, max attempts). Heartbeat task sends periodic pings, reader task handles pong responses. send_text(), send_json(), send_binary(), recv(), try_recv() methods. State subscription via watch channel. 38 unit tests covering all functionality."
     },
     {
       "id": "US-029",
@@ -449,8 +449,8 @@
         "Unit tests for subscription flow"
       ],
       "priority": 4,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed: Subscription enum with 19 subscription types (allMids, l2Book, trades, candle, bbo, activeAssetCtx, notification, webData3, twapStates, clearinghouseState, openOrders, orderUpdates, userEvents, userFills, userFundings, userNonFundingLedgerUpdates, activeAssetData, userTwapSliceFills, userTwapHistory). SubscriptionRequest for message formatting with subscribe/unsubscribe methods. SubscriptionManager for state tracking (pending, active, unsubscribing). ChannelMessage for parsing incoming messages. WsClient methods: subscribe(), unsubscribe(), resubscribe_all(), unsubscribe_all(), clear_subscriptions(). 87 unit tests with comprehensive coverage."
     },
     {
       "id": "US-030",
@@ -466,8 +466,8 @@
         "Unit tests for each subscription"
       ],
       "priority": 4,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed: WsClient convenience methods for market data subscriptions. subscribe_all_mids(), subscribe_all_mids_with_dex(dex), subscribe_l2_book(coin), subscribe_l2_book_with_params(coin, n_sig_figs?, mantissa?), subscribe_trades(coin), subscribe_candle(coin, interval), subscribe_bbo(coin), and subscribe_active_asset_ctx(coin) methods implemented. 38 unit tests covering not-connected errors, subscription creation, JSON serialization, and integration tests (marked with #[ignore])."
     },
     {
       "id": "US-031",
