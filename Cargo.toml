@@ -1,0 +1,35 @@
+[package]
+name = "hyperliquid-sdk"
+version = "0.1.0"
+edition = "2021"
+description = "Rust SDK for the Hyperliquid API"
+license = "MIT"
+repository = "https://github.com/example/hyperliquid-sdk"
+keywords = ["hyperliquid", "trading", "crypto", "api", "sdk"]
+categories = ["api-bindings", "cryptography::cryptocurrencies"]
+
+[dependencies]
+# HTTP client
+reqwest = { version = "0.11", features = ["json"] }
+
+# Async runtime
+tokio = { version = "1", features = ["full"] }
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# Error handling
+thiserror = "1.0"
+
+# Ethereum/EIP-712 signing
+ethers = { version = "2.0", features = ["legacy"] }
+
+# WebSocket client
+tokio-tungstenite = { version = "0.21", features = ["native-tls"] }
+futures-util = "0.3"
+
+[dev-dependencies]
+# Testing utilities
+tokio-test = "0.4"
+mockito = "1.2"
