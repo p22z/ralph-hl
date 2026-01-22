@@ -24,4 +24,5 @@ pub use exchange::orders::{
 pub use exchange::twap::{get_twap_error, get_twap_id, is_twap_running};
 pub use exchange::schedule_cancel::{get_scheduled_time, is_schedule_cancel_successful};
 pub use exchange::transfer::{get_transfer_hash, is_transfer_successful};
+pub use exchange::vault::{get_vault_hash, is_vault_action_successful};
 pub use types::*;

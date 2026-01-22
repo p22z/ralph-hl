@@ -12,3 +12,4 @@ pub mod schedule_cancel;
 pub mod staking;
 pub mod transfer;
 pub mod twap;
+pub mod vault;
