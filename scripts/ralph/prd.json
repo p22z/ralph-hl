@@ -606,8 +606,8 @@
         "All unit tests passing"
       ],
       "priority": 5,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed: All 76 SDK functions accessible from demo UI (48 info, 27 exchange, 1 WebSocket demo). WebSocket connects directly to wss://api.hyperliquid.xyz/ws with 19 subscription types. Error handling with ApiResponse wrapper (success/error) in backend and visual error states in frontend. README.md documentation with quick start examples, API coverage tables, and demo instructions. All 730 unit tests passing (34 integration tests ignored as they require live server)."
     }
   ]
 }

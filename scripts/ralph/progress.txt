@@ -1,0 +1,1021 @@
+# Ralph Progress Log
+Started: Thu Jan 22 12:34:49 CET 2026
+---
+
+## US-001: Initialize Rust project with Cargo
+**Status:** COMPLETED
+**Commit:** 7917e9f
+
+### What was done:
+- Created Cargo.toml with dependencies: reqwest, tokio, serde, serde_json, thiserror, ethers, tokio-tungstenite, futures-util
+- Added dev dependencies: tokio-test, mockito for testing
+- Created src/lib.rs with module exports
+- Created src/client.rs with Client struct supporting mainnet/testnet
+- Created src/error.rs with Error enum using thiserror
+- Created src/types.rs with basic trading types (TimeInForce, OrderType, Side, etc.)
+- Added .gitignore for Rust projects
+- All 11 unit tests pass
+
+### Learnings:
+- ethers v2.0 requires the "legacy" feature for proper EIP-712 support
+- tokio-tungstenite v0.21 works well with native-tls feature for WebSocket
+- The Hyperliquid API uses "B"/"A" for Buy/Sell sides (not "buy"/"sell")
+
+---
+
+## US-002: Define core types and models
+**Status:** COMPLETED
+**Commit:** ae7b13a
+
+### What was done:
+- Added comprehensive request types for all Info endpoints (perpetuals, spot, market data, user state)
+- Added response types for market data, orders, fills, positions, balances
+- Added Exchange action types (orders, cancels, TWAP, leverage, transfers)
+- Added enum types: OrderStatus, CandleInterval, OrderGrouping, MarginMode
+- Builder pattern for request types (e.g., L2BookRequest::new("BTC").with_sig_figs(5))
+- 29 unit tests covering serialization/deserialization
+- Updated lib.rs to re-export all types with `pub use types::*`
+
+### Files changed:
+- src/types.rs (expanded from ~100 lines to ~2200 lines)
+- src/lib.rs (added re-exports)
+- src/client.rs (minor clippy fix for Default derive)
+
+### Learnings:
+- Hyperliquid API uses short field names in wire protocol (a, b, p, s, r, t) to minimize payload
+- Order type uses nested JSON: { "limit": { "tif": "Gtc" } } or { "trigger": {...} }
+- Serde's #[serde(untagged)] works well for discriminating enum variants by structure
+- API timestamps are in milliseconds, not seconds
+- L2BookResponse levels tuple is (bids, asks) - bids first, asks second
+- Use #[serde(skip_serializing_if = "Option::is_none")] for cleaner optional field serialization
+
+---
+
+## US-003: Implement error handling module
+**Status:** COMPLETED
+**Commit:** 8f603ba
+
+### What was done:
+- Enhanced error.rs with comprehensive unit tests
+- Individual tests for each error variant (Api, Auth, Http, Json, InvalidParameter, WebSocket)
+- Tests for From trait conversions (reqwest::Error -> Error, serde_json::Error -> Error)
+- Tests for Result type alias usage
+- Verification that Error implements Send + Sync traits
+- Verification of Debug implementation
+
+### Files changed:
+- src/error.rs (expanded tests from 2 to 10)
+
+### Learnings:
+- thiserror #[from] attribute automatically implements From trait for error conversion
+- Use #[tokio::test] for async tests involving reqwest (which doesn't have blocking feature enabled)
+- Testing Send + Sync traits at compile time: `fn assert_send<T: Send>() {}`
+- Error types should implement Send + Sync for use across async boundaries
+
+---
+
+## US-004: Implement HTTP client wrapper
+**Status:** COMPLETED
+**Commit:** 7d02f70
+
+### What was done:
+- Added post_info<T, R>() async method for /info endpoint queries
+- Added post_exchange<T, R>() async method for /exchange endpoint actions
+- Internal post() helper handles HTTP response status, body parsing, and errors
+- Error handling for: HTTP errors (non-2xx), API errors (JSON with "error" field), JSON parse failures
+- Added 10 comprehensive mocked tests using mockito crate
+- Tests cover: success cases, HTTP 500/401/429 errors, malformed JSON, complex nested responses
+
+### Files changed:
+- src/client.rs (added ~400 lines of implementation and tests)
+- src/types.rs (formatting change from cargo fmt)
+
+### Learnings:
+- mockito crate provides async server with Server::new_async().await
+- For mocked tests, created TestClient struct that mirrors Client but with configurable base_url
+- HTTP response.text().await consumes the response body - save it before checking status
+- serde_json::from_str can fail even on 200 responses if API returns error object instead of expected type
+- Check for {"error": "..."} pattern when JSON parsing fails for better error messages
+
+---
+
+## US-005: Implement EIP-712 signing for authentication
+**Status:** COMPLETED
+**Commit:** a1a01be
+
+### What was done:
+- Created src/auth.rs module with Wallet struct for signing
+- Wallet::from_private_key() and Wallet::from_bytes() constructors with proper validation
+- Wallet::generate_nonce() returns current timestamp in milliseconds
+- Wallet::sign_l1_action() implements the phantom agent EIP-712 signing:
+  - Serializes action with msgpack (rmp-serde)
+  - Appends nonce (8 bytes BE), vault flag, and vault address (if present)
+  - Computes keccak256 hash as connection_id
+  - Creates phantom agent with source ("a" for mainnet, "b" for testnet)
+  - Signs using EIP-712 TypedData with domain: Exchange, v1, chainId 1337
+- Signature struct with r, s, v components formatted as hex strings
+- Added hex and rmp-serde dependencies to Cargo.toml
+- Updated lib.rs to export auth module (Wallet, Signature)
+- 14 unit tests covering all functionality
+
+### Files changed:
+- src/auth.rs (new file, ~510 lines)
+- src/lib.rs (added auth module export)
+- Cargo.toml (added rmp-serde and hex dependencies)
+
+### Learnings:
+- Hyperliquid uses phantom agent construction: the action is hashed and that hash becomes the connectionId
+- The EIP-712 domain for L1 actions uses chainId 1337 (not Arbitrum's 42161)
+- The "source" field differentiates mainnet ("a") from testnet ("b")
+- ethers TypedData struct works with sign_typed_data() - no need for custom Eip712 trait implementation
+- Connection ID format: msgpack(action) + nonce(8B BE) + vault_flag(1B) + vault_address(20B if present)
+- Signature v component from ethers is already in the 27/28 format for Ethereum
+
+---
+
+## US-006: Implement Perpetuals metadata endpoints
+**Status:** COMPLETED
+**Commit:** d3934ce
+
+### What was done:
+- Created src/info/ module structure for organizing info endpoint implementations
+- Created src/info/perpetuals.rs with Client method extensions:
+  - perp_dexs() - retrieves all perpetual DEX configurations
+  - meta(dex?) - gets perp metadata including assets and margin tables
+  - meta_and_asset_ctxs(dex?) - metadata with current asset contexts (mark price, funding, OI, etc.)
+  - all_perp_metas() - all perp asset metadata across all DEXs
+- Methods implemented using existing request types from types.rs
+- 13 unit tests with mocked responses covering all endpoints
+
+### Files changed:
+- src/info/mod.rs (new file, ~6 lines)
+- src/info/perpetuals.rs (new file, ~350 lines)
+- src/lib.rs (added info module)
+
+### Learnings:
+- Implement Client methods in separate modules using `impl Client` blocks for better organization
+- The metaAndAssetCtxs endpoint returns a tuple [PerpMetaResponse, Vec<AssetCtx>] as JSON array
+- Use `..Default::default()` pattern for cleaner request construction with optional fields
+- Keep test helper TestClient in each module to allow mocked testing with configurable base URL
+
+---
+
+## US-007: Implement Spot metadata endpoints
+**Status:** COMPLETED
+**Commit:** 7d693c4
+
+### What was done:
+- Created src/info/spot.rs with Client method extensions:
+  - spot_meta() - retrieves spot token and pair metadata
+  - spot_meta_and_asset_ctxs() - metadata with current asset contexts
+  - token_details(token_id) - detailed token information
+  - spot_deploy_state(user) - user's token deployment auction state
+  - spot_pair_deploy_auction_status() - current pair deployment auction status
+- Added response types: SpotAssetCtx, TokenDetails, SpotDeployState, SpotPairAuctionStatus
+- 17 unit tests with mocked responses
+
+### Files changed:
+- src/info/spot.rs (new file, ~640 lines)
+- src/info/mod.rs (added spot module)
+- src/types.rs (added SpotAssetCtx response type)
+
+### Learnings:
+- Spot metadata uses different field structure than perp (circulatingSupply vs openInterest)
+- Token details has many optional fields depending on whether token is user-deployed or canonical
+- spotMetaAndAssetCtxs returns tuple like perp version [SpotMetaResponse, Vec<SpotAssetCtx>]
+
+---
+
+## US-008: Implement market data endpoints
+**Status:** COMPLETED
+**Commit:** 6238ba3
+
+### What was done:
+- Created src/info/market.rs with Client method extensions:
+  - all_mids(dex?) - retrieves all mid prices as HashMap<String, String>
+  - l2_book(coin, n_sig_figs?, mantissa?) - L2 order book snapshot with optional price aggregation
+  - candle(coin, interval, start_time, end_time?) - OHLCV candlestick data
+- 22 unit tests covering all endpoints, optional parameters, empty responses, and error handling
+
+### Files changed:
+- src/info/market.rs (new file, ~750 lines)
+- src/info/mod.rs (added market module)
+
+### Learnings:
+- allMids returns a flat HashMap, not a struct - use HashMap<String, String> for type flexibility
+- L2 book supports nSigFigs (2-5) and mantissa for price level aggregation
+- When using serde_json::json! macro with large integers (timestamps), add _u64 suffix to avoid i32 overflow
+- The candle endpoint wraps the inner parameters in a "req" field
+
+---
+
+## US-009: Implement user clearinghouse state endpoints
+**Status:** COMPLETED
+**Commit:** 3ab0964
+
+### What was done:
+- Created src/info/user.rs with Client method extensions:
+  - clearinghouse_state(user, dex?) - retrieves user's perpetual account state including positions, margin summary, and withdrawable balance
+  - spot_clearinghouse_state(user) - retrieves user's spot account state including token balances
+- 12 unit tests with mocked responses covering:
+  - Clearinghouse state without dex parameter
+  - Clearinghouse state with dex parameter
+  - Multiple positions (long and short)
+  - Spot balances including empty balances
+  - Error handling (HTTP errors, API errors)
+  - Request serialization
+
+### Files changed:
+- src/info/user.rs (new file, ~550 lines)
+- src/info/mod.rs (added user module)
+
+### Learnings:
+- ClearinghouseState contains nested structures: AssetPosition -> Position -> LeverageInfo, CumulativeFunding
+- Position szi (signed size) can be negative for short positions
+- Use builder pattern with_dex() for optional parameters rather than Default::default() pattern when request types don't have Default impl
+- Spot clearinghouse state is simpler - just contains balances array
+
+---
+
+## US-012: Implement funding endpoints
+**Status:** COMPLETED
+**Commit:** 1ae6d32
+
+### What was done:
+- Created src/info/funding.rs with Client method extensions:
+  - user_funding(user, start_time, end_time?) - retrieves user's funding payment history within time range
+  - funding_history(coin, start_time, end_time?) - retrieves historical funding rates for a specific coin
+  - predicted_fundings() - retrieves predicted next funding rates for all perpetuals as HashMap<String, PredictedFunding>
+- 16 unit tests with mocked responses covering:
+  - User funding with and without end_time parameter
+  - Empty user funding history
+  - Funding history for specific coins
+  - Predicted fundings for multiple coins
+  - Negative funding rates
+  - Error handling (API errors, HTTP errors)
+
+### Files changed:
+- src/info/funding.rs (new file, ~800 lines)
+- src/info/mod.rs (added funding module)
+
+### Learnings:
+- FundingHistoryEntry contains nested FundingDelta struct with funding details
+- FundingDelta uses "type" field for delta_type (renamed via serde) to distinguish funding from other delta types
+- predicted_fundings returns HashMap<String, PredictedFunding> similar to all_mids pattern
+- n_samples field in FundingDelta is optional (only present in some responses)
+- Request types UserFundingRequest, FundingHistoryRequest, PredictedFundingsRequest were already defined in types.rs
+
+---
+
+## US-014: Implement staking info endpoints
+**Status:** COMPLETED
+**Commit:** 1e280e4
+
+### What was done:
+- Created src/info/staking.rs with Client method extensions:
+  - staking_delegations(user) - retrieves user's delegations to validators with pending undelegation and lock times
+  - staking_summary(user) - retrieves overall staking state including total staked, pending, and rewards
+  - staking_history(user) - retrieves staking-related action history (delegate, undelegate, claim)
+  - staking_rewards(user) - retrieves earned rewards organized by validator
+- Added response types to types.rs:
+  - StakingDelegation - validator address, amount, pending undelegation, locked until
+  - StakingSummary - staked, pending undelegation, unclaimed rewards, total claimed
+  - StakingHistoryEntry - hash, time, action type, amount, optional validator
+  - StakingReward - validator, amount, time
+- 18 unit tests with mocked responses covering:
+  - All four endpoints with normal responses
+  - Empty response arrays
+  - Minimal responses (without optional fields)
+  - Error handling (HTTP errors, API errors)
+  - Request serialization
+  - Response type deserialization
+
+### Files changed:
+- src/info/staking.rs (new file, ~650 lines)
+- src/info/mod.rs (added staking module)
+- src/types.rs (added StakingDelegation, StakingSummary, StakingHistoryEntry, StakingReward response types)
+
+### Learnings:
+- Request types StakingDelegationsRequest, StakingSummaryRequest, StakingHistoryRequest, StakingRewardsRequest were already defined in types.rs
+- Staking amounts are typically in wei (18 decimals) represented as strings for precision
+- StakingHistoryEntry uses "type" field renamed to action_type via serde to avoid Rust keyword
+- The locked_until field is Option<u64> timestamp for undelegation lock period
+
+---
+
+## US-015: Implement vault and misc info endpoints
+**Status:** COMPLETED
+**Commit:** ad0faf9
+
+### What was done:
+- Created src/info/vault.rs with Client method extensions for 10 endpoints:
+  - vault_details(vault_address) - retrieve vault configuration and performance metrics
+  - user_vaults(user) - list user's vault deposits with equity shares and values
+  - builder_fee_approval(user, builder) - check if user has approved a builder for fees
+  - referral(user) - get referral code, referrer, and cumulative stats
+  - hip3_state(user) - HIP-3 abstraction state (enabled/balance)
+  - active_asset_data(user, coin) - leverage, max trade sizes, available margin
+  - perps_at_open_interest_cap(dex?) - list assets at OI cap
+  - perp_dex_limits(dex) - DEX limits configuration
+  - perp_dex_status(dex) - DEX status and statistics
+  - perp_deploy_auction_status() - deployment auction info
+- Added response types in vault.rs module:
+  - VaultDetails - name, description, TVL, leader info, commission, capacity
+  - UserVaultDeposit - vault address, equity share, value, pending withdrawal
+  - BuilderFeeApprovalInfo - approved flag, max fee rate, nonce
+  - ReferralInfo - code, referrer, cumulative stats
+  - Hip3State - enabled flag, balance
+  - PerpDexStatus - name, active status, assets, OI, volume
+- Re-exported response types from info/mod.rs
+- 45 unit tests with mocked responses
+
+### Files changed:
+- src/info/vault.rs (new file, ~1385 lines)
+- src/info/mod.rs (added vault module and re-exports)
+
+### Learnings:
+- All request types for vault/misc endpoints were already defined in types.rs
+- Response types like PerpDexLimits and PerpDeployAuctionStatus were already in types.rs
+- ActiveAssetData was already defined in types.rs with leverage and trade size tuples
+- New response types for vault module should be defined in the module itself and re-exported
+- The perps_at_open_interest_cap endpoint returns Vec<String> (just asset names)
+- Vault equity uses "equityShare" and optional "equityFraction" for user's share
+
+---
+
+## US-016: Implement borrow/lend info endpoints
+**Status:** COMPLETED
+**Commit:** ccb605a
+
+### What was done:
+- Created src/info/borrow_lend.rs with Client method extensions for 4 endpoints:
+  - borrow_lend_user_state(user) - retrieve user's positions and health factor
+  - borrow_lend_reserve_state(coin) - reserve state for a specific asset
+  - all_borrow_lend_reserve_states() - all reserve states across assets
+  - aligned_quote_token(coin) - check if coin is an aligned quote token
+- Added response types to types.rs:
+  - BorrowLendPosition - coin, supplied, borrowed, supply_apy, borrow_apy, accrued_interest
+  - BorrowLendUserState - positions, total_supplied_value, total_borrowed_value, health_factor
+  - BorrowLendReserveState - coin, total_supplied, total_borrowed, supply_apy, borrow_apy, utilization_rate, available_liquidity, ltv, liquidation_threshold
+  - AlignedQuoteToken - coin, is_aligned, quote_token_index
+- Added AlignedQuoteTokenRequest to types.rs (was missing from existing request types)
+- 23 unit tests with mocked responses covering all endpoints and error handling
+
+### Files changed:
+- src/info/borrow_lend.rs (new file, ~580 lines)
+- src/info/mod.rs (added borrow_lend module)
+- src/types.rs (added AlignedQuoteTokenRequest and borrow/lend response types)
+
+### Learnings:
+- Request types for borrowLendUserState, borrowLendReserveState, allBorrowLendReserveStates were already defined in types.rs
+- alignedQuoteToken request type was missing and needed to be added
+- BorrowLendUserState contains nested positions array for each asset the user has interacted with
+- Health factor represents the collateral/debt ratio - important for liquidation risk
+- Reserve state includes utilization_rate which is a key metric for borrow/lend protocols
+- Optional fields like ltv and liquidation_threshold may not be present for all assets
+
+---
+
+## US-017: Implement order placement endpoints
+**Status:** COMPLETED
+**Commit:** 861acab
+
+### What was done:
+- Created src/exchange/ module structure for exchange endpoint implementations
+- Created src/exchange/orders.rs with Client method extensions:
+  - place_order(wallet, order, grouping) - place a single order
+  - place_batch_orders(wallet, orders, grouping) - place multiple orders atomically
+  - place_order_with_options() and place_batch_orders_with_options() - variants with builder fee and vault support
+- Added builder patterns for ergonomic order construction:
+  - LimitOrderBuilder - for limit orders with GTC/IOC/ALO time-in-force
+  - TriggerOrderBuilder - for stop loss and take profit orders (limit or market trigger)
+- Added helper functions:
+  - is_order_successful(status) - check if order was placed successfully
+  - get_order_id(status) - extract OID from placement status
+- Added ExchangeRequest<T> wrapper for authenticated requests with signature, nonce, and optional vault
+- Added ExchangeApiResponse for parsing exchange endpoint responses
+- Re-exported builder types and helpers from lib.rs
+- 28 unit tests with mocked responses
+
+### Files changed:
+- src/exchange/mod.rs (new file, ~8 lines)
+- src/exchange/orders.rs (new file, ~1320 lines)
+- src/lib.rs (added exchange module exports)
+
+### Learnings:
+- Exchange endpoints require signed requests using the Wallet::sign_l1_action() from auth module
+- Order wire format uses short field names: a (asset), b (is_buy), p (price), s (size), r (reduce_only), t (type), c (cloid)
+- OrderAction wraps the orders array with action_type="order" and grouping field
+- Three order placement status variants: Resting (order book), Filled (matched), Error (rejected)
+- Batch orders return an array of statuses - one per order in the request
+- Builder pattern with fluent API (time_in_force(), reduce_only(), client_order_id()) makes order construction clean
+- TriggerOrderBuilder needs trigger_px, trigger_type (TriggerType::Tp or TriggerType::Sl), and is_market flag
+- The grouping field (Na, NormalTpsl, PositionTpsl) controls how TP/SL orders pair with entry orders
+- ExchangeApiResponse has status field ("ok" or error message) and optional response (the actual data)
+- Empty orders list should return InvalidParameter error before attempting to send request
+
+
+---
+
+## US-018: Implement order cancellation endpoints
+**Status:** COMPLETED
+**Commit:** a899a10
+
+### What was done:
+- Created src/exchange/cancel.rs with Client method extensions for 4 endpoints:
+  - cancel_order(wallet, asset, oid) - cancel single order by numeric order ID
+  - cancel_order_by_cloid(wallet, asset, cloid) - cancel single order by client order ID
+  - cancel_batch_orders(wallet, cancels) - batch cancel multiple orders by oid
+  - cancel_batch_orders_by_cloid(wallet, cancels) - batch cancel multiple orders by cloid
+- All methods have _with_options() variants supporting optional vault_address for vault trading
+- Added CancelExchangeRequest<T> wrapper for cancel-specific request format
+- Added CancelExchangeApiResponse for parsing cancel responses
+- Added helper function is_cancel_successful(status) to check if cancel succeeded
+- Re-exported is_cancel_successful from lib.rs
+- 22 unit tests with mocked responses
+
+### Files changed:
+- src/exchange/cancel.rs (new file, ~995 lines)
+- src/exchange/mod.rs (added cancel module)
+- src/lib.rs (added is_cancel_successful export)
+
+### Learnings:
+- CancelAction uses action_type="cancel" with cancels array of CancelWire (short fields: a=asset, o=oid)
+- CancelByCloidAction uses action_type="cancelByCloid" with cancels array of CancelByCloidWire (asset, cloid)
+- CancelResponse.data.statuses is Vec<String> where each status is "success" or an error message
+- Batch cancels can have partial success - some orders cancelled while others fail (e.g., "error: Order not found")
+- Cancel requests follow same auth pattern as order placement: sign action with nonce and optional vault
+- Empty cancels list should return InvalidParameter error immediately
+- Response status codes match the order of cancel requests submitted
+
+---
+
+## US-022: Implement leverage and margin endpoints
+**Status:** COMPLETED
+**Commit:** 94abcf6
+
+### What was done:
+- Created src/exchange/leverage.rs with Client method extensions for 2 endpoints:
+  - update_leverage(wallet, asset, is_cross, leverage) - set leverage for a perpetual asset (cross or isolated margin mode)
+  - update_isolated_margin(wallet, asset, is_buy, ntli) - add or remove margin from an isolated margin position
+- All methods have _with_options() variants supporting optional vault_address for vault trading
+- Added LeverageExchangeRequest<T> wrapper for leverage-specific request format
+- Added response types:
+  - LeverageResponse - API response wrapper
+  - LeverageResponseData - response data with type and data fields
+  - LeverageResultData - contains leverage info
+  - LeverageResultInfo - leverage type (cross/isolated), value, optional raw USD
+  - IsolatedMarginResponse and IsolatedMarginResponseData for margin update responses
+- Added helper functions:
+  - is_leverage_update_successful(response) - check if leverage update succeeded
+  - get_updated_leverage(response) - extract leverage info from response
+- Re-exported helper functions from lib.rs
+- 27 unit tests with mocked responses
+
+### Files changed:
+- src/exchange/leverage.rs (new file, ~700 lines)
+- src/exchange/mod.rs (added leverage module)
+- src/lib.rs (added leverage helper exports)
+
+### Learnings:
+- UpdateLeverageAction uses action_type="updateLeverage" with asset, isCross, leverage fields
+- UpdateIsolatedMarginAction uses action_type="updateIsolatedMargin" with asset, isBuy, ntli fields
+- The ntli field for isolated margin is i64 (signed) - positive adds margin, negative removes margin
+- The ntli value is scaled (multiplied by 1e6 for USDC) - so 100 USDC = 100_000_000
+- Leverage must be validated to be > 0 before sending request (0 leverage is invalid)
+- Leverage response contains the updated leverage info with type (cross/isolated) and value
+- Isolated margin response is simpler - just confirms the action type was processed
+- Action types defined in types.rs (UpdateLeverageAction, UpdateIsolatedMarginAction) were already present
+---
+
+## US-023: Implement transfer endpoints
+**Status:** COMPLETED
+**Commit:** 1f491bb
+
+### What was done:
+- Created src/exchange/transfer.rs with Client method extensions for 5 endpoints:
+  - usd_transfer(wallet, destination, amount) - transfer USDC to another address
+  - spot_transfer(wallet, destination, token, amount) - transfer spot tokens to another address
+  - send_asset(wallet, destination, token, amount, time) - generalized transfer with chain info
+  - withdraw(wallet, destination, amount) - L1 withdrawal to Arbitrum
+  - spot_perp_transfer(wallet, amount, to_perp) - internal transfer between spot and perp accounts
+- All methods have _with_options() variants supporting optional vault_address for vault trading
+- Added SendAssetAction type to types.rs with hyperliquid_chain, signature_chain_id, and time fields
+- Added TransferExchangeRequest<T> wrapper for transfer-specific request format
+- Added response types:
+  - TransferResponse - API response wrapper
+  - TransferResponseData - response data with type and optional data fields
+  - TransferResultData - optional hash and nonce for transaction tracking
+- Added helper functions:
+  - is_transfer_successful(response) - check if transfer succeeded
+  - get_transfer_hash(response) - extract transaction hash from response
+- Added is_mainnet() method to Client for determining network (used by send_asset)
+- Re-exported helper functions from lib.rs
+- 35 unit tests with mocked responses
+
+### Files changed:
+- src/exchange/transfer.rs (new file, ~1850 lines)
+- src/exchange/mod.rs (added transfer module)
+- src/client.rs (added is_mainnet() method)
+- src/types.rs (added SendAssetAction)
+- src/lib.rs (added transfer helper exports)
+
+### Learnings:
+- UsdTransferAction uses action_type="usdTransfer" with destination and amount fields
+- SpotTransferAction uses action_type="spotTransfer" with destination, token, and amount fields
+- SendAssetAction uses action_type="sendAsset" with additional chain fields for cross-chain transfers
+  - hyperliquid_chain: "Mainnet" or "Testnet"
+  - signature_chain_id: "0xa4b1" (Arbitrum mainnet) or "0x66eee" (Arbitrum Sepolia)
+  - time: timestamp for the transfer (part of signature)
+- WithdrawAction uses action_type="withdraw3" (version 3 of the withdraw protocol)
+- SpotPerpTransferAction uses action_type="spotUser" with amount and to_perp fields
+- Transfer responses may have optional data with hash and nonce for tracking
+- Input validation prevents empty destination, token, or amount fields
+
+
+---
+
+## US-027: Implement misc exchange endpoints
+**Status:** COMPLETED
+**Commit:** 1c44fbf
+
+### What was done:
+- Created src/exchange/misc.rs with Client method extensions for 3 endpoints:
+  - reserve_request_weight(wallet, weight) - purchase additional rate limit capacity
+  - noop(wallet) - no-operation action for testing signatures
+  - set_hip3_enabled(wallet, enabled) - toggle HIP-3 abstraction mode
+- Added action types:
+  - ReserveRequestWeightAction - action_type="reserveRequestWeight" with weight field
+  - NoopAction - action_type="noop" with no additional fields
+  - SetHip3EnabledAction - action_type="setHip3Enabled" with enabled boolean
+- Added MiscExchangeRequest<T> wrapper for misc request format
+- Added response types:
+  - MiscResponse - API response wrapper
+  - MiscResponseData - response data with type and optional data fields
+  - MiscResultData - optional hash for transaction tracking
+- Added helper functions:
+  - is_misc_successful(response) - check if misc operation succeeded
+  - get_misc_hash(response) - extract transaction hash from response
+- Re-exported helper functions from lib.rs
+- 28 unit tests with mocked responses
+
+### Files changed:
+- src/exchange/misc.rs (new file, ~1065 lines)
+- src/exchange/mod.rs (added misc module)
+- src/lib.rs (added misc helper exports)
+
+### Learnings:
+- The misc endpoints follow the same signing pattern as other exchange endpoints
+- reserve_request_weight's weight parameter represents USDC amount to spend on rate limit
+- The noop action is useful for testing wallet connectivity and signature validity without side effects
+- HIP-3 abstraction mode simplifies certain trading operations when enabled
+- Weight must be > 0 for reserveRequestWeight (validation added)
+- SetHip3EnabledAction's enabled field is a simple boolean, no complex state management
+
+---
+
+## US-028: Implement WebSocket client foundation
+**Status:** COMPLETED
+**Commit:** 6f542b5
+
+### What was done:
+- Created src/websocket/ module structure for WebSocket implementations
+- Created src/websocket/client.rs with WsClient implementation:
+  - WsClient::new(network) / mainnet() / testnet() constructors
+  - WsClient::connect() - establish WebSocket connection
+  - WsClient::disconnect() - gracefully disconnect
+  - WsClient::close() - permanently close client
+  - WsClient::send_text(), send_json(), send_binary() for sending messages
+  - WsClient::recv(), try_recv() for receiving messages
+  - WsClient::state(), is_connected(), state_receiver() for state monitoring
+- Implemented ConnectionState enum with Display trait:
+  - Disconnected, Connecting, Connected, Reconnecting, Closed
+- Implemented ReconnectConfig with exponential backoff:
+  - enabled, initial_delay, max_delay, backoff_multiplier, max_attempts
+  - delay_for_attempt() and should_attempt() helper methods
+- Implemented automatic reconnection in reader task with configurable attempts
+- Implemented heartbeat/ping task sending periodic pings (30s interval)
+- WsMessage enum wrapping tungstenite Message types
+- Re-exported types from lib.rs: WsClient, WsMessage, ConnectionState, ReconnectConfig, MAINNET_WS_URL, TESTNET_WS_URL
+- 38 unit tests covering all functionality
+
+### Files changed:
+- src/websocket/mod.rs (new file, ~12 lines)
+- src/websocket/client.rs (new file, ~890 lines)
+- src/lib.rs (added websocket module exports)
+
+### Learnings:
+- tokio-tungstenite connect_async returns Result<(WebSocketStream, Response)>
+- WebSocketStream splits into SplitSink (send) and SplitStream (receive) using futures_util::StreamExt::split()
+- Use Arc<Mutex<Option<WsSink>>> pattern to allow sink replacement during reconnection
+- Watch channels are ideal for state broadcast - multiple receivers can subscribe
+- Reconnection logic in reader task allows seamless stream replacement
+- Heartbeat pings should only be sent when in Connected state
+- Error mapping from tungstenite::Error to custom Error requires matching all variants
+
+---
+
+## US-029: Implement subscription management
+**Status:** COMPLETED
+**Commit:** f11d4fc
+
+### What was done:
+- Created src/websocket/subscription.rs with comprehensive subscription management:
+  - Subscription enum with 19 subscription types covering all Hyperliquid WebSocket channels:
+    - Market data: allMids, l2Book, trades, candle, bbo, activeAssetCtx
+    - User data: notification, webData3, twapStates, clearinghouseState, openOrders
+    - User events: orderUpdates, userEvents, userFills, userFundings, userNonFundingLedgerUpdates,
+      activeAssetData, userTwapSliceFills, userTwapHistory
+  - Constructor methods for each subscription type (e.g., Subscription::trades("BTC"))
+  - Helper methods: channel_name(), is_user_subscription(), is_market_subscription(), user(), coin()
+- SubscriptionRequest struct for subscribe/unsubscribe message formatting
+  - SubscriptionMethod enum (Subscribe, Unsubscribe)
+  - Proper JSON serialization matching Hyperliquid's { "method": "subscribe", "subscription": {...} } format
+- SubscriptionManager for tracking subscription state:
+  - SubscriptionStatus enum: Pending, Active, Unsubscribing
+  - add_pending(), mark_active(), mark_unsubscribing(), remove() state transitions
+  - active_subscriptions(), all_subscriptions(), is_active(), contains() queries
+  - Thread-safe with Arc<RwLock<HashMap>> for concurrent access
+- ChannelMessage for parsing incoming WebSocket messages:
+  - is_subscription_response(), is_error(), parse_channel() helpers
+  - parse_data<T>() generic deserialization
+- SubscriptionResponse for parsing subscription confirmations
+- Added subscribe/unsubscribe methods to WsClient:
+  - subscribe(subscription) - send subscription request and track state
+  - unsubscribe(subscription) - send unsubscribe request and track state
+  - confirm_subscription(), confirm_unsubscription() - manual state management
+  - resubscribe_all() - restore subscriptions after reconnection
+  - unsubscribe_all() - unsubscribe from all channels
+  - clear_subscriptions() - clear tracking without server requests
+  - is_subscribed(), active_subscriptions(), subscription_count() - queries
+- Added Hash derive to CandleInterval for use in subscription HashMaps
+- Updated websocket/mod.rs to export all new types
+- 87 unit tests covering subscription types, serialization, and manager state machine
+
+### Files changed:
+- src/websocket/subscription.rs (new file, ~800 lines)
+- src/websocket/mod.rs (updated exports, ~30 lines)
+- src/websocket/client.rs (added subscription methods, ~170 lines)
+- src/types.rs (added Hash derive to CandleInterval)
+
+### Learnings:
+- Hyperliquid WebSocket subscription format: { "method": "subscribe/unsubscribe", "subscription": { "type": "...", ...params } }
+- Subscription types are tagged with camelCase naming via serde rename
+- Many subscriptions support optional dex parameter for filtering by perpetual DEX
+- User subscriptions require user address, market subscriptions require coin symbol
+- Subscriptions are identified by the full Subscription struct (not just channel name) for unique tracking
+- The SubscriptionManager uses a three-state machine (Pending → Active → Unsubscribing → Removed) for proper lifecycle
+- Clone of SubscriptionManager shares the same underlying state (Arc) which is useful for WsClient cloning
+- CandleInterval needed Hash derive since Subscription uses it as part of the enum and Subscription derives Hash
+
+
+---
+
+## US-031: Implement user data subscriptions
+**Status:** COMPLETED
+**Commit:** ad4d6ab
+
+### What was done:
+- Added WsClient convenience methods for user data subscriptions:
+  - subscribe_notification(user) - user notifications stream
+  - subscribe_web_data3(user) - aggregate user data (positions, orders, balances)
+  - subscribe_twap_states(user) - TWAP order state updates
+  - subscribe_twap_states_with_dex(user, dex) - TWAP states for specific DEX
+  - subscribe_clearinghouse_state(user) - account positions/margins updates
+  - subscribe_clearinghouse_state_with_dex(user, dex) - clearinghouse state for specific DEX
+  - subscribe_open_orders(user) - open orders updates
+  - subscribe_open_orders_with_dex(user, dex) - open orders for specific DEX
+- All methods leverage existing Subscription enum and subscribe() method
+- 38 unit tests covering:
+  - Not-connected error handling for all 8 methods
+  - Subscription creation for all subscription types
+  - JSON serialization verification
+  - is_user_subscription() validation
+  - Integration tests with real server (marked #[ignore])
+
+### Files changed:
+- src/websocket/client.rs (added ~589 lines of methods and tests)
+
+### Learnings:
+- The Subscription enum and constructor methods were already implemented in US-029
+- Convenience methods on WsClient provide a cleaner API by hiding Subscription construction
+- User data subscriptions require a user address (Ethereum address string)
+- Optional dex parameter filters subscriptions to specific perpetual DEXs
+- All user data subscriptions are marked as is_user_subscription() = true
+- The pattern follows US-030's market data subscription implementation
+
+---
+
+## US-032: Implement user event subscriptions
+**Status:** COMPLETED
+**Commit:** 9ce6d32
+
+### What was done:
+- Added WsClient convenience methods for user event subscriptions:
+  - subscribe_order_updates(user) - order status changes (placed, modified, filled, cancelled, rejected)
+  - subscribe_user_events(user) - general events (fills, funding, liquidations)
+  - subscribe_user_fills(user) - fill notifications when orders execute
+  - subscribe_user_fills_with_aggregation(user, aggregate_by_time) - fills with optional time-based aggregation
+  - subscribe_user_fundings(user) - funding payments for perpetual positions
+  - subscribe_user_non_funding_ledger_updates(user) - ledger updates (deposits, withdrawals, transfers, liquidations)
+  - subscribe_active_asset_data(user, coin) - user-specific data for a perpetual asset
+  - subscribe_user_twap_slice_fills(user) - TWAP order slice fills
+  - subscribe_user_twap_history(user) - TWAP order history updates
+- All methods leverage existing Subscription enum and subscribe() method
+- 36 unit tests covering:
+  - Not-connected error handling for all 9 methods
+  - Subscription creation for all subscription types
+  - JSON serialization verification
+  - is_user_subscription() validation
+  - Integration tests with real server (marked #[ignore])
+
+### Files changed:
+- src/websocket/client.rs (added ~671 lines of methods and tests)
+- scripts/ralph/prd.json (marked US-032 as passes: true)
+
+### Learnings:
+- The Subscription enum and constructor methods were already implemented in US-029
+- User event subscriptions complete PHASE-4 WebSocket implementation
+- subscribe_user_fills supports optional aggregateByTime parameter via the with_aggregation variant
+- subscribe_active_asset_data takes both user address and coin for position-specific data
+- All user event subscriptions are marked as is_user_subscription() = true
+- The pattern matches US-030 (market data) and US-031 (user data) implementations
+
+---
+
+## US-033: Set up web project with Rust backend
+**Status:** COMPLETED
+**Commit:** b2d868f
+
+### What was done:
+- Added demo-server binary to Cargo.toml with required-features = ["demo"]
+- Added optional dependencies: axum 0.7, tower-http 0.5 (cors, fs), tracing 0.1, tracing-subscriber 0.3
+- Created src/bin/demo_server/ directory structure:
+  - main.rs - Axum server with tracing, CORS, static file serving, and API routes
+  - state.rs - AppState struct wrapping SDK Client in Arc
+  - routes.rs - API routes with /api/info/perp-dexs and /api/info/meta endpoints
+- Created static/index.html with Bloomberg-style white theme:
+  - Clean white background with minimal borders
+  - Monospace fonts (SF Mono, Monaco, Inconsolata fallbacks)
+  - Sidebar navigation for endpoint categories
+  - Response panel with JSON display area
+  - JavaScript for fetching endpoints and displaying results
+- Configured CORS to allow any origin for demo purposes
+- Server runs on http://127.0.0.1:3000
+
+### Files changed:
+- Cargo.toml (added bin, features, optional dependencies)
+- src/bin/demo_server/main.rs (new file, ~60 lines)
+- src/bin/demo_server/state.rs (new file, ~25 lines)
+- src/bin/demo_server/routes.rs (new file, ~65 lines)
+- static/index.html (new file, ~330 lines)
+
+### Learnings:
+- Use required-features in [[bin]] to prevent compilation without feature flag
+- Axum 0.7 uses Router::with_state() for state injection
+- tower-http ServeDir with append_index_html_on_directories(true) serves index.html automatically
+- Client::new(Network::Mainnet) returns Result - need to unwrap/expect in AppState
+- CORS with tower-http: CorsLayer::new().allow_origin(Any).allow_methods(Any).allow_headers(Any)
+
+---
+
+## US-034: Create API endpoints for SDK functions
+**Status:** COMPLETED
+**Commit:** 03e0f82
+
+### What was done:
+- Expanded routes.rs to ~2400 lines with comprehensive REST API endpoints
+- Info endpoints (40+):
+  - Perpetuals: perp-dexs, meta, meta-and-asset-ctxs, all-perp-metas
+  - Spot: spot-meta, spot-meta-and-asset-ctxs, token-details, spot-deploy-state, spot-pair-deploy-auction-status
+  - Market data: all-mids, l2-book, candle
+  - User state: clearinghouse-state, spot-clearinghouse-state, open-orders, frontend-open-orders, historical-orders, order-status
+  - Fills: user-fills, user-fills-by-time, user-twap-slice-fills
+  - Funding: user-funding, funding-history, predicted-fundings
+  - Account: user-non-funding-ledger-updates, rate-limits, portfolio, user-fees, user-role, subaccounts
+  - Staking: staking-delegations, staking-summary, staking-history, staking-rewards
+  - Vault: vault-details, user-vaults, builder-fee-approval, referral, hip3-state, active-asset-data, perps-at-open-interest-cap, perp-dex-limits, perp-dex-status, perp-deploy-auction-status
+  - Borrow/lend: borrow-lend-user-state, borrow-lend-reserve-state, all-borrow-lend-reserve-states, aligned-quote-token
+- Exchange endpoints (25+):
+  - Orders: place-order, place-batch-orders, cancel-order, cancel-batch-orders, cancel-order-by-cloid, modify-order, modify-batch-orders
+  - TWAP: place-twap-order, cancel-twap-order
+  - Leverage: update-leverage, update-isolated-margin, schedule-cancel
+  - Transfers: usd-transfer, spot-transfer, withdraw, spot-perp-transfer
+  - Staking: stake-deposit, stake-withdraw, delegate, undelegate
+  - Vaults: vault-deposit, vault-withdraw
+  - Approvals: approve-agent, approve-builder-fee
+  - Misc: reserve-request-weight, noop, set-hip3-enabled
+- WebSocket proxy at /ws using tokio-tungstenite
+- Standard ApiResponse<T> wrapper with success/data/error format
+- Updated Cargo.toml to add axum ws feature
+- Updated response types with Serialize derive for JSON serialization
+
+### Files changed:
+- Cargo.toml (added axum ws feature)
+- src/bin/demo_server/main.rs (added WebSocket routes)
+- src/bin/demo_server/routes.rs (~2400 lines, complete rewrite)
+- src/bin/demo_server/state.rs (added is_mainnet field)
+- src/exchange/approval.rs (added Serialize to response types)
+- src/exchange/leverage.rs (added Serialize to response types)
+- src/exchange/misc.rs (added Serialize to response types)
+- src/exchange/schedule_cancel.rs (added Serialize to response types)
+- src/exchange/staking.rs (added Serialize to response types)
+- src/exchange/transfer.rs (added Serialize to response types)
+- src/exchange/vault.rs (added Serialize to response types)
+
+### Learnings:
+- Exchange response types needed Serialize derive added for JSON serialization in API responses
+- axum WebSocket support requires "ws" feature enabled
+- WebSocket proxy uses tokio-tungstenite for upstream connection and axum's ws extractor for client
+- AuthenticatedRequest<T> pattern with private_key field allows wallet signing for exchange endpoints
+- Query parameters via Axum's Query extractor with serde Deserialize structs
+- Standard ApiResponse wrapper provides consistent success/error format across all endpoints
+- WebSocket proxy bidirectionally forwards messages between client and Hyperliquid upstream
+- Into<String> trait bounds allow flexible parameter passing (String, &str, etc.)
+
+---
+
+## US-035: Design Bloomberg-style white theme UI
+**Status:** COMPLETED
+**Commit:** c113c82
+
+### What was done:
+- Redesigned static/index.html with comprehensive Bloomberg-inspired dashboard styling
+- Implemented CSS custom properties (CSS variables) for systematic design tokens:
+  - Color palette: bg-primary/secondary/tertiary, text-primary/secondary/tertiary, accent colors
+  - Spacing scale: 4px to 48px (xs to 3xl)
+  - Typography scale: 10px to 24px (xs to 3xl)
+- Professional financial dashboard aesthetic:
+  - Sticky top bar with logo and status indicators
+  - Sidebar navigation with collapsible sections
+  - Panel system with headers and actions
+  - Stats grid and data table components
+- Fully responsive design with four breakpoints:
+  - 1200px: stats grid adjustment
+  - 992px: sidebar width reduction, header stacking
+  - 768px: sidebar becomes horizontal, mobile navigation
+  - 480px: compact controls, reduced padding
+- Dynamic parameter forms for endpoints requiring input
+- Response panel with timing display, copy, and format actions
+- Custom scrollbar styling for WebKit browsers
+- Utility classes for common styling needs
+
+### Files changed:
+- static/index.html (~1160 lines, complete redesign)
+
+### Learnings:
+- CSS custom properties enable systematic design tokens that cascade properly
+- CSS variables with fallbacks: `var(--color, fallback)` for browser compatibility
+- :root selector is ideal for global CSS variable definitions
+- Responsive sidebar-to-horizontal-nav transformation works well for mobile financial dashboards
+- Border-left accent for active nav items provides clear visual hierarchy
+- monospace font stacks should include system fallbacks: SF Mono, Monaco, Inconsolata, Fira Mono, Consolas
+- Position: sticky on header requires explicit z-index for proper layering
+- calc() with viewport units (calc(100vh - 49px)) enables precise layout calculations
+- Font-smoothing properties (-webkit-font-smoothing: antialiased) improve monospace readability
+
+---
+
+## US-036: Build Info Endpoints demo section
+**Status:** COMPLETED
+**Commit:** f834f19
+
+### What was done:
+- Added comprehensive sidebar navigation for 48 info endpoints across 10 categories:
+  - Perpetuals (4): perp-dexs, meta, meta-and-asset-ctxs, all-perp-metas
+  - Spot (5): spot-meta, spot-meta-and-asset-ctxs, token-details, spot-deploy-state, pair-auction
+  - Market Data (3): all-mids, l2-book, candle
+  - User State (6): clearinghouse-state, spot-clearinghouse, open-orders, frontend-orders, historical-orders, order-status
+  - Fills (3): user-fills, user-fills-by-time, user-twap-slice-fills
+  - Funding (3): user-funding, funding-history, predicted-fundings
+  - Account (6): ledger-updates, rate-limits, portfolio, user-fees, user-role, subaccounts
+  - Staking (4): delegations, summary, history, rewards
+  - Vaults & Misc (10): vault-details, user-vaults, builder-fee-approval, referral, hip3-state, active-asset-data, perps-at-oi-cap, dex-limits, dex-status, deploy-auction
+  - Borrow/Lend (4): user-state, reserve-state, all-reserves, aligned-quote-token
+- Dynamic input forms with:
+  - Required/optional field indicators (red asterisk)
+  - Select dropdowns for enumerated options (candle intervals)
+  - Form help text for complex parameters
+  - Grid layout for compact multi-parameter forms
+- JSON syntax highlighting using VS Code dark theme colors:
+  - json-key: #9cdcfe (light blue)
+  - json-string: #ce9178 (orange)
+  - json-number: #b5cea8 (green)
+  - json-boolean: #569cd6 (blue)
+  - json-null: #569cd6 (blue)
+- Loading states with animated spinner
+- Error handling with red error styling
+- Response timing display in header
+- "Call Endpoint" / "Re-call" button functionality
+- Keyboard shortcut: Ctrl+Enter to call endpoint
+
+### Files changed:
+- static/index.html (~1730 lines, major expansion)
+
+### Learnings:
+- JavaScript regex-based JSON syntax highlighting is efficient for client-side rendering
+- Dark themed response area (#1e1e1e) provides good contrast for JSON highlighting
+- Select elements need same styling as input elements for visual consistency
+- Grid template columns with auto-fit and minmax creates responsive form layouts
+- Method badge colors (GET=green, POST=orange, WS=blue) follow REST API conventions
+- Loading spinner with CSS animation (border-top-color technique) is lightweight
+- Form validation can check required fields before making API calls
+- Event.preventDefault() is essential for keyboard shortcuts to avoid form submission
+
+---
+
+## US-037: Build Exchange Endpoints demo section
+**Status:** COMPLETED
+**Commit:** 2e41bb6
+
+### What was done:
+- Added 27 exchange endpoints organized in 7 sidebar categories:
+  - Orders (7): place-order, place-batch-orders, cancel-order, cancel-batch-orders, cancel-by-cloid, modify-order, modify-batch-orders
+  - TWAP (2): place-twap-order, cancel-twap-order
+  - Leverage (3): update-leverage, update-isolated-margin, schedule-cancel
+  - Transfers (4): usd-transfer, spot-transfer, withdraw, spot-perp-transfer
+  - Staking Actions (4): stake-deposit, stake-withdraw, delegate, undelegate
+  - Vault Actions (2): vault-deposit, vault-withdraw
+  - Approvals & Misc (5): approve-agent, approve-builder-fee, reserve-weight, noop, set-hip3-enabled
+- Added security warning banner for exchange endpoints with private key warning
+- Added CSS styling for warning banner, success/error status indicators, and orange button
+- Updated selectEndpoint() to show/hide warning banner and change button styling
+- Added convertParamTypes() function to convert string params to proper types:
+  - Boolean fields: mainnet, is_buy, is_cross, reduce_only, randomize, to_perp, enabled
+  - Integer fields: asset, oid, twap_id, leverage, ntli, weight, duration_minutes, timestamp_ms
+  - JSON array fields: orders, cancels, modifications
+- Updated callEndpoint() to apply type conversion for exchange endpoints
+- Added response status indicator showing Success/Error badge
+- All endpoints connect to existing backend API routes from US-034
+
+### Files changed:
+- static/index.html (+581 lines, -17 lines)
+- scripts/ralph/prd.json (marked US-037 as passes: true)
+
+### Learnings:
+- Select dropdowns for boolean fields (true/false) are more user-friendly than text inputs
+- Type conversion is necessary before JSON.stringify() since form values are always strings
+- Warning banners with icon + title + description pattern provide clear security guidance
+- Orange (#ff8b00) button color differentiates exchange actions from read-only info calls
+- Response status indicators (Success/Error) provide immediate visual feedback
+- The existing backend from US-034 already handles all exchange endpoints - no backend changes needed
+
+---
+
+## US-038: Build WebSocket demo section
+**Status:** COMPLETED
+**Commit:** 1d1f7a6
+
+### What was done:
+- Full WebSocket demo section with connection status indicator (disconnected/connecting/connected/error states with animated dots)
+- 19 subscription types organized in 3 categories (Market Data: 6, User Data: 5, User Events: 8)
+- Live data feed panel with collapsible JSON messages, syntax highlighting, and timestamps with milliseconds
+- Message history capped at 500 with newest-first display
+- Pause/resume functionality that queues messages when paused
+- Clear button to reset the feed
+- Form inputs for coin/interval/user address with validation
+- Active subscription tracking with visual indicators on toggle buttons
+- WebSocket connects directly to wss://api.hyperliquid.xyz/ws (not proxied through backend)
+
+### Files changed:
+- static/index.html (~3300 lines total, major WebSocket section addition)
+- scripts/ralph/prd.json (marked US-038 as passes: true)
+
+### Learnings:
+- Direct WebSocket connection from browser to Hyperliquid avoids proxy complexity
+- CSS animation with dots (. → .. → ...) creates effective "connecting" indicator
+- Timestamp formatting with toTimeString() and milliseconds provides useful debugging info
+- Message queue pattern (wsMessageQueue) allows buffering during pause without losing data
+- Set data structure (wsActiveSubscriptions) efficiently tracks active subscriptions
+- Collapsible JSON messages with details/summary HTML elements save screen space
+
+---
+
+## US-039: Final integration and testing
+**Status:** COMPLETED
+**Commit:** (pending)
+
+### What was done:
+- Verified all 76 SDK functions are accessible from demo UI (48 info, 27 exchange, 1 WebSocket demo)
+- Confirmed WebSocket subscriptions work in real-time with 19 subscription types
+- Verified error handling throughout application:
+  - Backend: ApiResponse wrapper with success/error fields, StatusCode::INTERNAL_SERVER_ERROR for failures
+  - Frontend: Visual error states, response status badges, WebSocket error handling
+- Created comprehensive README.md documentation:
+  - Quick start examples for info, exchange, and WebSocket usage
+  - API coverage tables listing all 48 info, 27 exchange, and 19 WebSocket endpoints
+  - Instructions for running the demo server
+  - Project structure overview
+  - Dependency list
+- All 730 unit tests passing (34 integration tests ignored as they require live server)
+
+### Files changed:
+- README.md (new file, ~280 lines)
+- scripts/ralph/prd.json (marked US-039 as passes: true)
+
+### Learnings:
+- Final integration testing requires checking both backend routes and frontend UI elements match
+- grep -c is useful for counting occurrences to verify feature parity (76 routes = 76 nav items)
+- README documentation should include working code examples, not just API references
+- Security warnings for exchange endpoints are critical - users should only use testnet keys in demos
+
