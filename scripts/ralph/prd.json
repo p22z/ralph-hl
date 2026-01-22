@@ -482,8 +482,8 @@
         "Unit tests for each subscription"
       ],
       "priority": 4,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed: WsClient convenience methods for user data subscriptions. subscribe_notification(user), subscribe_web_data3(user), subscribe_twap_states(user), subscribe_twap_states_with_dex(user, dex), subscribe_clearinghouse_state(user), subscribe_clearinghouse_state_with_dex(user, dex), subscribe_open_orders(user), and subscribe_open_orders_with_dex(user, dex) methods implemented. 38 unit tests covering not-connected errors, subscription creation, JSON serialization, and integration tests (marked with #[ignore])."
     },
     {
       "id": "US-032",
@@ -501,8 +501,8 @@
         "Unit tests for each subscription"
       ],
       "priority": 4,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed: WsClient convenience methods for user event subscriptions. subscribe_order_updates(user), subscribe_user_events(user), subscribe_user_fills(user), subscribe_user_fills_with_aggregation(user, aggregate_by_time), subscribe_user_fundings(user), subscribe_user_non_funding_ledger_updates(user), subscribe_active_asset_data(user, coin), subscribe_user_twap_slice_fills(user), and subscribe_user_twap_history(user) methods implemented. 36 unit tests covering not-connected errors, subscription creation, JSON serialization, and integration tests (marked with #[ignore])."
     },
     {
       "id": "US-033",

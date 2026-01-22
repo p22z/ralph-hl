@@ -1051,6 +1051,218 @@ impl WsClient {
             .await
     }
 
+    // ========================================================================
+    // User Event Subscription Methods
+    // ========================================================================
+
+    /// Subscribe to order status updates
+    ///
+    /// Receives real-time notifications when orders are placed, modified, filled,
+    /// cancelled, or rejected.
+    ///
+    /// # Arguments
+    ///
+    /// * `user` - The user's Ethereum address (e.g., "0x...")
+    ///
+    /// # Example
+    ///
+    /// ```ignore
+    /// use hyperliquid::websocket::WsClient;
+    ///
+    /// let client = WsClient::mainnet();
+    /// client.connect().await?;
+    /// client.subscribe_order_updates("0x1234567890123456789012345678901234567890").await?;
+    /// ```
+    pub async fn subscribe_order_updates(&self, user: impl Into<String>) -> Result<()> {
+        self.subscribe(Subscription::order_updates(user)).await
+    }
+
+    /// Subscribe to user events
+    ///
+    /// Receives general user events including fills, funding payments, and liquidations.
+    ///
+    /// # Arguments
+    ///
+    /// * `user` - The user's Ethereum address (e.g., "0x...")
+    ///
+    /// # Example
+    ///
+    /// ```ignore
+    /// use hyperliquid::websocket::WsClient;
+    ///
+    /// let client = WsClient::mainnet();
+    /// client.connect().await?;
+    /// client.subscribe_user_events("0x1234567890123456789012345678901234567890").await?;
+    /// ```
+    pub async fn subscribe_user_events(&self, user: impl Into<String>) -> Result<()> {
+        self.subscribe(Subscription::user_events(user)).await
+    }
+
+    /// Subscribe to user fills
+    ///
+    /// Receives real-time fill notifications when orders are executed.
+    ///
+    /// # Arguments
+    ///
+    /// * `user` - The user's Ethereum address (e.g., "0x...")
+    ///
+    /// # Example
+    ///
+    /// ```ignore
+    /// use hyperliquid::websocket::WsClient;
+    ///
+    /// let client = WsClient::mainnet();
+    /// client.connect().await?;
+    /// client.subscribe_user_fills("0x1234567890123456789012345678901234567890").await?;
+    /// ```
+    pub async fn subscribe_user_fills(&self, user: impl Into<String>) -> Result<()> {
+        self.subscribe(Subscription::user_fills(user)).await
+    }
+
+    /// Subscribe to user fills with aggregation option
+    ///
+    /// Receives real-time fill notifications with optional time-based aggregation.
+    ///
+    /// # Arguments
+    ///
+    /// * `user` - The user's Ethereum address (e.g., "0x...")
+    /// * `aggregate_by_time` - Whether to aggregate fills by time
+    ///
+    /// # Example
+    ///
+    /// ```ignore
+    /// use hyperliquid::websocket::WsClient;
+    ///
+    /// let client = WsClient::mainnet();
+    /// client.connect().await?;
+    /// client.subscribe_user_fills_with_aggregation("0x123...", true).await?;
+    /// ```
+    pub async fn subscribe_user_fills_with_aggregation(
+        &self,
+        user: impl Into<String>,
+        aggregate_by_time: bool,
+    ) -> Result<()> {
+        self.subscribe(Subscription::user_fills_with_aggregation(user, aggregate_by_time))
+            .await
+    }
+
+    /// Subscribe to user funding payments
+    ///
+    /// Receives real-time notifications of funding payments for perpetual positions.
+    ///
+    /// # Arguments
+    ///
+    /// * `user` - The user's Ethereum address (e.g., "0x...")
+    ///
+    /// # Example
+    ///
+    /// ```ignore
+    /// use hyperliquid::websocket::WsClient;
+    ///
+    /// let client = WsClient::mainnet();
+    /// client.connect().await?;
+    /// client.subscribe_user_fundings("0x1234567890123456789012345678901234567890").await?;
+    /// ```
+    pub async fn subscribe_user_fundings(&self, user: impl Into<String>) -> Result<()> {
+        self.subscribe(Subscription::user_fundings(user)).await
+    }
+
+    /// Subscribe to user non-funding ledger updates
+    ///
+    /// Receives real-time notifications for ledger updates that are not funding payments,
+    /// such as deposits, withdrawals, transfers, and liquidations.
+    ///
+    /// # Arguments
+    ///
+    /// * `user` - The user's Ethereum address (e.g., "0x...")
+    ///
+    /// # Example
+    ///
+    /// ```ignore
+    /// use hyperliquid::websocket::WsClient;
+    ///
+    /// let client = WsClient::mainnet();
+    /// client.connect().await?;
+    /// client.subscribe_user_non_funding_ledger_updates("0x1234567890123456789012345678901234567890").await?;
+    /// ```
+    pub async fn subscribe_user_non_funding_ledger_updates(
+        &self,
+        user: impl Into<String>,
+    ) -> Result<()> {
+        self.subscribe(Subscription::user_non_funding_ledger_updates(user))
+            .await
+    }
+
+    /// Subscribe to active asset data for a specific user and coin
+    ///
+    /// Receives real-time user-specific data for a particular perpetual asset,
+    /// including position details and unrealized PnL.
+    ///
+    /// # Arguments
+    ///
+    /// * `user` - The user's Ethereum address (e.g., "0x...")
+    /// * `coin` - The asset symbol (e.g., "BTC", "ETH")
+    ///
+    /// # Example
+    ///
+    /// ```ignore
+    /// use hyperliquid::websocket::WsClient;
+    ///
+    /// let client = WsClient::mainnet();
+    /// client.connect().await?;
+    /// client.subscribe_active_asset_data("0x1234567890123456789012345678901234567890", "BTC").await?;
+    /// ```
+    pub async fn subscribe_active_asset_data(
+        &self,
+        user: impl Into<String>,
+        coin: impl Into<String>,
+    ) -> Result<()> {
+        self.subscribe(Subscription::active_asset_data(user, coin))
+            .await
+    }
+
+    /// Subscribe to user TWAP slice fills
+    ///
+    /// Receives real-time notifications when TWAP order slices are filled.
+    ///
+    /// # Arguments
+    ///
+    /// * `user` - The user's Ethereum address (e.g., "0x...")
+    ///
+    /// # Example
+    ///
+    /// ```ignore
+    /// use hyperliquid::websocket::WsClient;
+    ///
+    /// let client = WsClient::mainnet();
+    /// client.connect().await?;
+    /// client.subscribe_user_twap_slice_fills("0x1234567890123456789012345678901234567890").await?;
+    /// ```
+    pub async fn subscribe_user_twap_slice_fills(&self, user: impl Into<String>) -> Result<()> {
+        self.subscribe(Subscription::user_twap_slice_fills(user)).await
+    }
+
+    /// Subscribe to user TWAP history
+    ///
+    /// Receives real-time updates to the user's TWAP order history.
+    ///
+    /// # Arguments
+    ///
+    /// * `user` - The user's Ethereum address (e.g., "0x...")
+    ///
+    /// # Example
+    ///
+    /// ```ignore
+    /// use hyperliquid::websocket::WsClient;
+    ///
+    /// let client = WsClient::mainnet();
+    /// client.connect().await?;
+    /// client.subscribe_user_twap_history("0x1234567890123456789012345678901234567890").await?;
+    /// ```
+    pub async fn subscribe_user_twap_history(&self, user: impl Into<String>) -> Result<()> {
+        self.subscribe(Subscription::user_twap_history(user)).await
+    }
+
     /// Receive the next message from the WebSocket
     ///
     /// Returns `None` if the connection is closed.
@@ -2447,6 +2659,461 @@ mod tests {
 
         // Verify all subscriptions are tracked
         assert!(client.subscription_manager().total_count().await >= 5);
+
+        client.close().await.unwrap();
+    }
+
+    // ============ User Event Subscription Methods - Not Connected Tests ============
+
+    #[tokio::test]
+    async fn test_subscribe_order_updates_not_connected() {
+        let client = WsClient::mainnet();
+        let result = client.subscribe_order_updates("0x1234567890123456789012345678901234567890").await;
+        assert!(result.is_err());
+        let err = result.unwrap_err();
+        assert!(err.to_string().contains("Not connected"));
+    }
+
+    #[tokio::test]
+    async fn test_subscribe_user_events_not_connected() {
+        let client = WsClient::mainnet();
+        let result = client.subscribe_user_events("0x1234567890123456789012345678901234567890").await;
+        assert!(result.is_err());
+        let err = result.unwrap_err();
+        assert!(err.to_string().contains("Not connected"));
+    }
+
+    #[tokio::test]
+    async fn test_subscribe_user_fills_not_connected() {
+        let client = WsClient::mainnet();
+        let result = client.subscribe_user_fills("0x1234567890123456789012345678901234567890").await;
+        assert!(result.is_err());
+        let err = result.unwrap_err();
+        assert!(err.to_string().contains("Not connected"));
+    }
+
+    #[tokio::test]
+    async fn test_subscribe_user_fills_with_aggregation_not_connected() {
+        let client = WsClient::mainnet();
+        let result = client.subscribe_user_fills_with_aggregation("0x123...", true).await;
+        assert!(result.is_err());
+        let err = result.unwrap_err();
+        assert!(err.to_string().contains("Not connected"));
+    }
+
+    #[tokio::test]
+    async fn test_subscribe_user_fundings_not_connected() {
+        let client = WsClient::mainnet();
+        let result = client.subscribe_user_fundings("0x1234567890123456789012345678901234567890").await;
+        assert!(result.is_err());
+        let err = result.unwrap_err();
+        assert!(err.to_string().contains("Not connected"));
+    }
+
+    #[tokio::test]
+    async fn test_subscribe_user_non_funding_ledger_updates_not_connected() {
+        let client = WsClient::mainnet();
+        let result = client.subscribe_user_non_funding_ledger_updates("0x1234567890123456789012345678901234567890").await;
+        assert!(result.is_err());
+        let err = result.unwrap_err();
+        assert!(err.to_string().contains("Not connected"));
+    }
+
+    #[tokio::test]
+    async fn test_subscribe_active_asset_data_not_connected() {
+        let client = WsClient::mainnet();
+        let result = client.subscribe_active_asset_data("0x1234567890123456789012345678901234567890", "BTC").await;
+        assert!(result.is_err());
+        let err = result.unwrap_err();
+        assert!(err.to_string().contains("Not connected"));
+    }
+
+    #[tokio::test]
+    async fn test_subscribe_user_twap_slice_fills_not_connected() {
+        let client = WsClient::mainnet();
+        let result = client.subscribe_user_twap_slice_fills("0x1234567890123456789012345678901234567890").await;
+        assert!(result.is_err());
+        let err = result.unwrap_err();
+        assert!(err.to_string().contains("Not connected"));
+    }
+
+    #[tokio::test]
+    async fn test_subscribe_user_twap_history_not_connected() {
+        let client = WsClient::mainnet();
+        let result = client.subscribe_user_twap_history("0x1234567890123456789012345678901234567890").await;
+        assert!(result.is_err());
+        let err = result.unwrap_err();
+        assert!(err.to_string().contains("Not connected"));
+    }
+
+    // ============ User Event Subscription Methods - Subscription Creation Tests ============
+
+    #[test]
+    fn test_subscription_order_updates_creates_correct_subscription() {
+        let sub = Subscription::order_updates("0x1234");
+        assert_eq!(sub.channel_name(), "orderUpdates");
+        assert_eq!(sub.user(), Some("0x1234"));
+        assert!(sub.is_user_subscription());
+        assert!(!sub.is_market_subscription());
+    }
+
+    #[test]
+    fn test_subscription_user_events_creates_correct_subscription() {
+        let sub = Subscription::user_events("0x5678");
+        assert_eq!(sub.channel_name(), "userEvents");
+        assert_eq!(sub.user(), Some("0x5678"));
+        assert!(sub.is_user_subscription());
+    }
+
+    #[test]
+    fn test_subscription_user_fills_creates_correct_subscription() {
+        let sub = Subscription::user_fills("0xabcd");
+        assert_eq!(sub.channel_name(), "userFills");
+        assert_eq!(sub.user(), Some("0xabcd"));
+        assert!(sub.is_user_subscription());
+    }
+
+    #[test]
+    fn test_subscription_user_fills_with_aggregation_creates_correct_subscription() {
+        let sub = Subscription::user_fills_with_aggregation("0xabcd", true);
+        assert_eq!(sub.channel_name(), "userFills");
+        assert_eq!(sub.user(), Some("0xabcd"));
+        if let Subscription::UserFills { user, aggregate_by_time } = sub {
+            assert_eq!(user, "0xabcd");
+            assert_eq!(aggregate_by_time, Some(true));
+        } else {
+            panic!("Expected UserFills subscription");
+        }
+    }
+
+    #[test]
+    fn test_subscription_user_fundings_creates_correct_subscription() {
+        let sub = Subscription::user_fundings("0xefgh");
+        assert_eq!(sub.channel_name(), "userFundings");
+        assert_eq!(sub.user(), Some("0xefgh"));
+        assert!(sub.is_user_subscription());
+    }
+
+    #[test]
+    fn test_subscription_user_non_funding_ledger_updates_creates_correct_subscription() {
+        let sub = Subscription::user_non_funding_ledger_updates("0xijkl");
+        assert_eq!(sub.channel_name(), "userNonFundingLedgerUpdates");
+        assert_eq!(sub.user(), Some("0xijkl"));
+        assert!(sub.is_user_subscription());
+    }
+
+    #[test]
+    fn test_subscription_active_asset_data_creates_correct_subscription() {
+        let sub = Subscription::active_asset_data("0xmnop", "BTC");
+        assert_eq!(sub.channel_name(), "activeAssetData");
+        assert_eq!(sub.user(), Some("0xmnop"));
+        assert_eq!(sub.coin(), Some("BTC"));
+        assert!(sub.is_user_subscription());
+    }
+
+    #[test]
+    fn test_subscription_user_twap_slice_fills_creates_correct_subscription() {
+        let sub = Subscription::user_twap_slice_fills("0xqrst");
+        assert_eq!(sub.channel_name(), "userTwapSliceFills");
+        assert_eq!(sub.user(), Some("0xqrst"));
+        assert!(sub.is_user_subscription());
+    }
+
+    #[test]
+    fn test_subscription_user_twap_history_creates_correct_subscription() {
+        let sub = Subscription::user_twap_history("0xuvwx");
+        assert_eq!(sub.channel_name(), "userTwapHistory");
+        assert_eq!(sub.user(), Some("0xuvwx"));
+        assert!(sub.is_user_subscription());
+    }
+
+    // ============ User Event Subscription JSON Serialization Tests ============
+
+    #[test]
+    fn test_subscribe_order_updates_serializes_correctly() {
+        let request = SubscriptionRequest::subscribe(Subscription::order_updates("0x1234"));
+        let json = serde_json::to_string(&request).unwrap();
+        assert!(json.contains("\"method\":\"subscribe\""));
+        assert!(json.contains("\"type\":\"orderUpdates\""));
+        assert!(json.contains("\"user\":\"0x1234\""));
+    }
+
+    #[test]
+    fn test_subscribe_user_events_serializes_correctly() {
+        let request = SubscriptionRequest::subscribe(Subscription::user_events("0x5678"));
+        let json = serde_json::to_string(&request).unwrap();
+        assert!(json.contains("\"method\":\"subscribe\""));
+        assert!(json.contains("\"type\":\"userEvents\""));
+        assert!(json.contains("\"user\":\"0x5678\""));
+    }
+
+    #[test]
+    fn test_subscribe_user_fills_serializes_correctly() {
+        let request = SubscriptionRequest::subscribe(Subscription::user_fills("0xabcd"));
+        let json = serde_json::to_string(&request).unwrap();
+        assert!(json.contains("\"method\":\"subscribe\""));
+        assert!(json.contains("\"type\":\"userFills\""));
+        assert!(json.contains("\"user\":\"0xabcd\""));
+    }
+
+    #[test]
+    fn test_subscribe_user_fills_with_aggregation_serializes_correctly() {
+        let request = SubscriptionRequest::subscribe(
+            Subscription::user_fills_with_aggregation("0xabcd", true)
+        );
+        let json = serde_json::to_string(&request).unwrap();
+        assert!(json.contains("\"type\":\"userFills\""));
+        assert!(json.contains("\"user\":\"0xabcd\""));
+        assert!(json.contains("\"aggregateByTime\":true"));
+    }
+
+    #[test]
+    fn test_subscribe_user_fundings_serializes_correctly() {
+        let request = SubscriptionRequest::subscribe(Subscription::user_fundings("0xefgh"));
+        let json = serde_json::to_string(&request).unwrap();
+        assert!(json.contains("\"method\":\"subscribe\""));
+        assert!(json.contains("\"type\":\"userFundings\""));
+        assert!(json.contains("\"user\":\"0xefgh\""));
+    }
+
+    #[test]
+    fn test_subscribe_user_non_funding_ledger_updates_serializes_correctly() {
+        let request = SubscriptionRequest::subscribe(
+            Subscription::user_non_funding_ledger_updates("0xijkl")
+        );
+        let json = serde_json::to_string(&request).unwrap();
+        assert!(json.contains("\"method\":\"subscribe\""));
+        assert!(json.contains("\"type\":\"userNonFundingLedgerUpdates\""));
+        assert!(json.contains("\"user\":\"0xijkl\""));
+    }
+
+    #[test]
+    fn test_subscribe_active_asset_data_serializes_correctly() {
+        let request = SubscriptionRequest::subscribe(
+            Subscription::active_asset_data("0xmnop", "BTC")
+        );
+        let json = serde_json::to_string(&request).unwrap();
+        assert!(json.contains("\"method\":\"subscribe\""));
+        assert!(json.contains("\"type\":\"activeAssetData\""));
+        assert!(json.contains("\"user\":\"0xmnop\""));
+        assert!(json.contains("\"coin\":\"BTC\""));
+    }
+
+    #[test]
+    fn test_subscribe_user_twap_slice_fills_serializes_correctly() {
+        let request = SubscriptionRequest::subscribe(
+            Subscription::user_twap_slice_fills("0xqrst")
+        );
+        let json = serde_json::to_string(&request).unwrap();
+        assert!(json.contains("\"method\":\"subscribe\""));
+        assert!(json.contains("\"type\":\"userTwapSliceFills\""));
+        assert!(json.contains("\"user\":\"0xqrst\""));
+    }
+
+    #[test]
+    fn test_subscribe_user_twap_history_serializes_correctly() {
+        let request = SubscriptionRequest::subscribe(
+            Subscription::user_twap_history("0xuvwx")
+        );
+        let json = serde_json::to_string(&request).unwrap();
+        assert!(json.contains("\"method\":\"subscribe\""));
+        assert!(json.contains("\"type\":\"userTwapHistory\""));
+        assert!(json.contains("\"user\":\"0xuvwx\""));
+    }
+
+    // ============ User Event Subscription is_user_subscription Tests ============
+
+    #[test]
+    fn test_all_user_event_subscriptions_are_user() {
+        let subscriptions = vec![
+            Subscription::order_updates("0x1234"),
+            Subscription::user_events("0x1234"),
+            Subscription::user_fills("0x1234"),
+            Subscription::user_fills_with_aggregation("0x1234", true),
+            Subscription::user_fundings("0x1234"),
+            Subscription::user_non_funding_ledger_updates("0x1234"),
+            Subscription::active_asset_data("0x1234", "BTC"),
+            Subscription::user_twap_slice_fills("0x1234"),
+            Subscription::user_twap_history("0x1234"),
+        ];
+
+        for sub in subscriptions {
+            assert!(sub.is_user_subscription(), "Expected {:?} to be a user subscription", sub);
+            assert!(!sub.is_market_subscription(), "Expected {:?} to NOT be a market subscription", sub);
+        }
+    }
+
+    // ============ User Event Subscription Integration Tests (require network) ============
+
+    #[tokio::test]
+    #[ignore]
+    async fn test_subscribe_order_updates_integration() {
+        let client = WsClient::mainnet();
+        client.connect().await.unwrap();
+
+        let result = client.subscribe_order_updates("0x1234567890123456789012345678901234567890").await;
+        assert!(result.is_ok());
+
+        // Check subscription is tracked
+        let sub = Subscription::order_updates("0x1234567890123456789012345678901234567890");
+        assert!(client.subscription_manager().contains(&sub).await);
+
+        client.close().await.unwrap();
+    }
+
+    #[tokio::test]
+    #[ignore]
+    async fn test_subscribe_user_events_integration() {
+        let client = WsClient::mainnet();
+        client.connect().await.unwrap();
+
+        let result = client.subscribe_user_events("0x1234567890123456789012345678901234567890").await;
+        assert!(result.is_ok());
+
+        // Check subscription is tracked
+        let sub = Subscription::user_events("0x1234567890123456789012345678901234567890");
+        assert!(client.subscription_manager().contains(&sub).await);
+
+        client.close().await.unwrap();
+    }
+
+    #[tokio::test]
+    #[ignore]
+    async fn test_subscribe_user_fills_integration() {
+        let client = WsClient::mainnet();
+        client.connect().await.unwrap();
+
+        let result = client.subscribe_user_fills("0x1234567890123456789012345678901234567890").await;
+        assert!(result.is_ok());
+
+        // Check subscription is tracked
+        let sub = Subscription::user_fills("0x1234567890123456789012345678901234567890");
+        assert!(client.subscription_manager().contains(&sub).await);
+
+        client.close().await.unwrap();
+    }
+
+    #[tokio::test]
+    #[ignore]
+    async fn test_subscribe_user_fills_with_aggregation_integration() {
+        let client = WsClient::mainnet();
+        client.connect().await.unwrap();
+
+        let result = client.subscribe_user_fills_with_aggregation(
+            "0x1234567890123456789012345678901234567890",
+            true
+        ).await;
+        assert!(result.is_ok());
+
+        client.close().await.unwrap();
+    }
+
+    #[tokio::test]
+    #[ignore]
+    async fn test_subscribe_user_fundings_integration() {
+        let client = WsClient::mainnet();
+        client.connect().await.unwrap();
+
+        let result = client.subscribe_user_fundings("0x1234567890123456789012345678901234567890").await;
+        assert!(result.is_ok());
+
+        // Check subscription is tracked
+        let sub = Subscription::user_fundings("0x1234567890123456789012345678901234567890");
+        assert!(client.subscription_manager().contains(&sub).await);
+
+        client.close().await.unwrap();
+    }
+
+    #[tokio::test]
+    #[ignore]
+    async fn test_subscribe_user_non_funding_ledger_updates_integration() {
+        let client = WsClient::mainnet();
+        client.connect().await.unwrap();
+
+        let result = client.subscribe_user_non_funding_ledger_updates("0x1234567890123456789012345678901234567890").await;
+        assert!(result.is_ok());
+
+        // Check subscription is tracked
+        let sub = Subscription::user_non_funding_ledger_updates("0x1234567890123456789012345678901234567890");
+        assert!(client.subscription_manager().contains(&sub).await);
+
+        client.close().await.unwrap();
+    }
+
+    #[tokio::test]
+    #[ignore]
+    async fn test_subscribe_active_asset_data_integration() {
+        let client = WsClient::mainnet();
+        client.connect().await.unwrap();
+
+        let result = client.subscribe_active_asset_data(
+            "0x1234567890123456789012345678901234567890",
+            "BTC"
+        ).await;
+        assert!(result.is_ok());
+
+        // Check subscription is tracked
+        let sub = Subscription::active_asset_data(
+            "0x1234567890123456789012345678901234567890",
+            "BTC"
+        );
+        assert!(client.subscription_manager().contains(&sub).await);
+
+        client.close().await.unwrap();
+    }
+
+    #[tokio::test]
+    #[ignore]
+    async fn test_subscribe_user_twap_slice_fills_integration() {
+        let client = WsClient::mainnet();
+        client.connect().await.unwrap();
+
+        let result = client.subscribe_user_twap_slice_fills("0x1234567890123456789012345678901234567890").await;
+        assert!(result.is_ok());
+
+        // Check subscription is tracked
+        let sub = Subscription::user_twap_slice_fills("0x1234567890123456789012345678901234567890");
+        assert!(client.subscription_manager().contains(&sub).await);
+
+        client.close().await.unwrap();
+    }
+
+    #[tokio::test]
+    #[ignore]
+    async fn test_subscribe_user_twap_history_integration() {
+        let client = WsClient::mainnet();
+        client.connect().await.unwrap();
+
+        let result = client.subscribe_user_twap_history("0x1234567890123456789012345678901234567890").await;
+        assert!(result.is_ok());
+
+        // Check subscription is tracked
+        let sub = Subscription::user_twap_history("0x1234567890123456789012345678901234567890");
+        assert!(client.subscription_manager().contains(&sub).await);
+
+        client.close().await.unwrap();
+    }
+
+    #[tokio::test]
+    #[ignore]
+    async fn test_subscribe_multiple_user_event_integration() {
+        let client = WsClient::mainnet();
+        client.connect().await.unwrap();
+
+        let user = "0x1234567890123456789012345678901234567890";
+
+        // Subscribe to multiple user event streams
+        client.subscribe_order_updates(user).await.unwrap();
+        client.subscribe_user_events(user).await.unwrap();
+        client.subscribe_user_fills(user).await.unwrap();
+        client.subscribe_user_fundings(user).await.unwrap();
+        client.subscribe_user_non_funding_ledger_updates(user).await.unwrap();
+        client.subscribe_active_asset_data(user, "BTC").await.unwrap();
+        client.subscribe_user_twap_slice_fills(user).await.unwrap();
+        client.subscribe_user_twap_history(user).await.unwrap();
+
+        // Verify all subscriptions are tracked
+        assert!(client.subscription_manager().total_count().await >= 8);
 
         client.close().await.unwrap();
     }
