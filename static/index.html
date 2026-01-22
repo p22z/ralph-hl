@@ -25,6 +25,15 @@
             --error: #de350b;
             --error-bg: #ffebe6;
 
+            /* JSON Syntax Highlighting */
+            --json-key: #0550ae;
+            --json-string: #0a3069;
+            --json-number: #0550ae;
+            --json-boolean: #cf222e;
+            --json-null: #6e7781;
+            --json-bracket: #1a1d21;
+            --json-punctuation: #5c6370;
+
             /* Typography */
             --font-mono: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Mono', 'Droid Sans Mono', 'Consolas', monospace;
             --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
@@ -153,7 +162,7 @@
 
         /* Sidebar */
         .sidebar {
-            width: 220px;
+            width: 260px;
             background-color: var(--bg-primary);
             border-right: 1px solid var(--border-light);
             display: flex;
@@ -178,6 +187,17 @@
             color: var(--text-tertiary);
             padding: 0 var(--space-lg) var(--space-sm);
             font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .nav-header-count {
+            font-size: var(--text-xs);
+            color: var(--text-tertiary);
+            background-color: var(--bg-tertiary);
+            padding: 1px 6px;
+            border-radius: 10px;
         }
 
         .nav-list {
@@ -186,7 +206,7 @@
 
         .nav-item {
             padding: var(--space-sm) var(--space-lg);
-            font-size: var(--text-md);
+            font-size: var(--text-sm);
             color: var(--text-secondary);
             cursor: pointer;
             transition: all 0.1s ease;
@@ -208,13 +228,14 @@
             font-weight: 500;
         }
 
-        .nav-item-count {
+        .nav-item-tag {
             margin-left: auto;
-            font-size: var(--text-xs);
+            font-size: 9px;
             color: var(--text-tertiary);
             background-color: var(--bg-tertiary);
-            padding: 1px 6px;
-            border-radius: 10px;
+            padding: 1px 5px;
+            border-radius: 3px;
+            text-transform: uppercase;
         }
 
         /* Main Content Area */
@@ -245,12 +266,32 @@
             font-weight: 600;
             color: var(--text-primary);
             margin-bottom: var(--space-xs);
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .endpoint-method {
+            font-size: var(--text-xs);
+            padding: 2px 6px;
+            background-color: var(--success);
+            color: white;
+            border-radius: 3px;
+            text-transform: uppercase;
+            font-weight: 600;
         }
 
         .content-description {
             font-size: var(--text-sm);
             color: var(--text-secondary);
             max-width: 600px;
+        }
+
+        .content-path {
+            font-size: var(--text-xs);
+            color: var(--text-tertiary);
+            margin-top: var(--space-xs);
+            font-family: var(--font-mono);
         }
 
         .content-actions {
@@ -273,13 +314,18 @@
             border: 1px solid transparent;
         }
 
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
         .btn-primary {
             background-color: var(--accent-primary);
             color: white;
             border-color: var(--accent-primary);
         }
 
-        .btn-primary:hover {
+        .btn-primary:hover:not(:disabled) {
             background-color: var(--accent-secondary);
             border-color: var(--accent-secondary);
         }
@@ -290,7 +336,7 @@
             border-color: var(--border-medium);
         }
 
-        .btn-secondary:hover {
+        .btn-secondary:hover:not(:disabled) {
             background-color: var(--bg-secondary);
         }
 
@@ -370,6 +416,10 @@
             letter-spacing: 0.5px;
         }
 
+        .form-label .required {
+            color: var(--error);
+        }
+
         .form-input {
             width: 100%;
             padding: var(--space-sm) var(--space-md);
@@ -392,13 +442,33 @@
             color: var(--text-tertiary);
         }
 
+        .form-help {
+            font-size: var(--text-xs);
+            color: var(--text-tertiary);
+            margin-top: var(--space-xs);
+        }
+
         .form-row {
-            display: flex;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: var(--space-lg);
         }
 
-        .form-row .form-group {
-            flex: 1;
+        .form-select {
+            width: 100%;
+            padding: var(--space-sm) var(--space-md);
+            font-family: var(--font-mono);
+            font-size: var(--text-md);
+            border: 1px solid var(--border-medium);
+            border-radius: 4px;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            cursor: pointer;
+        }
+
+        .form-select:focus {
+            outline: none;
+            border-color: var(--accent-primary);
         }
 
         /* Response Area */
@@ -411,12 +481,13 @@
 
         .response-area {
             flex: 1;
-            background-color: var(--bg-tertiary);
+            background-color: #1e1e1e;
             border-radius: 4px;
             padding: var(--space-lg);
             overflow: auto;
             font-size: var(--text-base);
             line-height: 1.6;
+            color: #d4d4d4;
         }
 
         .response-area pre {
@@ -431,6 +502,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            background-color: var(--bg-tertiary);
         }
 
         .response-area.error {
@@ -438,112 +510,30 @@
             color: var(--error);
         }
 
-        .response-area.success pre {
-            color: var(--text-primary);
+        /* JSON Syntax Highlighting (dark theme) */
+        .json-key { color: #9cdcfe; }
+        .json-string { color: #ce9178; }
+        .json-number { color: #b5cea8; }
+        .json-boolean { color: #569cd6; }
+        .json-null { color: #569cd6; }
+        .json-bracket { color: #d4d4d4; }
+        .json-punctuation { color: #d4d4d4; }
+
+        /* Loading Spinner */
+        .spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid var(--border-light);
+            border-top-color: var(--accent-primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-right: var(--space-sm);
         }
 
-        /* JSON Syntax Highlighting */
-        .json-key {
-            color: #0550ae;
-        }
-
-        .json-string {
-            color: #0a3069;
-        }
-
-        .json-number {
-            color: #0550ae;
-        }
-
-        .json-boolean {
-            color: #cf222e;
-        }
-
-        .json-null {
-            color: #6e7781;
-        }
-
-        /* Stats Grid */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: var(--space-lg);
-            margin-bottom: var(--space-lg);
-        }
-
-        .stat-card {
-            background-color: var(--bg-primary);
-            border: 1px solid var(--border-light);
-            border-radius: 6px;
-            padding: var(--space-lg);
-        }
-
-        .stat-label {
-            font-size: var(--text-xs);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: var(--text-tertiary);
-            margin-bottom: var(--space-xs);
-        }
-
-        .stat-value {
-            font-size: var(--text-2xl);
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        .stat-value.positive {
-            color: var(--success);
-        }
-
-        .stat-value.negative {
-            color: var(--error);
-        }
-
-        .stat-change {
-            font-size: var(--text-sm);
-            color: var(--text-secondary);
-            margin-top: var(--space-xs);
-        }
-
-        /* Data Table */
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: var(--text-sm);
-        }
-
-        .data-table th {
-            text-align: left;
-            padding: var(--space-sm) var(--space-md);
-            font-size: var(--text-xs);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: var(--text-tertiary);
-            border-bottom: 1px solid var(--border-light);
-            background-color: var(--bg-panel);
-            font-weight: 600;
-        }
-
-        .data-table td {
-            padding: var(--space-sm) var(--space-md);
-            border-bottom: 1px solid var(--border-light);
-            color: var(--text-primary);
-        }
-
-        .data-table tr:hover td {
-            background-color: var(--bg-secondary);
-        }
-
-        /* Keyboard Shortcuts */
-        kbd {
-            font-family: var(--font-mono);
-            font-size: var(--text-xs);
-            padding: 2px 6px;
-            background-color: var(--bg-tertiary);
-            border: 1px solid var(--border-medium);
-            border-radius: 3px;
-            color: var(--text-secondary);
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
         }
 
         /* Scrollbar Styling */
@@ -591,32 +581,35 @@
             color: var(--accent-primary);
         }
 
-        /* Loading Spinner */
-        .spinner {
-            width: 16px;
-            height: 16px;
-            border: 2px solid var(--border-light);
-            border-top-color: var(--accent-primary);
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
+        /* Keyboard shortcut hint */
+        .shortcut-hint {
+            font-size: var(--text-xs);
+            color: var(--text-tertiary);
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
         }
 
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
+        kbd {
+            font-family: var(--font-mono);
+            font-size: var(--text-xs);
+            padding: 2px 6px;
+            background-color: var(--bg-tertiary);
+            border: 1px solid var(--border-medium);
+            border-radius: 3px;
+            color: var(--text-secondary);
         }
 
         /* Responsive Design */
         @media (max-width: 1200px) {
-            .stats-grid {
+            .form-row {
                 grid-template-columns: repeat(2, 1fr);
             }
         }
 
         @media (max-width: 992px) {
             .sidebar {
-                width: 200px;
+                width: 220px;
             }
 
             .content-header {
@@ -652,7 +645,7 @@
                 width: 100%;
                 border-right: none;
                 border-bottom: 1px solid var(--border-light);
-                max-height: 200px;
+                max-height: 250px;
                 overflow-y: auto;
             }
 
@@ -671,6 +664,7 @@
                 padding: var(--space-xs) var(--space-md);
                 border-radius: 20px;
                 border-left: none;
+                font-size: var(--text-xs);
             }
 
             .nav-item.active {
@@ -679,7 +673,7 @@
                 color: white;
             }
 
-            .nav-item-count {
+            .nav-item-tag {
                 display: none;
             }
 
@@ -687,12 +681,8 @@
                 padding: var(--space-lg);
             }
 
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-
             .form-row {
-                flex-direction: column;
+                grid-template-columns: 1fr;
             }
 
             .footer {
@@ -735,37 +725,6 @@
         .text-mono {
             font-family: var(--font-mono);
         }
-
-        .text-right {
-            text-align: right;
-        }
-
-        .text-center {
-            text-align: center;
-        }
-
-        .text-success {
-            color: var(--success);
-        }
-
-        .text-error {
-            color: var(--error);
-        }
-
-        .text-warning {
-            color: var(--warning);
-        }
-
-        .text-muted {
-            color: var(--text-tertiary);
-        }
-
-        .mt-sm { margin-top: var(--space-sm); }
-        .mt-md { margin-top: var(--space-md); }
-        .mt-lg { margin-top: var(--space-lg); }
-        .mb-sm { margin-bottom: var(--space-sm); }
-        .mb-md { margin-bottom: var(--space-md); }
-        .mb-lg { margin-bottom: var(--space-lg); }
     </style>
 </head>
 <body>
@@ -788,34 +747,174 @@
     <div class="app-container">
         <!-- Sidebar Navigation -->
         <nav class="sidebar">
+            <!-- Perpetuals Metadata -->
             <div class="nav-section">
-                <div class="nav-header">Info Endpoints</div>
-                <ul class="nav-list" id="info-nav">
+                <div class="nav-header">
+                    Perpetuals
+                    <span class="nav-header-count">4</span>
+                </div>
+                <ul class="nav-list">
                     <li class="nav-item active" data-endpoint="perp-dexs">Perp DEXs</li>
                     <li class="nav-item" data-endpoint="meta">Meta</li>
+                    <li class="nav-item" data-endpoint="meta-and-asset-ctxs">Meta + Asset Ctxs</li>
+                    <li class="nav-item" data-endpoint="all-perp-metas">All Perp Metas</li>
+                </ul>
+            </div>
+
+            <!-- Spot Metadata -->
+            <div class="nav-section">
+                <div class="nav-header">
+                    Spot
+                    <span class="nav-header-count">5</span>
+                </div>
+                <ul class="nav-list">
+                    <li class="nav-item" data-endpoint="spot-meta">Spot Meta</li>
+                    <li class="nav-item" data-endpoint="spot-meta-and-asset-ctxs">Spot Meta + Ctxs</li>
+                    <li class="nav-item" data-endpoint="token-details">Token Details</li>
+                    <li class="nav-item" data-endpoint="spot-deploy-state">Spot Deploy State</li>
+                    <li class="nav-item" data-endpoint="spot-pair-deploy-auction">Pair Auction Status</li>
+                </ul>
+            </div>
+
+            <!-- Market Data -->
+            <div class="nav-section">
+                <div class="nav-header">
+                    Market Data
+                    <span class="nav-header-count">3</span>
+                </div>
+                <ul class="nav-list">
                     <li class="nav-item" data-endpoint="all-mids">All Mids</li>
                     <li class="nav-item" data-endpoint="l2-book">L2 Book</li>
+                    <li class="nav-item" data-endpoint="candle">Candles</li>
                 </ul>
             </div>
+
+            <!-- User State -->
             <div class="nav-section">
-                <div class="nav-header">User Data</div>
-                <ul class="nav-list" id="user-nav">
-                    <li class="nav-item" data-endpoint="clearinghouse">Clearinghouse</li>
+                <div class="nav-header">
+                    User State
+                    <span class="nav-header-count">6</span>
+                </div>
+                <ul class="nav-list">
+                    <li class="nav-item" data-endpoint="clearinghouse-state">Clearinghouse</li>
+                    <li class="nav-item" data-endpoint="spot-clearinghouse-state">Spot Clearinghouse</li>
                     <li class="nav-item" data-endpoint="open-orders">Open Orders</li>
+                    <li class="nav-item" data-endpoint="frontend-open-orders">Frontend Orders</li>
+                    <li class="nav-item" data-endpoint="historical-orders">Historical Orders</li>
+                    <li class="nav-item" data-endpoint="order-status">Order Status</li>
+                </ul>
+            </div>
+
+            <!-- User Fills -->
+            <div class="nav-section">
+                <div class="nav-header">
+                    Fills
+                    <span class="nav-header-count">3</span>
+                </div>
+                <ul class="nav-list">
                     <li class="nav-item" data-endpoint="user-fills">User Fills</li>
+                    <li class="nav-item" data-endpoint="user-fills-by-time">Fills by Time</li>
+                    <li class="nav-item" data-endpoint="user-twap-slice-fills">TWAP Slice Fills</li>
                 </ul>
             </div>
+
+            <!-- Funding -->
             <div class="nav-section">
-                <div class="nav-header">Exchange</div>
-                <ul class="nav-list" id="exchange-nav">
-                    <li class="nav-item" data-endpoint="place-order">Place Order</li>
-                    <li class="nav-item" data-endpoint="cancel-order">Cancel Order</li>
+                <div class="nav-header">
+                    Funding
+                    <span class="nav-header-count">3</span>
+                </div>
+                <ul class="nav-list">
+                    <li class="nav-item" data-endpoint="user-funding">User Funding</li>
+                    <li class="nav-item" data-endpoint="funding-history">Funding History</li>
+                    <li class="nav-item" data-endpoint="predicted-fundings">Predicted Fundings</li>
                 </ul>
             </div>
+
+            <!-- Account Info -->
             <div class="nav-section">
-                <div class="nav-header">WebSocket</div>
-                <ul class="nav-list" id="ws-nav">
-                    <li class="nav-item" data-endpoint="ws-demo">Live Data</li>
+                <div class="nav-header">
+                    Account
+                    <span class="nav-header-count">6</span>
+                </div>
+                <ul class="nav-list">
+                    <li class="nav-item" data-endpoint="user-non-funding-ledger">Ledger Updates</li>
+                    <li class="nav-item" data-endpoint="rate-limits">Rate Limits</li>
+                    <li class="nav-item" data-endpoint="portfolio">Portfolio</li>
+                    <li class="nav-item" data-endpoint="user-fees">User Fees</li>
+                    <li class="nav-item" data-endpoint="user-role">User Role</li>
+                    <li class="nav-item" data-endpoint="subaccounts">Subaccounts</li>
+                </ul>
+            </div>
+
+            <!-- Staking -->
+            <div class="nav-section">
+                <div class="nav-header">
+                    Staking
+                    <span class="nav-header-count">4</span>
+                </div>
+                <ul class="nav-list">
+                    <li class="nav-item" data-endpoint="staking-delegations">Delegations</li>
+                    <li class="nav-item" data-endpoint="staking-summary">Summary</li>
+                    <li class="nav-item" data-endpoint="staking-history">History</li>
+                    <li class="nav-item" data-endpoint="staking-rewards">Rewards</li>
+                </ul>
+            </div>
+
+            <!-- Vault & Misc -->
+            <div class="nav-section">
+                <div class="nav-header">
+                    Vaults & Misc
+                    <span class="nav-header-count">10</span>
+                </div>
+                <ul class="nav-list">
+                    <li class="nav-item" data-endpoint="vault-details">Vault Details</li>
+                    <li class="nav-item" data-endpoint="user-vaults">User Vaults</li>
+                    <li class="nav-item" data-endpoint="builder-fee-approval">Builder Fee Approval</li>
+                    <li class="nav-item" data-endpoint="referral">Referral</li>
+                    <li class="nav-item" data-endpoint="hip3-state">HIP-3 State</li>
+                    <li class="nav-item" data-endpoint="active-asset-data">Active Asset Data</li>
+                    <li class="nav-item" data-endpoint="perps-at-oi-cap">Perps at OI Cap</li>
+                    <li class="nav-item" data-endpoint="perp-dex-limits">DEX Limits</li>
+                    <li class="nav-item" data-endpoint="perp-dex-status">DEX Status</li>
+                    <li class="nav-item" data-endpoint="perp-deploy-auction">Deploy Auction</li>
+                </ul>
+            </div>
+
+            <!-- Borrow/Lend -->
+            <div class="nav-section">
+                <div class="nav-header">
+                    Borrow/Lend
+                    <span class="nav-header-count">4</span>
+                </div>
+                <ul class="nav-list">
+                    <li class="nav-item" data-endpoint="borrow-lend-user-state">User State</li>
+                    <li class="nav-item" data-endpoint="borrow-lend-reserve-state">Reserve State</li>
+                    <li class="nav-item" data-endpoint="all-borrow-lend-reserves">All Reserves</li>
+                    <li class="nav-item" data-endpoint="aligned-quote-token">Aligned Quote Token</li>
+                </ul>
+            </div>
+
+            <!-- Exchange (Placeholder) -->
+            <div class="nav-section">
+                <div class="nav-header">
+                    Exchange
+                    <span class="nav-header-count">2</span>
+                </div>
+                <ul class="nav-list">
+                    <li class="nav-item" data-endpoint="place-order">Place Order<span class="nav-item-tag">POST</span></li>
+                    <li class="nav-item" data-endpoint="cancel-order">Cancel Order<span class="nav-item-tag">POST</span></li>
+                </ul>
+            </div>
+
+            <!-- WebSocket -->
+            <div class="nav-section">
+                <div class="nav-header">
+                    WebSocket
+                    <span class="nav-header-count">1</span>
+                </div>
+                <ul class="nav-list">
+                    <li class="nav-item" data-endpoint="ws-demo">Live Data<span class="nav-item-tag">WS</span></li>
                 </ul>
             </div>
         </nav>
@@ -825,12 +924,19 @@
             <!-- Content Header -->
             <div class="content-header">
                 <div class="content-title-section">
-                    <h1 class="content-title" id="endpoint-title">Perp DEXs</h1>
+                    <h1 class="content-title">
+                        <span id="endpoint-title">Perp DEXs</span>
+                        <span class="endpoint-method" id="endpoint-method">GET</span>
+                    </h1>
                     <p class="content-description" id="endpoint-description">
                         Retrieve all perpetual DEXs available on Hyperliquid. Returns DEX names, their indices, and configuration details.
                     </p>
+                    <p class="content-path" id="endpoint-path">/api/info/perp-dexs</p>
                 </div>
                 <div class="content-actions">
+                    <div class="shortcut-hint">
+                        <kbd>Ctrl</kbd><span>+</span><kbd>Enter</kbd>
+                    </div>
                     <button class="btn btn-secondary" id="copy-btn" title="Copy response">
                         Copy
                     </button>
@@ -847,7 +953,7 @@
                     <div class="panel-header">
                         <span class="panel-title">
                             Parameters
-                            <span class="panel-title-tag">Optional</span>
+                            <span class="panel-title-tag" id="params-tag">Required</span>
                         </span>
                     </div>
                     <div class="panel-body">
@@ -890,38 +996,133 @@
     </footer>
 
     <script>
-        // Endpoint configuration
+        // Endpoint configuration - comprehensive list of all info endpoints
         const endpoints = {
+            // === PERPETUALS METADATA ===
             'perp-dexs': {
                 title: 'Perp DEXs',
                 description: 'Retrieve all perpetual DEXs available on Hyperliquid. Returns DEX names, their indices, and configuration details.',
                 url: '/api/info/perp-dexs',
+                method: 'GET',
                 params: []
             },
             'meta': {
                 title: 'Meta',
                 description: 'Get perpetual metadata including available assets, their parameters, margin requirements, and trading limits.',
                 url: '/api/info/meta',
+                method: 'GET',
+                params: [
+                    { name: 'dex', label: 'DEX', placeholder: 'Optional DEX filter', required: false }
+                ]
+            },
+            'meta-and-asset-ctxs': {
+                title: 'Meta and Asset Contexts',
+                description: 'Get perpetual metadata along with current asset contexts including mark price, funding rate, and open interest.',
+                url: '/api/info/meta-and-asset-ctxs',
+                method: 'GET',
+                params: [
+                    { name: 'dex', label: 'DEX', placeholder: 'Optional DEX filter', required: false }
+                ]
+            },
+            'all-perp-metas': {
+                title: 'All Perp Metas',
+                description: 'Get metadata for all perpetual assets across all DEXs.',
+                url: '/api/info/all-perp-metas',
+                method: 'GET',
                 params: []
             },
+
+            // === SPOT METADATA ===
+            'spot-meta': {
+                title: 'Spot Meta',
+                description: 'Get spot market metadata including token information and trading pairs.',
+                url: '/api/info/spot-meta',
+                method: 'GET',
+                params: []
+            },
+            'spot-meta-and-asset-ctxs': {
+                title: 'Spot Meta and Asset Contexts',
+                description: 'Get spot metadata with current market contexts for all spot assets.',
+                url: '/api/info/spot-meta-and-asset-ctxs',
+                method: 'GET',
+                params: []
+            },
+            'token-details': {
+                title: 'Token Details',
+                description: 'Get detailed information about a specific spot token.',
+                url: '/api/info/token-details',
+                method: 'GET',
+                params: [
+                    { name: 'token_id', label: 'Token ID', placeholder: 'e.g., 1', required: true, help: 'The token index or identifier' }
+                ]
+            },
+            'spot-deploy-state': {
+                title: 'Spot Deploy State',
+                description: 'Get the current spot token deployment auction state for a user.',
+                url: '/api/info/spot-deploy-state',
+                method: 'GET',
+                params: [
+                    { name: 'user', label: 'User Address', placeholder: '0x...', required: true }
+                ]
+            },
+            'spot-pair-deploy-auction': {
+                title: 'Spot Pair Deploy Auction',
+                description: 'Get the current status of the spot pair deployment auction.',
+                url: '/api/info/spot-pair-deploy-auction-status',
+                method: 'GET',
+                params: []
+            },
+
+            // === MARKET DATA ===
             'all-mids': {
                 title: 'All Mids',
                 description: 'Get all mid prices for perpetual assets. Returns a mapping of asset names to their current mid prices.',
                 url: '/api/info/all-mids',
-                params: []
+                method: 'GET',
+                params: [
+                    { name: 'dex', label: 'DEX', placeholder: 'Optional DEX filter', required: false }
+                ]
             },
             'l2-book': {
                 title: 'L2 Book',
                 description: 'Get the Level 2 order book snapshot for a specific asset. Returns bids and asks with price and size.',
                 url: '/api/info/l2-book',
+                method: 'GET',
                 params: [
-                    { name: 'coin', label: 'Coin', placeholder: 'BTC', required: true }
+                    { name: 'coin', label: 'Coin', placeholder: 'BTC', required: true, help: 'Asset symbol (e.g., BTC, ETH)' },
+                    { name: 'n_sig_figs', label: 'Sig Figs', placeholder: '2-5', required: false, help: 'Number of significant figures for price aggregation' },
+                    { name: 'mantissa', label: 'Mantissa', placeholder: 'Optional', required: false, help: 'Mantissa for price aggregation' }
                 ]
             },
-            'clearinghouse': {
+            'candle': {
+                title: 'Candles',
+                description: 'Get OHLCV candlestick data for a specific asset and time interval.',
+                url: '/api/info/candle',
+                method: 'GET',
+                params: [
+                    { name: 'coin', label: 'Coin', placeholder: 'BTC', required: true },
+                    { name: 'interval', label: 'Interval', placeholder: '1m, 5m, 15m, 1h, 4h, 1d', required: true, type: 'select', options: ['1m', '5m', '15m', '1h', '4h', '1d'] },
+                    { name: 'start_time', label: 'Start Time', placeholder: 'Unix timestamp (ms)', required: true, help: 'Start time in milliseconds' },
+                    { name: 'end_time', label: 'End Time', placeholder: 'Unix timestamp (ms)', required: false, help: 'Optional end time in milliseconds' }
+                ]
+            },
+
+            // === USER STATE ===
+            'clearinghouse-state': {
                 title: 'Clearinghouse State',
-                description: 'Get the clearinghouse state for a user, including positions, margin summary, and account value.',
+                description: 'Get the perpetual clearinghouse state for a user including positions, margin summary, and account value.',
                 url: '/api/info/clearinghouse-state',
+                method: 'GET',
+                params: [
+                    { name: 'user', label: 'User Address', placeholder: '0x...', required: true },
+                    { name: 'dex', label: 'DEX', placeholder: 'Optional', required: false }
+                ]
+            },
+            'spot-clearinghouse-state': {
+                title: 'Spot Clearinghouse State',
+                description: 'Get the spot clearinghouse state for a user including token balances.',
+                url: '/api/info/spot-clearinghouse-state',
+                method: 'GET',
                 params: [
                     { name: 'user', label: 'User Address', placeholder: '0x...', required: true }
                 ]
@@ -930,18 +1131,331 @@
                 title: 'Open Orders',
                 description: 'Get all open orders for a user. Returns order details including price, size, and status.',
                 url: '/api/info/open-orders',
+                method: 'GET',
+                params: [
+                    { name: 'user', label: 'User Address', placeholder: '0x...', required: true },
+                    { name: 'dex', label: 'DEX', placeholder: 'Optional', required: false }
+                ]
+            },
+            'frontend-open-orders': {
+                title: 'Frontend Open Orders',
+                description: 'Get open orders with additional frontend-specific information.',
+                url: '/api/info/frontend-open-orders',
+                method: 'GET',
+                params: [
+                    { name: 'user', label: 'User Address', placeholder: '0x...', required: true },
+                    { name: 'dex', label: 'DEX', placeholder: 'Optional', required: false }
+                ]
+            },
+            'historical-orders': {
+                title: 'Historical Orders',
+                description: 'Get historical orders for a user including filled and cancelled orders.',
+                url: '/api/info/historical-orders',
+                method: 'GET',
                 params: [
                     { name: 'user', label: 'User Address', placeholder: '0x...', required: true }
                 ]
             },
+            'order-status': {
+                title: 'Order Status',
+                description: 'Get the status of a specific order by order ID or client order ID.',
+                url: '/api/info/order-status',
+                method: 'GET',
+                params: [
+                    { name: 'user', label: 'User Address', placeholder: '0x...', required: true },
+                    { name: 'oid', label: 'Order ID', placeholder: 'Numeric OID', required: false },
+                    { name: 'cloid', label: 'Client Order ID', placeholder: 'Client-provided ID', required: false, help: 'Provide either OID or Client Order ID' }
+                ]
+            },
+
+            // === USER FILLS ===
             'user-fills': {
                 title: 'User Fills',
                 description: 'Get recent fills for a user. Returns trade history with prices, sizes, and timestamps.',
                 url: '/api/info/user-fills',
+                method: 'GET',
+                params: [
+                    { name: 'user', label: 'User Address', placeholder: '0x...', required: true },
+                    { name: 'dex', label: 'DEX', placeholder: 'Optional', required: false }
+                ]
+            },
+            'user-fills-by-time': {
+                title: 'User Fills by Time',
+                description: 'Get user fills within a specific time range.',
+                url: '/api/info/user-fills-by-time',
+                method: 'GET',
+                params: [
+                    { name: 'user', label: 'User Address', placeholder: '0x...', required: true },
+                    { name: 'start_time', label: 'Start Time', placeholder: 'Unix timestamp (ms)', required: true },
+                    { name: 'end_time', label: 'End Time', placeholder: 'Unix timestamp (ms)', required: false }
+                ]
+            },
+            'user-twap-slice-fills': {
+                title: 'TWAP Slice Fills',
+                description: 'Get TWAP order slice fills for a user.',
+                url: '/api/info/user-twap-slice-fills',
+                method: 'GET',
                 params: [
                     { name: 'user', label: 'User Address', placeholder: '0x...', required: true }
                 ]
             },
+
+            // === FUNDING ===
+            'user-funding': {
+                title: 'User Funding',
+                description: 'Get funding payment history for a user within a time range.',
+                url: '/api/info/user-funding',
+                method: 'GET',
+                params: [
+                    { name: 'user', label: 'User Address', placeholder: '0x...', required: true },
+                    { name: 'start_time', label: 'Start Time', placeholder: 'Unix timestamp (ms)', required: true },
+                    { name: 'end_time', label: 'End Time', placeholder: 'Unix timestamp (ms)', required: false }
+                ]
+            },
+            'funding-history': {
+                title: 'Funding History',
+                description: 'Get historical funding rates for a specific perpetual asset.',
+                url: '/api/info/funding-history',
+                method: 'GET',
+                params: [
+                    { name: 'coin', label: 'Coin', placeholder: 'BTC', required: true },
+                    { name: 'start_time', label: 'Start Time', placeholder: 'Unix timestamp (ms)', required: true },
+                    { name: 'end_time', label: 'End Time', placeholder: 'Unix timestamp (ms)', required: false }
+                ]
+            },
+            'predicted-fundings': {
+                title: 'Predicted Fundings',
+                description: 'Get predicted next funding rates for all perpetual assets.',
+                url: '/api/info/predicted-fundings',
+                method: 'GET',
+                params: []
+            },
+
+            // === ACCOUNT INFO ===
+            'user-non-funding-ledger': {
+                title: 'Non-Funding Ledger Updates',
+                description: 'Get non-funding ledger updates (deposits, withdrawals, transfers, liquidations) for a user.',
+                url: '/api/info/user-non-funding-ledger-updates',
+                method: 'GET',
+                params: [
+                    { name: 'user', label: 'User Address', placeholder: '0x...', required: true },
+                    { name: 'start_time', label: 'Start Time', placeholder: 'Unix timestamp (ms)', required: true },
+                    { name: 'end_time', label: 'End Time', placeholder: 'Unix timestamp (ms)', required: false }
+                ]
+            },
+            'rate-limits': {
+                title: 'Rate Limits',
+                description: 'Get current API rate limit status for a user.',
+                url: '/api/info/rate-limits',
+                method: 'GET',
+                params: [
+                    { name: 'user', label: 'User Address', placeholder: '0x...', required: true }
+                ]
+            },
+            'portfolio': {
+                title: 'Portfolio',
+                description: 'Get portfolio summary for a user including total value and positions.',
+                url: '/api/info/portfolio',
+                method: 'GET',
+                params: [
+                    { name: 'user', label: 'User Address', placeholder: '0x...', required: true }
+                ]
+            },
+            'user-fees': {
+                title: 'User Fees',
+                description: 'Get fee structure and trading volume for a user.',
+                url: '/api/info/user-fees',
+                method: 'GET',
+                params: [
+                    { name: 'user', label: 'User Address', placeholder: '0x...', required: true }
+                ]
+            },
+            'user-role': {
+                title: 'User Role',
+                description: 'Get account role and permissions for a user.',
+                url: '/api/info/user-role',
+                method: 'GET',
+                params: [
+                    { name: 'user', label: 'User Address', placeholder: '0x...', required: true }
+                ]
+            },
+            'subaccounts': {
+                title: 'Subaccounts',
+                description: 'List all subaccounts associated with a master account.',
+                url: '/api/info/subaccounts',
+                method: 'GET',
+                params: [
+                    { name: 'user', label: 'User Address', placeholder: '0x...', required: true }
+                ]
+            },
+
+            // === STAKING ===
+            'staking-delegations': {
+                title: 'Staking Delegations',
+                description: 'Get staking delegations for a user including validators and amounts.',
+                url: '/api/info/staking-delegations',
+                method: 'GET',
+                params: [
+                    { name: 'user', label: 'User Address', placeholder: '0x...', required: true }
+                ]
+            },
+            'staking-summary': {
+                title: 'Staking Summary',
+                description: 'Get overall staking summary for a user including total staked and rewards.',
+                url: '/api/info/staking-summary',
+                method: 'GET',
+                params: [
+                    { name: 'user', label: 'User Address', placeholder: '0x...', required: true }
+                ]
+            },
+            'staking-history': {
+                title: 'Staking History',
+                description: 'Get staking action history (delegate, undelegate, claim) for a user.',
+                url: '/api/info/staking-history',
+                method: 'GET',
+                params: [
+                    { name: 'user', label: 'User Address', placeholder: '0x...', required: true }
+                ]
+            },
+            'staking-rewards': {
+                title: 'Staking Rewards',
+                description: 'Get earned staking rewards organized by validator.',
+                url: '/api/info/staking-rewards',
+                method: 'GET',
+                params: [
+                    { name: 'user', label: 'User Address', placeholder: '0x...', required: true }
+                ]
+            },
+
+            // === VAULTS & MISC ===
+            'vault-details': {
+                title: 'Vault Details',
+                description: 'Get detailed information about a specific vault including TVL, performance, and configuration.',
+                url: '/api/info/vault-details',
+                method: 'GET',
+                params: [
+                    { name: 'vault_address', label: 'Vault Address', placeholder: '0x...', required: true }
+                ]
+            },
+            'user-vaults': {
+                title: 'User Vaults',
+                description: 'Get vault deposits and equity shares for a user.',
+                url: '/api/info/user-vaults',
+                method: 'GET',
+                params: [
+                    { name: 'user', label: 'User Address', placeholder: '0x...', required: true }
+                ]
+            },
+            'builder-fee-approval': {
+                title: 'Builder Fee Approval',
+                description: 'Check if a user has approved a builder for fee collection.',
+                url: '/api/info/builder-fee-approval',
+                method: 'GET',
+                params: [
+                    { name: 'user', label: 'User Address', placeholder: '0x...', required: true },
+                    { name: 'builder', label: 'Builder Address', placeholder: '0x...', required: true }
+                ]
+            },
+            'referral': {
+                title: 'Referral',
+                description: 'Get referral code, referrer, and cumulative referral stats for a user.',
+                url: '/api/info/referral',
+                method: 'GET',
+                params: [
+                    { name: 'user', label: 'User Address', placeholder: '0x...', required: true }
+                ]
+            },
+            'hip3-state': {
+                title: 'HIP-3 State',
+                description: 'Get HIP-3 abstraction state for a user.',
+                url: '/api/info/hip3-state',
+                method: 'GET',
+                params: [
+                    { name: 'user', label: 'User Address', placeholder: '0x...', required: true }
+                ]
+            },
+            'active-asset-data': {
+                title: 'Active Asset Data',
+                description: 'Get user-specific data for a perpetual asset including leverage and available margin.',
+                url: '/api/info/active-asset-data',
+                method: 'GET',
+                params: [
+                    { name: 'user', label: 'User Address', placeholder: '0x...', required: true },
+                    { name: 'coin', label: 'Coin', placeholder: 'BTC', required: true }
+                ]
+            },
+            'perps-at-oi-cap': {
+                title: 'Perps at OI Cap',
+                description: 'List perpetual assets that are at their open interest cap.',
+                url: '/api/info/perps-at-open-interest-cap',
+                method: 'GET',
+                params: [
+                    { name: 'dex', label: 'DEX', placeholder: 'Optional', required: false }
+                ]
+            },
+            'perp-dex-limits': {
+                title: 'DEX Limits',
+                description: 'Get market limits configuration for a perpetual DEX.',
+                url: '/api/info/perp-dex-limits',
+                method: 'GET',
+                params: [
+                    { name: 'dex', label: 'DEX', placeholder: 'DEX name', required: true }
+                ]
+            },
+            'perp-dex-status': {
+                title: 'DEX Status',
+                description: 'Get status and statistics for a perpetual DEX.',
+                url: '/api/info/perp-dex-status',
+                method: 'GET',
+                params: [
+                    { name: 'dex', label: 'DEX', placeholder: 'DEX name', required: true }
+                ]
+            },
+            'perp-deploy-auction': {
+                title: 'Deploy Auction Status',
+                description: 'Get the current perpetual deployment auction status.',
+                url: '/api/info/perp-deploy-auction-status',
+                method: 'GET',
+                params: []
+            },
+
+            // === BORROW/LEND ===
+            'borrow-lend-user-state': {
+                title: 'Borrow/Lend User State',
+                description: 'Get borrow/lend positions and health factor for a user.',
+                url: '/api/info/borrow-lend-user-state',
+                method: 'GET',
+                params: [
+                    { name: 'user', label: 'User Address', placeholder: '0x...', required: true }
+                ]
+            },
+            'borrow-lend-reserve-state': {
+                title: 'Reserve State',
+                description: 'Get borrow/lend reserve state for a specific asset.',
+                url: '/api/info/borrow-lend-reserve-state',
+                method: 'GET',
+                params: [
+                    { name: 'coin', label: 'Coin', placeholder: 'USDC', required: true }
+                ]
+            },
+            'all-borrow-lend-reserves': {
+                title: 'All Reserve States',
+                description: 'Get borrow/lend reserve states for all assets.',
+                url: '/api/info/all-borrow-lend-reserve-states',
+                method: 'GET',
+                params: []
+            },
+            'aligned-quote-token': {
+                title: 'Aligned Quote Token',
+                description: 'Check if a coin is an aligned quote token.',
+                url: '/api/info/aligned-quote-token',
+                method: 'GET',
+                params: [
+                    { name: 'coin', label: 'Coin', placeholder: 'USDC', required: true }
+                ]
+            },
+
+            // === EXCHANGE (Placeholders) ===
             'place-order': {
                 title: 'Place Order',
                 description: 'Place a new order. Requires wallet authentication. This is a signed exchange action.',
@@ -969,10 +1483,13 @@
                 ],
                 isExchange: true
             },
+
+            // === WEBSOCKET ===
             'ws-demo': {
                 title: 'WebSocket Demo',
                 description: 'Real-time WebSocket subscriptions for market data and user events. Connect to receive live updates.',
                 url: null,
+                method: 'WS',
                 params: []
             }
         };
@@ -982,11 +1499,14 @@
         // DOM Elements
         const paramsPanel = document.getElementById('params-panel');
         const paramsForm = document.getElementById('params-form');
+        const paramsTag = document.getElementById('params-tag');
         const responseArea = document.getElementById('response-area');
         const responseContent = document.getElementById('response-content');
         const responseTime = document.getElementById('response-time');
         const endpointTitle = document.getElementById('endpoint-title');
         const endpointDescription = document.getElementById('endpoint-description');
+        const endpointPath = document.getElementById('endpoint-path');
+        const endpointMethod = document.getElementById('endpoint-method');
         const callBtn = document.getElementById('call-btn');
         const copyBtn = document.getElementById('copy-btn');
         const formatBtn = document.getElementById('format-btn');
@@ -1014,13 +1534,20 @@
 
             endpointTitle.textContent = config.title;
             endpointDescription.textContent = config.description;
-            responseContent.textContent = 'Click "Call Endpoint" to see the response.';
+            endpointPath.textContent = config.url || 'WebSocket connection';
+            endpointMethod.textContent = config.method;
+            endpointMethod.style.backgroundColor = config.method === 'POST' ? 'var(--warning)' :
+                                                    config.method === 'WS' ? 'var(--accent-primary)' : 'var(--success)';
+
+            responseContent.innerHTML = 'Click "Call Endpoint" to see the response.';
             responseArea.className = 'response-area';
             responseTime.textContent = '';
 
             // Update params panel
             if (config.params && config.params.length > 0) {
                 paramsPanel.classList.remove('hidden');
+                const hasRequired = config.params.some(p => p.required);
+                paramsTag.textContent = hasRequired ? 'Required' : 'Optional';
                 renderParamsForm(config.params);
             } else {
                 paramsPanel.classList.add('hidden');
@@ -1038,24 +1565,47 @@
 
         // Render parameter form
         function renderParamsForm(params) {
-            paramsForm.innerHTML = params.map(param => `
-                <div class="form-group">
-                    <label class="form-label">${param.label}${param.required ? ' *' : ''}</label>
-                    <input
+            const rows = [];
+            let currentRow = [];
+
+            params.forEach((param, index) => {
+                const inputHtml = param.type === 'select'
+                    ? `<select class="form-select" name="${param.name}" ${param.required ? 'required' : ''}>
+                        <option value="">Select ${param.label}</option>
+                        ${param.options.map(opt => `<option value="${opt}">${opt}</option>`).join('')}
+                       </select>`
+                    : `<input
                         type="${param.type || 'text'}"
                         class="form-input"
                         name="${param.name}"
                         placeholder="${param.placeholder}"
                         ${param.required ? 'required' : ''}
-                    >
-                </div>
-            `).join('');
+                    >`;
+
+                const html = `
+                    <div class="form-group">
+                        <label class="form-label">${param.label}${param.required ? ' <span class="required">*</span>' : ''}</label>
+                        ${inputHtml}
+                        ${param.help ? `<div class="form-help">${param.help}</div>` : ''}
+                    </div>
+                `;
+
+                currentRow.push(html);
+
+                // Create rows of 2-3 items for compact layout
+                if (currentRow.length === 3 || index === params.length - 1) {
+                    rows.push(`<div class="form-row">${currentRow.join('')}</div>`);
+                    currentRow = [];
+                }
+            });
+
+            paramsForm.innerHTML = rows.join('');
         }
 
         // Collect form parameters
         function collectParams() {
             const params = {};
-            paramsForm.querySelectorAll('.form-input').forEach(input => {
+            paramsForm.querySelectorAll('.form-input, .form-select').forEach(input => {
                 if (input.value) {
                     params[input.name] = input.value;
                 }
@@ -1063,11 +1613,33 @@
             return params;
         }
 
+        // JSON syntax highlighting
+        function syntaxHighlight(json) {
+            if (typeof json !== 'string') {
+                json = JSON.stringify(json, null, 2);
+            }
+            return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+                let cls = 'json-number';
+                if (/^"/.test(match)) {
+                    if (/:$/.test(match)) {
+                        cls = 'json-key';
+                    } else {
+                        cls = 'json-string';
+                    }
+                } else if (/true|false/.test(match)) {
+                    cls = 'json-boolean';
+                } else if (/null/.test(match)) {
+                    cls = 'json-null';
+                }
+                return '<span class="' + cls + '">' + match + '</span>';
+            });
+        }
+
         // Call endpoint
         async function callEndpoint() {
             const config = endpoints[currentEndpoint];
             if (!config.url) {
-                responseContent.textContent = 'This endpoint is not yet implemented.';
+                responseContent.innerHTML = 'This endpoint is not yet implemented.';
                 return;
             }
 
@@ -1079,12 +1651,12 @@
                 .map(p => p.label);
 
             if (missingParams.length > 0) {
-                responseContent.textContent = `Missing required parameters: ${missingParams.join(', ')}`;
+                responseContent.innerHTML = `<span class="json-string">Missing required parameters: ${missingParams.join(', ')}</span>`;
                 responseArea.className = 'response-area error';
                 return;
             }
 
-            responseContent.textContent = 'Loading...';
+            responseContent.innerHTML = '<div class="spinner"></div> Loading...';
             responseArea.className = 'response-area loading';
             const startTime = performance.now();
 
@@ -1108,12 +1680,12 @@
                 const duration = Math.round(performance.now() - startTime);
 
                 responseTime.textContent = `${duration}ms`;
-                responseContent.textContent = JSON.stringify(data, null, 2);
-                responseArea.className = data.success ? 'response-area success' : 'response-area error';
+                responseContent.innerHTML = syntaxHighlight(JSON.stringify(data, null, 2));
+                responseArea.className = data.success ? 'response-area' : 'response-area error';
             } catch (error) {
                 const duration = Math.round(performance.now() - startTime);
                 responseTime.textContent = `${duration}ms`;
-                responseContent.textContent = `Error: ${error.message}`;
+                responseContent.innerHTML = `<span class="json-string">Error: ${error.message}</span>`;
                 responseArea.className = 'response-area error';
             }
         }
@@ -1133,8 +1705,9 @@
         // Format JSON
         function formatJson() {
             try {
-                const json = JSON.parse(responseContent.textContent);
-                responseContent.textContent = JSON.stringify(json, null, 2);
+                const text = responseContent.textContent;
+                const json = JSON.parse(text);
+                responseContent.innerHTML = syntaxHighlight(JSON.stringify(json, null, 2));
             } catch (e) {
                 // Not valid JSON, ignore
             }
@@ -1145,9 +1718,10 @@
         copyBtn.addEventListener('click', copyResponse);
         formatBtn.addEventListener('click', formatJson);
 
-        // Keyboard shortcut: Enter to call endpoint
+        // Keyboard shortcut: Ctrl+Enter to call endpoint
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' && e.ctrlKey) {
+                e.preventDefault();
                 callEndpoint();
             }
         });
