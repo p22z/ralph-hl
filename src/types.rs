@@ -1368,6 +1368,15 @@ pub struct OrderDetails {
     pub orig_sz: Option<String>,
 }
 
+/// Historical order entry
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct HistoricalOrder {
+    pub order: OrderDetails,
+    pub status: String,
+    pub status_timestamp: u64,
+}
+
 /// Funding delta
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
