@@ -9,9 +9,10 @@ pub const MAINNET_URL: &str = "https://api.hyperliquid.xyz";
 pub const TESTNET_URL: &str = "https://api.hyperliquid-testnet.xyz";
 
 /// Network configuration
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub enum Network {
     /// Mainnet environment
+    #[default]
     Mainnet,
     /// Testnet environment
     Testnet,
@@ -27,11 +28,6 @@ impl Network {
     }
 }
 
-impl Default for Network {
-    fn default() -> Self {
-        Network::Mainnet
-    }
-}
 
 /// Hyperliquid API client
 #[derive(Debug, Clone)]

@@ -9,5 +9,6 @@ pub mod client;
 pub mod error;
 pub mod types;
 
-pub use client::Client;
+pub use client::{Client, Network, MAINNET_URL, TESTNET_URL};
 pub use error::{Error, Result};
+pub use types::*;
