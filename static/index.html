@@ -725,6 +725,75 @@
         .text-mono {
             font-family: var(--font-mono);
         }
+
+        /* Warning Banner for Exchange Endpoints */
+        .warning-banner {
+            background-color: var(--warning-bg);
+            border: 1px solid var(--warning);
+            border-radius: 4px;
+            padding: var(--space-md) var(--space-lg);
+            margin-bottom: var(--space-lg);
+            display: flex;
+            align-items: flex-start;
+            gap: var(--space-md);
+        }
+
+        .warning-banner-icon {
+            color: var(--warning);
+            font-size: var(--text-xl);
+            flex-shrink: 0;
+            line-height: 1;
+        }
+
+        .warning-banner-content {
+            flex: 1;
+        }
+
+        .warning-banner-title {
+            font-size: var(--text-md);
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: var(--space-xs);
+        }
+
+        .warning-banner-text {
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* Success/Error Response Indicators */
+        .response-status {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-xs);
+            font-size: var(--text-sm);
+            padding: 2px 8px;
+            border-radius: 3px;
+            margin-left: var(--space-sm);
+        }
+
+        .response-status.success {
+            background-color: var(--success-bg);
+            color: var(--success);
+        }
+
+        .response-status.error {
+            background-color: var(--error-bg);
+            color: var(--error);
+        }
+
+        /* Execute Action button styling */
+        .btn-warning {
+            background-color: var(--warning);
+            color: white;
+            border-color: var(--warning);
+        }
+
+        .btn-warning:hover:not(:disabled) {
+            background-color: #e67e00;
+            border-color: #e67e00;
+        }
     </style>
 </head>
 <body>
@@ -895,15 +964,100 @@
                 </ul>
             </div>
 
-            <!-- Exchange (Placeholder) -->
+            <!-- Exchange: Order Management -->
             <div class="nav-section">
                 <div class="nav-header">
-                    Exchange
-                    <span class="nav-header-count">2</span>
+                    Orders
+                    <span class="nav-header-count">7</span>
                 </div>
                 <ul class="nav-list">
                     <li class="nav-item" data-endpoint="place-order">Place Order<span class="nav-item-tag">POST</span></li>
+                    <li class="nav-item" data-endpoint="place-batch-orders">Batch Orders<span class="nav-item-tag">POST</span></li>
                     <li class="nav-item" data-endpoint="cancel-order">Cancel Order<span class="nav-item-tag">POST</span></li>
+                    <li class="nav-item" data-endpoint="cancel-batch-orders">Batch Cancel<span class="nav-item-tag">POST</span></li>
+                    <li class="nav-item" data-endpoint="cancel-order-by-cloid">Cancel by CLOID<span class="nav-item-tag">POST</span></li>
+                    <li class="nav-item" data-endpoint="modify-order">Modify Order<span class="nav-item-tag">POST</span></li>
+                    <li class="nav-item" data-endpoint="modify-batch-orders">Batch Modify<span class="nav-item-tag">POST</span></li>
+                </ul>
+            </div>
+
+            <!-- Exchange: TWAP Orders -->
+            <div class="nav-section">
+                <div class="nav-header">
+                    TWAP
+                    <span class="nav-header-count">2</span>
+                </div>
+                <ul class="nav-list">
+                    <li class="nav-item" data-endpoint="place-twap-order">Place TWAP<span class="nav-item-tag">POST</span></li>
+                    <li class="nav-item" data-endpoint="cancel-twap-order">Cancel TWAP<span class="nav-item-tag">POST</span></li>
+                </ul>
+            </div>
+
+            <!-- Exchange: Leverage & Margin -->
+            <div class="nav-section">
+                <div class="nav-header">
+                    Leverage
+                    <span class="nav-header-count">3</span>
+                </div>
+                <ul class="nav-list">
+                    <li class="nav-item" data-endpoint="update-leverage">Update Leverage<span class="nav-item-tag">POST</span></li>
+                    <li class="nav-item" data-endpoint="update-isolated-margin">Isolated Margin<span class="nav-item-tag">POST</span></li>
+                    <li class="nav-item" data-endpoint="schedule-cancel">Schedule Cancel<span class="nav-item-tag">POST</span></li>
+                </ul>
+            </div>
+
+            <!-- Exchange: Transfers -->
+            <div class="nav-section">
+                <div class="nav-header">
+                    Transfers
+                    <span class="nav-header-count">4</span>
+                </div>
+                <ul class="nav-list">
+                    <li class="nav-item" data-endpoint="usd-transfer">USD Transfer<span class="nav-item-tag">POST</span></li>
+                    <li class="nav-item" data-endpoint="spot-transfer">Spot Transfer<span class="nav-item-tag">POST</span></li>
+                    <li class="nav-item" data-endpoint="withdraw">Withdraw<span class="nav-item-tag">POST</span></li>
+                    <li class="nav-item" data-endpoint="spot-perp-transfer">Spot/Perp Transfer<span class="nav-item-tag">POST</span></li>
+                </ul>
+            </div>
+
+            <!-- Exchange: Staking Actions -->
+            <div class="nav-section">
+                <div class="nav-header">
+                    Staking Actions
+                    <span class="nav-header-count">4</span>
+                </div>
+                <ul class="nav-list">
+                    <li class="nav-item" data-endpoint="stake-deposit">Stake Deposit<span class="nav-item-tag">POST</span></li>
+                    <li class="nav-item" data-endpoint="stake-withdraw">Stake Withdraw<span class="nav-item-tag">POST</span></li>
+                    <li class="nav-item" data-endpoint="delegate">Delegate<span class="nav-item-tag">POST</span></li>
+                    <li class="nav-item" data-endpoint="undelegate">Undelegate<span class="nav-item-tag">POST</span></li>
+                </ul>
+            </div>
+
+            <!-- Exchange: Vault Operations -->
+            <div class="nav-section">
+                <div class="nav-header">
+                    Vault Actions
+                    <span class="nav-header-count">2</span>
+                </div>
+                <ul class="nav-list">
+                    <li class="nav-item" data-endpoint="vault-deposit">Vault Deposit<span class="nav-item-tag">POST</span></li>
+                    <li class="nav-item" data-endpoint="vault-withdraw">Vault Withdraw<span class="nav-item-tag">POST</span></li>
+                </ul>
+            </div>
+
+            <!-- Exchange: Approvals & Misc -->
+            <div class="nav-section">
+                <div class="nav-header">
+                    Approvals & Misc
+                    <span class="nav-header-count">5</span>
+                </div>
+                <ul class="nav-list">
+                    <li class="nav-item" data-endpoint="approve-agent">Approve Agent<span class="nav-item-tag">POST</span></li>
+                    <li class="nav-item" data-endpoint="approve-builder-fee">Approve Builder<span class="nav-item-tag">POST</span></li>
+                    <li class="nav-item" data-endpoint="reserve-request-weight">Reserve Weight<span class="nav-item-tag">POST</span></li>
+                    <li class="nav-item" data-endpoint="noop">No-Op<span class="nav-item-tag">POST</span></li>
+                    <li class="nav-item" data-endpoint="set-hip3-enabled">HIP-3 Toggle<span class="nav-item-tag">POST</span></li>
                 </ul>
             </div>
 
@@ -948,6 +1102,18 @@
 
             <!-- Content Body -->
             <div class="content-body">
+                <!-- Warning Banner for Exchange Endpoints -->
+                <div class="warning-banner hidden" id="exchange-warning">
+                    <span class="warning-banner-icon">&#9888;</span>
+                    <div class="warning-banner-content">
+                        <div class="warning-banner-title">Security Warning - Demo Only</div>
+                        <div class="warning-banner-text">
+                            This endpoint requires a private key for authentication. <strong>Never use a mainnet private key with real funds in this demo environment.</strong>
+                            Use a testnet wallet or a dedicated demo account. Private keys are sent to the local server and never stored.
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Parameters Panel (hidden by default, shown for endpoints that need params) -->
                 <div class="panel hidden" id="params-panel">
                     <div class="panel-header">
@@ -1455,19 +1621,36 @@
                 ]
             },
 
-            // === EXCHANGE (Placeholders) ===
+            // === EXCHANGE: ORDER MANAGEMENT ===
             'place-order': {
                 title: 'Place Order',
-                description: 'Place a new order. Requires wallet authentication. This is a signed exchange action.',
+                description: 'Place a single order (limit or trigger). Requires wallet authentication. WARNING: Never use a mainnet private key with real funds in a demo!',
                 url: '/api/exchange/place-order',
                 method: 'POST',
                 params: [
+                    { name: 'private_key', label: 'Private Key', placeholder: '0x...', required: true, type: 'password', help: 'Hex private key (with or without 0x prefix)' },
+                    { name: 'mainnet', label: 'Network', placeholder: 'true', required: false, type: 'select', options: ['true', 'false'], help: 'true = mainnet, false = testnet' },
+                    { name: 'asset', label: 'Asset Index', placeholder: '0', required: true, help: 'Asset index (e.g., 0 for BTC)' },
+                    { name: 'is_buy', label: 'Side', placeholder: 'true', required: true, type: 'select', options: ['true', 'false'], help: 'true = buy, false = sell' },
+                    { name: 'price', label: 'Price', placeholder: '50000.0', required: true, help: 'Limit price as string' },
+                    { name: 'size', label: 'Size', placeholder: '0.01', required: true, help: 'Order size as string' },
+                    { name: 'reduce_only', label: 'Reduce Only', placeholder: 'false', required: false, type: 'select', options: ['false', 'true'] },
+                    { name: 'time_in_force', label: 'Time in Force', placeholder: 'Gtc', required: false, type: 'select', options: ['Gtc', 'Ioc', 'Alo'], help: 'GTC, IOC, or ALO' },
+                    { name: 'client_order_id', label: 'Client Order ID', placeholder: 'my-order-1', required: false, help: 'Optional client-provided ID' },
+                    { name: 'trigger_price', label: 'Trigger Price', placeholder: '', required: false, help: 'For stop/take-profit orders' },
+                    { name: 'trigger_type', label: 'Trigger Type', placeholder: '', required: false, type: 'select', options: ['', 'sl', 'tp'], help: 'sl = stop loss, tp = take profit' }
+                ],
+                isExchange: true
+            },
+            'place-batch-orders': {
+                title: 'Place Batch Orders',
+                description: 'Place multiple orders in a single request. Requires wallet authentication. Send orders as JSON array.',
+                url: '/api/exchange/place-batch-orders',
+                method: 'POST',
+                params: [
                     { name: 'private_key', label: 'Private Key', placeholder: '0x...', required: true, type: 'password' },
-                    { name: 'asset', label: 'Asset', placeholder: 'BTC', required: true },
-                    { name: 'is_buy', label: 'Side', placeholder: 'true (buy) or false (sell)', required: true },
-                    { name: 'sz', label: 'Size', placeholder: '0.01', required: true },
-                    { name: 'limit_px', label: 'Limit Price', placeholder: '50000', required: true },
-                    { name: 'reduce_only', label: 'Reduce Only', placeholder: 'false', required: false }
+                    { name: 'mainnet', label: 'Network', placeholder: 'true', required: false, type: 'select', options: ['true', 'false'] },
+                    { name: 'orders', label: 'Orders (JSON)', placeholder: '[{"asset":0,"is_buy":true,"price":"50000","size":"0.01"}]', required: true, help: 'JSON array of order objects' }
                 ],
                 isExchange: true
             },
@@ -1478,8 +1661,339 @@
                 method: 'POST',
                 params: [
                     { name: 'private_key', label: 'Private Key', placeholder: '0x...', required: true, type: 'password' },
-                    { name: 'asset', label: 'Asset', placeholder: 'BTC', required: true },
-                    { name: 'oid', label: 'Order ID', placeholder: '123456', required: true }
+                    { name: 'mainnet', label: 'Network', placeholder: 'true', required: false, type: 'select', options: ['true', 'false'] },
+                    { name: 'asset', label: 'Asset Index', placeholder: '0', required: true, help: 'Asset index' },
+                    { name: 'oid', label: 'Order ID', placeholder: '123456789', required: true, help: 'Numeric order ID' }
+                ],
+                isExchange: true
+            },
+            'cancel-batch-orders': {
+                title: 'Cancel Batch Orders',
+                description: 'Cancel multiple orders in a single request. Requires wallet authentication.',
+                url: '/api/exchange/cancel-batch-orders',
+                method: 'POST',
+                params: [
+                    { name: 'private_key', label: 'Private Key', placeholder: '0x...', required: true, type: 'password' },
+                    { name: 'mainnet', label: 'Network', placeholder: 'true', required: false, type: 'select', options: ['true', 'false'] },
+                    { name: 'cancels', label: 'Cancels (JSON)', placeholder: '[{"asset":0,"oid":123456}]', required: true, help: 'JSON array of {asset, oid} objects' }
+                ],
+                isExchange: true
+            },
+            'cancel-order-by-cloid': {
+                title: 'Cancel Order by CLOID',
+                description: 'Cancel an order using client-provided order ID. Requires wallet authentication.',
+                url: '/api/exchange/cancel-order-by-cloid',
+                method: 'POST',
+                params: [
+                    { name: 'private_key', label: 'Private Key', placeholder: '0x...', required: true, type: 'password' },
+                    { name: 'mainnet', label: 'Network', placeholder: 'true', required: false, type: 'select', options: ['true', 'false'] },
+                    { name: 'asset', label: 'Asset Index', placeholder: '0', required: true },
+                    { name: 'cloid', label: 'Client Order ID', placeholder: 'my-order-1', required: true, help: 'Your client-provided order ID' }
+                ],
+                isExchange: true
+            },
+            'modify-order': {
+                title: 'Modify Order',
+                description: 'Modify an existing order. Changes price, size, or other parameters. Requires wallet authentication.',
+                url: '/api/exchange/modify-order',
+                method: 'POST',
+                params: [
+                    { name: 'private_key', label: 'Private Key', placeholder: '0x...', required: true, type: 'password' },
+                    { name: 'mainnet', label: 'Network', placeholder: 'true', required: false, type: 'select', options: ['true', 'false'] },
+                    { name: 'oid', label: 'Order ID', placeholder: '123456789', required: true, help: 'Order ID to modify' },
+                    { name: 'asset', label: 'Asset Index', placeholder: '0', required: true },
+                    { name: 'is_buy', label: 'Side', placeholder: 'true', required: true, type: 'select', options: ['true', 'false'] },
+                    { name: 'price', label: 'New Price', placeholder: '51000.0', required: true },
+                    { name: 'size', label: 'New Size', placeholder: '0.01', required: true },
+                    { name: 'reduce_only', label: 'Reduce Only', placeholder: 'false', required: false, type: 'select', options: ['false', 'true'] },
+                    { name: 'time_in_force', label: 'Time in Force', placeholder: 'Gtc', required: false, type: 'select', options: ['Gtc', 'Ioc', 'Alo'] },
+                    { name: 'client_order_id', label: 'Client Order ID', placeholder: '', required: false }
+                ],
+                isExchange: true
+            },
+            'modify-batch-orders': {
+                title: 'Modify Batch Orders',
+                description: 'Modify multiple orders in a single request. Requires wallet authentication.',
+                url: '/api/exchange/modify-batch-orders',
+                method: 'POST',
+                params: [
+                    { name: 'private_key', label: 'Private Key', placeholder: '0x...', required: true, type: 'password' },
+                    { name: 'mainnet', label: 'Network', placeholder: 'true', required: false, type: 'select', options: ['true', 'false'] },
+                    { name: 'modifications', label: 'Modifications (JSON)', placeholder: '[{"oid":123,"asset":0,"is_buy":true,"price":"51000","size":"0.01"}]', required: true, help: 'JSON array of modification objects' }
+                ],
+                isExchange: true
+            },
+
+            // === EXCHANGE: TWAP ORDERS ===
+            'place-twap-order': {
+                title: 'Place TWAP Order',
+                description: 'Place a Time-Weighted Average Price order. Executes over specified duration. Requires wallet authentication.',
+                url: '/api/exchange/place-twap-order',
+                method: 'POST',
+                params: [
+                    { name: 'private_key', label: 'Private Key', placeholder: '0x...', required: true, type: 'password' },
+                    { name: 'mainnet', label: 'Network', placeholder: 'true', required: false, type: 'select', options: ['true', 'false'] },
+                    { name: 'asset', label: 'Asset Index', placeholder: '0', required: true },
+                    { name: 'is_buy', label: 'Side', placeholder: 'true', required: true, type: 'select', options: ['true', 'false'] },
+                    { name: 'size', label: 'Total Size', placeholder: '1.0', required: true, help: 'Total size to execute' },
+                    { name: 'duration_minutes', label: 'Duration (min)', placeholder: '60', required: true, help: 'Duration in minutes (5-1440)' },
+                    { name: 'randomize', label: 'Randomize', placeholder: 'false', required: false, type: 'select', options: ['false', 'true'], help: 'Randomize execution timing' },
+                    { name: 'reduce_only', label: 'Reduce Only', placeholder: 'false', required: false, type: 'select', options: ['false', 'true'] }
+                ],
+                isExchange: true
+            },
+            'cancel-twap-order': {
+                title: 'Cancel TWAP Order',
+                description: 'Cancel an active TWAP order. Requires wallet authentication.',
+                url: '/api/exchange/cancel-twap-order',
+                method: 'POST',
+                params: [
+                    { name: 'private_key', label: 'Private Key', placeholder: '0x...', required: true, type: 'password' },
+                    { name: 'mainnet', label: 'Network', placeholder: 'true', required: false, type: 'select', options: ['true', 'false'] },
+                    { name: 'asset', label: 'Asset Index', placeholder: '0', required: true },
+                    { name: 'twap_id', label: 'TWAP ID', placeholder: '123456', required: true, help: 'TWAP order ID to cancel' }
+                ],
+                isExchange: true
+            },
+
+            // === EXCHANGE: LEVERAGE & MARGIN ===
+            'update-leverage': {
+                title: 'Update Leverage',
+                description: 'Update leverage settings for an asset. Choose between cross and isolated margin mode.',
+                url: '/api/exchange/update-leverage',
+                method: 'POST',
+                params: [
+                    { name: 'private_key', label: 'Private Key', placeholder: '0x...', required: true, type: 'password' },
+                    { name: 'mainnet', label: 'Network', placeholder: 'true', required: false, type: 'select', options: ['true', 'false'] },
+                    { name: 'asset', label: 'Asset Index', placeholder: '0', required: true },
+                    { name: 'is_cross', label: 'Cross Margin', placeholder: 'true', required: true, type: 'select', options: ['true', 'false'], help: 'true = cross margin, false = isolated' },
+                    { name: 'leverage', label: 'Leverage', placeholder: '10', required: true, help: 'Leverage multiplier (1-100)' }
+                ],
+                isExchange: true
+            },
+            'update-isolated-margin': {
+                title: 'Update Isolated Margin',
+                description: 'Add or remove isolated margin from a position. Requires wallet authentication.',
+                url: '/api/exchange/update-isolated-margin',
+                method: 'POST',
+                params: [
+                    { name: 'private_key', label: 'Private Key', placeholder: '0x...', required: true, type: 'password' },
+                    { name: 'mainnet', label: 'Network', placeholder: 'true', required: false, type: 'select', options: ['true', 'false'] },
+                    { name: 'asset', label: 'Asset Index', placeholder: '0', required: true },
+                    { name: 'is_buy', label: 'Position Side', placeholder: 'true', required: true, type: 'select', options: ['true', 'false'], help: 'true = long, false = short' },
+                    { name: 'ntli', label: 'Margin Delta', placeholder: '100', required: true, help: 'Amount to add (positive) or remove (negative)' }
+                ],
+                isExchange: true
+            },
+            'schedule-cancel': {
+                title: 'Schedule Cancel (Dead Man\'s Switch)',
+                description: 'Schedule automatic cancellation of all orders at a future time. Must be at least 5 seconds in the future.',
+                url: '/api/exchange/schedule-cancel',
+                method: 'POST',
+                params: [
+                    { name: 'private_key', label: 'Private Key', placeholder: '0x...', required: true, type: 'password' },
+                    { name: 'mainnet', label: 'Network', placeholder: 'true', required: false, type: 'select', options: ['true', 'false'] },
+                    { name: 'timestamp_ms', label: 'Cancel Time (ms)', placeholder: '', required: true, help: 'Unix timestamp in milliseconds (must be >= 5s in future)' }
+                ],
+                isExchange: true
+            },
+
+            // === EXCHANGE: TRANSFERS ===
+            'usd-transfer': {
+                title: 'USD Transfer',
+                description: 'Transfer USDC to another address on Hyperliquid. Requires wallet authentication.',
+                url: '/api/exchange/usd-transfer',
+                method: 'POST',
+                params: [
+                    { name: 'private_key', label: 'Private Key', placeholder: '0x...', required: true, type: 'password' },
+                    { name: 'mainnet', label: 'Network', placeholder: 'true', required: false, type: 'select', options: ['true', 'false'] },
+                    { name: 'destination', label: 'Destination', placeholder: '0x...', required: true, help: 'Recipient address' },
+                    { name: 'amount', label: 'Amount', placeholder: '100.0', required: true, help: 'Amount of USDC to transfer' }
+                ],
+                isExchange: true
+            },
+            'spot-transfer': {
+                title: 'Spot Transfer',
+                description: 'Transfer spot tokens to another address on Hyperliquid. Requires wallet authentication.',
+                url: '/api/exchange/spot-transfer',
+                method: 'POST',
+                params: [
+                    { name: 'private_key', label: 'Private Key', placeholder: '0x...', required: true, type: 'password' },
+                    { name: 'mainnet', label: 'Network', placeholder: 'true', required: false, type: 'select', options: ['true', 'false'] },
+                    { name: 'destination', label: 'Destination', placeholder: '0x...', required: true, help: 'Recipient address' },
+                    { name: 'token', label: 'Token', placeholder: 'PURR', required: true, help: 'Token symbol to transfer' },
+                    { name: 'amount', label: 'Amount', placeholder: '10.0', required: true, help: 'Amount to transfer' }
+                ],
+                isExchange: true
+            },
+            'withdraw': {
+                title: 'Withdraw',
+                description: 'Withdraw USDC to Arbitrum L1. Requires wallet authentication.',
+                url: '/api/exchange/withdraw',
+                method: 'POST',
+                params: [
+                    { name: 'private_key', label: 'Private Key', placeholder: '0x...', required: true, type: 'password' },
+                    { name: 'mainnet', label: 'Network', placeholder: 'true', required: false, type: 'select', options: ['true', 'false'] },
+                    { name: 'destination', label: 'Destination', placeholder: '0x...', required: true, help: 'L1 destination address' },
+                    { name: 'amount', label: 'Amount', placeholder: '100.0', required: true, help: 'Amount of USDC to withdraw' }
+                ],
+                isExchange: true
+            },
+            'spot-perp-transfer': {
+                title: 'Spot/Perp Transfer',
+                description: 'Transfer funds between spot and perpetuals accounts. Requires wallet authentication.',
+                url: '/api/exchange/spot-perp-transfer',
+                method: 'POST',
+                params: [
+                    { name: 'private_key', label: 'Private Key', placeholder: '0x...', required: true, type: 'password' },
+                    { name: 'mainnet', label: 'Network', placeholder: 'true', required: false, type: 'select', options: ['true', 'false'] },
+                    { name: 'amount', label: 'Amount', placeholder: '100.0', required: true, help: 'Amount to transfer' },
+                    { name: 'to_perp', label: 'Direction', placeholder: 'true', required: true, type: 'select', options: ['true', 'false'], help: 'true = spot to perp, false = perp to spot' }
+                ],
+                isExchange: true
+            },
+
+            // === EXCHANGE: STAKING ACTIONS ===
+            'stake-deposit': {
+                title: 'Stake Deposit',
+                description: 'Deposit HYPE to staking. Amount in wei (1 HYPE = 10^18 wei). Requires wallet authentication.',
+                url: '/api/exchange/stake-deposit',
+                method: 'POST',
+                params: [
+                    { name: 'private_key', label: 'Private Key', placeholder: '0x...', required: true, type: 'password' },
+                    { name: 'mainnet', label: 'Network', placeholder: 'true', required: false, type: 'select', options: ['true', 'false'] },
+                    { name: 'wei_amount', label: 'Amount (wei)', placeholder: '1000000000000000000', required: true, help: '1 HYPE = 10^18 wei' }
+                ],
+                isExchange: true
+            },
+            'stake-withdraw': {
+                title: 'Stake Withdraw',
+                description: 'Withdraw HYPE from staking. Amount in wei. Requires wallet authentication.',
+                url: '/api/exchange/stake-withdraw',
+                method: 'POST',
+                params: [
+                    { name: 'private_key', label: 'Private Key', placeholder: '0x...', required: true, type: 'password' },
+                    { name: 'mainnet', label: 'Network', placeholder: 'true', required: false, type: 'select', options: ['true', 'false'] },
+                    { name: 'wei_amount', label: 'Amount (wei)', placeholder: '1000000000000000000', required: true, help: '1 HYPE = 10^18 wei' }
+                ],
+                isExchange: true
+            },
+            'delegate': {
+                title: 'Delegate',
+                description: 'Delegate staked HYPE to a validator. Requires wallet authentication.',
+                url: '/api/exchange/delegate',
+                method: 'POST',
+                params: [
+                    { name: 'private_key', label: 'Private Key', placeholder: '0x...', required: true, type: 'password' },
+                    { name: 'mainnet', label: 'Network', placeholder: 'true', required: false, type: 'select', options: ['true', 'false'] },
+                    { name: 'validator', label: 'Validator', placeholder: '0x...', required: true, help: 'Validator address to delegate to' },
+                    { name: 'amount', label: 'Amount', placeholder: '100.0', required: true, help: 'Amount of HYPE to delegate' }
+                ],
+                isExchange: true
+            },
+            'undelegate': {
+                title: 'Undelegate',
+                description: 'Undelegate staked HYPE from a validator. Requires wallet authentication.',
+                url: '/api/exchange/undelegate',
+                method: 'POST',
+                params: [
+                    { name: 'private_key', label: 'Private Key', placeholder: '0x...', required: true, type: 'password' },
+                    { name: 'mainnet', label: 'Network', placeholder: 'true', required: false, type: 'select', options: ['true', 'false'] },
+                    { name: 'validator', label: 'Validator', placeholder: '0x...', required: true, help: 'Validator address to undelegate from' },
+                    { name: 'amount', label: 'Amount', placeholder: '100.0', required: true, help: 'Amount of HYPE to undelegate' }
+                ],
+                isExchange: true
+            },
+
+            // === EXCHANGE: VAULT OPERATIONS ===
+            'vault-deposit': {
+                title: 'Vault Deposit',
+                description: 'Deposit USDC into a vault. Requires wallet authentication.',
+                url: '/api/exchange/vault-deposit',
+                method: 'POST',
+                params: [
+                    { name: 'private_key', label: 'Private Key', placeholder: '0x...', required: true, type: 'password' },
+                    { name: 'mainnet', label: 'Network', placeholder: 'true', required: false, type: 'select', options: ['true', 'false'] },
+                    { name: 'vault_address', label: 'Vault Address', placeholder: '0x...', required: true, help: 'Address of the vault' },
+                    { name: 'amount', label: 'Amount', placeholder: '100.0', required: true, help: 'Amount of USDC to deposit' }
+                ],
+                isExchange: true
+            },
+            'vault-withdraw': {
+                title: 'Vault Withdraw',
+                description: 'Withdraw USDC from a vault. Requires wallet authentication.',
+                url: '/api/exchange/vault-withdraw',
+                method: 'POST',
+                params: [
+                    { name: 'private_key', label: 'Private Key', placeholder: '0x...', required: true, type: 'password' },
+                    { name: 'mainnet', label: 'Network', placeholder: 'true', required: false, type: 'select', options: ['true', 'false'] },
+                    { name: 'vault_address', label: 'Vault Address', placeholder: '0x...', required: true, help: 'Address of the vault' },
+                    { name: 'amount', label: 'Amount', placeholder: '100.0', required: true, help: 'Amount of USDC to withdraw' }
+                ],
+                isExchange: true
+            },
+
+            // === EXCHANGE: APPROVALS ===
+            'approve-agent': {
+                title: 'Approve Agent',
+                description: 'Approve an API wallet (agent) to trade on your behalf. Requires wallet authentication.',
+                url: '/api/exchange/approve-agent',
+                method: 'POST',
+                params: [
+                    { name: 'private_key', label: 'Private Key', placeholder: '0x...', required: true, type: 'password' },
+                    { name: 'mainnet', label: 'Network', placeholder: 'true', required: false, type: 'select', options: ['true', 'false'] },
+                    { name: 'agent_address', label: 'Agent Address', placeholder: '0x...', required: true, help: 'Address of the agent wallet to approve' },
+                    { name: 'agent_name', label: 'Agent Name', placeholder: 'My Trading Bot', required: false, help: 'Optional human-readable name' }
+                ],
+                isExchange: true
+            },
+            'approve-builder-fee': {
+                title: 'Approve Builder Fee',
+                description: 'Approve a builder to collect fees from your trades. Requires wallet authentication.',
+                url: '/api/exchange/approve-builder-fee',
+                method: 'POST',
+                params: [
+                    { name: 'private_key', label: 'Private Key', placeholder: '0x...', required: true, type: 'password' },
+                    { name: 'mainnet', label: 'Network', placeholder: 'true', required: false, type: 'select', options: ['true', 'false'] },
+                    { name: 'builder', label: 'Builder Address', placeholder: '0x...', required: true, help: 'Address of the builder to approve' },
+                    { name: 'max_fee_rate', label: 'Max Fee Rate', placeholder: '0.001', required: true, help: 'Maximum fee rate (e.g., 0.001 = 0.1%)' }
+                ],
+                isExchange: true
+            },
+
+            // === EXCHANGE: MISCELLANEOUS ===
+            'reserve-request-weight': {
+                title: 'Reserve Request Weight',
+                description: 'Purchase additional rate limit capacity. Requires wallet authentication.',
+                url: '/api/exchange/reserve-request-weight',
+                method: 'POST',
+                params: [
+                    { name: 'private_key', label: 'Private Key', placeholder: '0x...', required: true, type: 'password' },
+                    { name: 'mainnet', label: 'Network', placeholder: 'true', required: false, type: 'select', options: ['true', 'false'] },
+                    { name: 'weight', label: 'Weight', placeholder: '1000', required: true, help: 'Amount of rate limit weight to reserve' }
+                ],
+                isExchange: true
+            },
+            'noop': {
+                title: 'No-Op (Heartbeat)',
+                description: 'Send a no-op action. Useful as a heartbeat to keep API wallet sessions alive.',
+                url: '/api/exchange/noop',
+                method: 'POST',
+                params: [
+                    { name: 'private_key', label: 'Private Key', placeholder: '0x...', required: true, type: 'password' },
+                    { name: 'mainnet', label: 'Network', placeholder: 'true', required: false, type: 'select', options: ['true', 'false'] }
+                ],
+                isExchange: true
+            },
+            'set-hip3-enabled': {
+                title: 'HIP-3 Toggle',
+                description: 'Enable or disable HIP-3 abstraction for your account. Requires wallet authentication.',
+                url: '/api/exchange/set-hip3-enabled',
+                method: 'POST',
+                params: [
+                    { name: 'private_key', label: 'Private Key', placeholder: '0x...', required: true, type: 'password' },
+                    { name: 'mainnet', label: 'Network', placeholder: 'true', required: false, type: 'select', options: ['true', 'false'] },
+                    { name: 'enabled', label: 'Enabled', placeholder: 'true', required: true, type: 'select', options: ['true', 'false'], help: 'true = enable HIP-3, false = disable' }
                 ],
                 isExchange: true
             },
@@ -1531,6 +2045,7 @@
         function selectEndpoint(endpoint) {
             currentEndpoint = endpoint;
             const config = endpoints[endpoint];
+            const exchangeWarning = document.getElementById('exchange-warning');
 
             endpointTitle.textContent = config.title;
             endpointDescription.textContent = config.description;
@@ -1539,9 +2054,18 @@
             endpointMethod.style.backgroundColor = config.method === 'POST' ? 'var(--warning)' :
                                                     config.method === 'WS' ? 'var(--accent-primary)' : 'var(--success)';
 
-            responseContent.innerHTML = 'Click "Call Endpoint" to see the response.';
+            responseContent.innerHTML = config.isExchange
+                ? 'Fill in the parameters above and click "Execute Action" to send the request.'
+                : 'Click "Call Endpoint" to see the response.';
             responseArea.className = 'response-area';
             responseTime.textContent = '';
+
+            // Show/hide warning banner for exchange endpoints
+            if (config.isExchange) {
+                exchangeWarning.classList.remove('hidden');
+            } else {
+                exchangeWarning.classList.add('hidden');
+            }
 
             // Update params panel
             if (config.params && config.params.length > 0) {
@@ -1557,9 +2081,16 @@
             if (!config.url) {
                 callBtn.disabled = true;
                 callBtn.textContent = 'Not Available';
+                callBtn.className = 'btn btn-primary';
             } else {
                 callBtn.disabled = false;
-                callBtn.textContent = config.isExchange ? 'Execute Action' : 'Call Endpoint';
+                if (config.isExchange) {
+                    callBtn.textContent = 'Execute Action';
+                    callBtn.className = 'btn btn-warning';
+                } else {
+                    callBtn.textContent = 'Call Endpoint';
+                    callBtn.className = 'btn btn-primary';
+                }
             }
         }
 
@@ -1635,6 +2166,30 @@
             });
         }
 
+        // Convert string values to proper types based on endpoint config
+        function convertParamTypes(params, config) {
+            const converted = { ...params };
+            const booleanFields = ['mainnet', 'is_buy', 'is_cross', 'reduce_only', 'randomize', 'to_perp', 'enabled'];
+            const intFields = ['asset', 'oid', 'twap_id', 'leverage', 'ntli', 'weight', 'duration_minutes', 'timestamp_ms'];
+
+            for (const [key, value] of Object.entries(converted)) {
+                if (booleanFields.includes(key)) {
+                    converted[key] = value === 'true';
+                } else if (intFields.includes(key)) {
+                    converted[key] = parseInt(value, 10);
+                }
+                // Try to parse JSON for array/object fields
+                if (key === 'orders' || key === 'cancels' || key === 'modifications') {
+                    try {
+                        converted[key] = JSON.parse(value);
+                    } catch (e) {
+                        // Keep as string if invalid JSON
+                    }
+                }
+            }
+            return converted;
+        }
+
         // Call endpoint
         async function callEndpoint() {
             const config = endpoints[currentEndpoint];
@@ -1643,7 +2198,7 @@
                 return;
             }
 
-            const params = collectParams();
+            let params = collectParams();
 
             // Validate required params
             const missingParams = config.params
@@ -1665,6 +2220,10 @@
                 let options = { method: 'GET' };
 
                 if (config.method === 'POST') {
+                    // Convert types for exchange endpoints
+                    if (config.isExchange) {
+                        params = convertParamTypes(params, config);
+                    }
                     options = {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -1679,12 +2238,17 @@
                 const data = await response.json();
                 const duration = Math.round(performance.now() - startTime);
 
-                responseTime.textContent = `${duration}ms`;
+                // Update response time with status indicator
+                if (data.success) {
+                    responseTime.innerHTML = `${duration}ms <span class="response-status success">Success</span>`;
+                } else {
+                    responseTime.innerHTML = `${duration}ms <span class="response-status error">Error</span>`;
+                }
                 responseContent.innerHTML = syntaxHighlight(JSON.stringify(data, null, 2));
                 responseArea.className = data.success ? 'response-area' : 'response-area error';
             } catch (error) {
                 const duration = Math.round(performance.now() - startTime);
-                responseTime.textContent = `${duration}ms`;
+                responseTime.innerHTML = `${duration}ms <span class="response-status error">Failed</span>`;
                 responseContent.innerHTML = `<span class="json-string">Error: ${error.message}</span>`;
                 responseArea.className = 'response-area error';
             }
