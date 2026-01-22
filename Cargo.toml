@@ -39,3 +39,29 @@ futures-util = "0.3"
 # Testing utilities
 tokio-test = "0.4"
 mockito = "1.2"
+
+[[bin]]
+name = "demo-server"
+path = "src/bin/demo_server/main.rs"
+required-features = ["demo"]
+
+[features]
+demo = ["axum", "tower-http", "tracing", "tracing-subscriber"]
+
+[dependencies.axum]
+version = "0.7"
+optional = true
+
+[dependencies.tower-http]
+version = "0.5"
+features = ["cors", "fs"]
+optional = true
+
+[dependencies.tracing]
+version = "0.1"
+optional = true
+
+[dependencies.tracing-subscriber]
+version = "0.3"
+features = ["env-filter"]
+optional = true

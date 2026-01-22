@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hyperliquid SDK Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Mono', 'Droid Sans Mono', monospace;
+            background-color: #ffffff;
+            color: #1a1a1a;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            border-bottom: 1px solid #e0e0e0;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 24px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .layout {
+            display: flex;
+            gap: 30px;
+        }
+
+        .sidebar {
+            width: 250px;
+            flex-shrink: 0;
+        }
+
+        .sidebar h2 {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .sidebar ul {
+            list-style: none;
+        }
+
+        .sidebar li {
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: background-color 0.15s;
+        }
+
+        .sidebar li:hover {
+            background-color: #f5f5f5;
+        }
+
+        .sidebar li.active {
+            background-color: #e8f4fd;
+            color: #0066cc;
+        }
+
+        .main-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .panel {
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+
+        .panel-header {
+            padding: 12px 16px;
+            border-bottom: 1px solid #e0e0e0;
+            background-color: #fafafa;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .panel-header h3 {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .panel-body {
+            padding: 16px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: 1px solid #d0d0d0;
+            border-radius: 4px;
+            background-color: #fff;
+            font-family: inherit;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .btn:hover {
+            background-color: #f5f5f5;
+        }
+
+        .btn-primary {
+            background-color: #0066cc;
+            border-color: #0066cc;
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background-color: #0052a3;
+        }
+
+        .response-area {
+            background-color: #f8f8f8;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            padding: 12px;
+            font-size: 12px;
+            overflow-x: auto;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .response-area pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .loading {
+            color: #666;
+            font-style: italic;
+        }
+
+        .error {
+            color: #cc0000;
+        }
+
+        .success {
+            color: #008000;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status-connected {
+            background-color: #00cc00;
+        }
+
+        .status-disconnected {
+            background-color: #cc0000;
+        }
+
+        .status-bar {
+            display: flex;
+            align-items: center;
+            font-size: 12px;
+            color: #666;
+        }
+
+        footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+            font-size: 12px;
+            color: #666;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Hyperliquid SDK Demo</h1>
+            <p class="subtitle">Bloomberg-style dashboard for the Hyperliquid Rust SDK</p>
+        </header>
+
+        <div class="layout">
+            <nav class="sidebar">
+                <h2>Info Endpoints</h2>
+                <ul id="info-nav">
+                    <li class="active" data-endpoint="perp-dexs">Perp DEXs</li>
+                    <li data-endpoint="meta">Meta</li>
+                </ul>
+
+                <h2 style="margin-top: 20px;">Exchange Endpoints</h2>
+                <ul id="exchange-nav">
+                    <li data-endpoint="coming-soon">Coming Soon</li>
+                </ul>
+
+                <h2 style="margin-top: 20px;">WebSocket</h2>
+                <ul id="ws-nav">
+                    <li data-endpoint="ws-demo">Live Data</li>
+                </ul>
+            </nav>
+
+            <main class="main-content">
+                <div class="panel">
+                    <div class="panel-header">
+                        <h3 id="endpoint-title">Perp DEXs</h3>
+                        <div class="status-bar">
+                            <span class="status-indicator status-connected"></span>
+                            <span>Connected to Mainnet</span>
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <p style="margin-bottom: 12px; font-size: 13px; color: #666;">
+                            <span id="endpoint-description">Retrieve all perpetual DEXs available on Hyperliquid.</span>
+                        </p>
+                        <button class="btn btn-primary" id="call-btn">Call Endpoint</button>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-header">
+                        <h3>Response</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="response-area" id="response-area">
+                            <pre id="response-content">Click "Call Endpoint" to see the response.</pre>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <footer>
+            <p>Hyperliquid Rust SDK Demo &mdash; v0.1.0</p>
+        </footer>
+    </div>
+
+    <script>
+        const endpoints = {
+            'perp-dexs': {
+                title: 'Perp DEXs',
+                description: 'Retrieve all perpetual DEXs available on Hyperliquid.',
+                url: '/api/info/perp-dexs'
+            },
+            'meta': {
+                title: 'Meta',
+                description: 'Get perpetual metadata including available assets.',
+                url: '/api/info/meta'
+            },
+            'coming-soon': {
+                title: 'Coming Soon',
+                description: 'Exchange endpoints will be available in a future update.',
+                url: null
+            },
+            'ws-demo': {
+                title: 'WebSocket Demo',
+                description: 'Real-time WebSocket subscriptions will be available in a future update.',
+                url: null
+            }
+        };
+
+        let currentEndpoint = 'perp-dexs';
+
+        // Set up navigation
+        document.querySelectorAll('.sidebar li').forEach(item => {
+            item.addEventListener('click', () => {
+                const endpoint = item.dataset.endpoint;
+                if (endpoints[endpoint]) {
+                    // Update active state
+                    document.querySelectorAll('.sidebar li').forEach(i => i.classList.remove('active'));
+                    item.classList.add('active');
+
+                    // Update UI
+                    currentEndpoint = endpoint;
+                    document.getElementById('endpoint-title').textContent = endpoints[endpoint].title;
+                    document.getElementById('endpoint-description').textContent = endpoints[endpoint].description;
+                    document.getElementById('response-content').textContent = 'Click "Call Endpoint" to see the response.';
+                }
+            });
+        });
+
+        // Call endpoint button
+        document.getElementById('call-btn').addEventListener('click', async () => {
+            const endpoint = endpoints[currentEndpoint];
+            if (!endpoint.url) {
+                document.getElementById('response-content').textContent = 'This endpoint is not yet implemented.';
+                return;
+            }
+
+            const responseEl = document.getElementById('response-content');
+            responseEl.textContent = 'Loading...';
+            responseEl.className = 'loading';
+
+            try {
+                const response = await fetch(endpoint.url);
+                const data = await response.json();
+                responseEl.textContent = JSON.stringify(data, null, 2);
+                responseEl.className = data.success ? 'success' : 'error';
+            } catch (error) {
+                responseEl.textContent = 'Error: ' + error.message;
+                responseEl.className = 'error';
+            }
+        });
+    </script>
+</body>
+</html>
