@@ -867,6 +867,190 @@ impl WsClient {
         self.subscribe(Subscription::active_asset_ctx(coin)).await
     }
 
+    // ========== User Data Subscription Methods ==========
+
+    /// Subscribe to user notifications
+    ///
+    /// Receives real-time notifications for the specified user address.
+    ///
+    /// # Arguments
+    ///
+    /// * `user` - The user's Ethereum address (e.g., "0x...")
+    ///
+    /// # Example
+    ///
+    /// ```ignore
+    /// use hyperliquid::websocket::WsClient;
+    ///
+    /// let client = WsClient::mainnet();
+    /// client.connect().await?;
+    /// client.subscribe_notification("0x1234567890123456789012345678901234567890").await?;
+    /// ```
+    pub async fn subscribe_notification(&self, user: impl Into<String>) -> Result<()> {
+        self.subscribe(Subscription::notification(user)).await
+    }
+
+    /// Subscribe to aggregate user data (webData3)
+    ///
+    /// Receives comprehensive real-time user data including positions, orders,
+    /// balances, and other account information in a single stream.
+    ///
+    /// # Arguments
+    ///
+    /// * `user` - The user's Ethereum address (e.g., "0x...")
+    ///
+    /// # Example
+    ///
+    /// ```ignore
+    /// use hyperliquid::websocket::WsClient;
+    ///
+    /// let client = WsClient::mainnet();
+    /// client.connect().await?;
+    /// client.subscribe_web_data3("0x1234567890123456789012345678901234567890").await?;
+    /// ```
+    pub async fn subscribe_web_data3(&self, user: impl Into<String>) -> Result<()> {
+        self.subscribe(Subscription::web_data3(user)).await
+    }
+
+    /// Subscribe to TWAP order states
+    ///
+    /// Receives real-time TWAP (Time-Weighted Average Price) order state updates.
+    ///
+    /// # Arguments
+    ///
+    /// * `user` - The user's Ethereum address (e.g., "0x...")
+    ///
+    /// # Example
+    ///
+    /// ```ignore
+    /// use hyperliquid::websocket::WsClient;
+    ///
+    /// let client = WsClient::mainnet();
+    /// client.connect().await?;
+    /// client.subscribe_twap_states("0x1234567890123456789012345678901234567890").await?;
+    /// ```
+    pub async fn subscribe_twap_states(&self, user: impl Into<String>) -> Result<()> {
+        self.subscribe(Subscription::twap_states(user)).await
+    }
+
+    /// Subscribe to TWAP order states for a specific DEX
+    ///
+    /// # Arguments
+    ///
+    /// * `user` - The user's Ethereum address (e.g., "0x...")
+    /// * `dex` - The DEX identifier (e.g., "perp", "spot")
+    ///
+    /// # Example
+    ///
+    /// ```ignore
+    /// use hyperliquid::websocket::WsClient;
+    ///
+    /// let client = WsClient::mainnet();
+    /// client.connect().await?;
+    /// client.subscribe_twap_states_with_dex("0x123...", "perp").await?;
+    /// ```
+    pub async fn subscribe_twap_states_with_dex(
+        &self,
+        user: impl Into<String>,
+        dex: impl Into<String>,
+    ) -> Result<()> {
+        self.subscribe(Subscription::twap_states_with_dex(user, dex))
+            .await
+    }
+
+    /// Subscribe to clearinghouse state updates
+    ///
+    /// Receives real-time updates to the user's account state including positions,
+    /// margins, and balances.
+    ///
+    /// # Arguments
+    ///
+    /// * `user` - The user's Ethereum address (e.g., "0x...")
+    ///
+    /// # Example
+    ///
+    /// ```ignore
+    /// use hyperliquid::websocket::WsClient;
+    ///
+    /// let client = WsClient::mainnet();
+    /// client.connect().await?;
+    /// client.subscribe_clearinghouse_state("0x1234567890123456789012345678901234567890").await?;
+    /// ```
+    pub async fn subscribe_clearinghouse_state(&self, user: impl Into<String>) -> Result<()> {
+        self.subscribe(Subscription::clearinghouse_state(user)).await
+    }
+
+    /// Subscribe to clearinghouse state updates for a specific DEX
+    ///
+    /// # Arguments
+    ///
+    /// * `user` - The user's Ethereum address (e.g., "0x...")
+    /// * `dex` - The DEX identifier (e.g., "perp", "spot")
+    ///
+    /// # Example
+    ///
+    /// ```ignore
+    /// use hyperliquid::websocket::WsClient;
+    ///
+    /// let client = WsClient::mainnet();
+    /// client.connect().await?;
+    /// client.subscribe_clearinghouse_state_with_dex("0x123...", "perp").await?;
+    /// ```
+    pub async fn subscribe_clearinghouse_state_with_dex(
+        &self,
+        user: impl Into<String>,
+        dex: impl Into<String>,
+    ) -> Result<()> {
+        self.subscribe(Subscription::clearinghouse_state_with_dex(user, dex))
+            .await
+    }
+
+    /// Subscribe to open orders updates
+    ///
+    /// Receives real-time updates when orders are placed, modified, or removed.
+    ///
+    /// # Arguments
+    ///
+    /// * `user` - The user's Ethereum address (e.g., "0x...")
+    ///
+    /// # Example
+    ///
+    /// ```ignore
+    /// use hyperliquid::websocket::WsClient;
+    ///
+    /// let client = WsClient::mainnet();
+    /// client.connect().await?;
+    /// client.subscribe_open_orders("0x1234567890123456789012345678901234567890").await?;
+    /// ```
+    pub async fn subscribe_open_orders(&self, user: impl Into<String>) -> Result<()> {
+        self.subscribe(Subscription::open_orders(user)).await
+    }
+
+    /// Subscribe to open orders updates for a specific DEX
+    ///
+    /// # Arguments
+    ///
+    /// * `user` - The user's Ethereum address (e.g., "0x...")
+    /// * `dex` - The DEX identifier (e.g., "perp", "spot")
+    ///
+    /// # Example
+    ///
+    /// ```ignore
+    /// use hyperliquid::websocket::WsClient;
+    ///
+    /// let client = WsClient::mainnet();
+    /// client.connect().await?;
+    /// client.subscribe_open_orders_with_dex("0x123...", "perp").await?;
+    /// ```
+    pub async fn subscribe_open_orders_with_dex(
+        &self,
+        user: impl Into<String>,
+        dex: impl Into<String>,
+    ) -> Result<()> {
+        self.subscribe(Subscription::open_orders_with_dex(user, dex))
+            .await
+    }
+
     /// Receive the next message from the WebSocket
     ///
     /// Returns `None` if the connection is closed.
@@ -1855,6 +2039,411 @@ mod tests {
         client.subscribe_trades("ETH").await.unwrap();
         client.subscribe_candle("SOL", CandleInterval::FifteenMinutes).await.unwrap();
         client.subscribe_bbo("AVAX").await.unwrap();
+
+        // Verify all subscriptions are tracked
+        assert!(client.subscription_manager().total_count().await >= 5);
+
+        client.close().await.unwrap();
+    }
+
+    // ============ User Data Subscription Methods Tests (without network) ============
+
+    #[tokio::test]
+    async fn test_subscribe_notification_not_connected() {
+        let client = WsClient::mainnet();
+        let result = client.subscribe_notification("0x1234567890123456789012345678901234567890").await;
+        assert!(result.is_err());
+        let err = result.unwrap_err();
+        assert!(err.to_string().contains("Not connected"));
+    }
+
+    #[tokio::test]
+    async fn test_subscribe_web_data3_not_connected() {
+        let client = WsClient::mainnet();
+        let result = client.subscribe_web_data3("0x1234567890123456789012345678901234567890").await;
+        assert!(result.is_err());
+        let err = result.unwrap_err();
+        assert!(err.to_string().contains("Not connected"));
+    }
+
+    #[tokio::test]
+    async fn test_subscribe_twap_states_not_connected() {
+        let client = WsClient::mainnet();
+        let result = client.subscribe_twap_states("0x1234567890123456789012345678901234567890").await;
+        assert!(result.is_err());
+        let err = result.unwrap_err();
+        assert!(err.to_string().contains("Not connected"));
+    }
+
+    #[tokio::test]
+    async fn test_subscribe_twap_states_with_dex_not_connected() {
+        let client = WsClient::mainnet();
+        let result = client.subscribe_twap_states_with_dex("0x123...", "perp").await;
+        assert!(result.is_err());
+        let err = result.unwrap_err();
+        assert!(err.to_string().contains("Not connected"));
+    }
+
+    #[tokio::test]
+    async fn test_subscribe_clearinghouse_state_not_connected() {
+        let client = WsClient::mainnet();
+        let result = client.subscribe_clearinghouse_state("0x1234567890123456789012345678901234567890").await;
+        assert!(result.is_err());
+        let err = result.unwrap_err();
+        assert!(err.to_string().contains("Not connected"));
+    }
+
+    #[tokio::test]
+    async fn test_subscribe_clearinghouse_state_with_dex_not_connected() {
+        let client = WsClient::mainnet();
+        let result = client.subscribe_clearinghouse_state_with_dex("0x123...", "perp").await;
+        assert!(result.is_err());
+        let err = result.unwrap_err();
+        assert!(err.to_string().contains("Not connected"));
+    }
+
+    #[tokio::test]
+    async fn test_subscribe_open_orders_not_connected() {
+        let client = WsClient::mainnet();
+        let result = client.subscribe_open_orders("0x1234567890123456789012345678901234567890").await;
+        assert!(result.is_err());
+        let err = result.unwrap_err();
+        assert!(err.to_string().contains("Not connected"));
+    }
+
+    #[tokio::test]
+    async fn test_subscribe_open_orders_with_dex_not_connected() {
+        let client = WsClient::mainnet();
+        let result = client.subscribe_open_orders_with_dex("0x123...", "spot").await;
+        assert!(result.is_err());
+        let err = result.unwrap_err();
+        assert!(err.to_string().contains("Not connected"));
+    }
+
+    // ============ User Data Subscription Methods - Subscription Creation Tests ============
+
+    #[test]
+    fn test_subscription_notification_creates_correct_subscription() {
+        let sub = Subscription::notification("0x1234");
+        assert_eq!(sub.channel_name(), "notification");
+        assert_eq!(sub.user(), Some("0x1234"));
+        assert!(sub.is_user_subscription());
+        assert!(!sub.is_market_subscription());
+    }
+
+    #[test]
+    fn test_subscription_web_data3_creates_correct_subscription() {
+        let sub = Subscription::web_data3("0x5678");
+        assert_eq!(sub.channel_name(), "webData3");
+        assert_eq!(sub.user(), Some("0x5678"));
+        assert!(sub.is_user_subscription());
+    }
+
+    #[test]
+    fn test_subscription_twap_states_creates_correct_subscription() {
+        let sub = Subscription::twap_states("0xabcd");
+        assert_eq!(sub.channel_name(), "twapStates");
+        assert_eq!(sub.user(), Some("0xabcd"));
+        assert!(sub.is_user_subscription());
+    }
+
+    #[test]
+    fn test_subscription_twap_states_with_dex_creates_correct_subscription() {
+        let sub = Subscription::twap_states_with_dex("0xabcd", "perp");
+        assert_eq!(sub.channel_name(), "twapStates");
+        assert_eq!(sub.user(), Some("0xabcd"));
+        if let Subscription::TwapStates { user, dex } = sub {
+            assert_eq!(user, "0xabcd");
+            assert_eq!(dex, Some("perp".to_string()));
+        } else {
+            panic!("Expected TwapStates subscription");
+        }
+    }
+
+    #[test]
+    fn test_subscription_clearinghouse_state_creates_correct_subscription() {
+        let sub = Subscription::clearinghouse_state("0xefgh");
+        assert_eq!(sub.channel_name(), "clearinghouseState");
+        assert_eq!(sub.user(), Some("0xefgh"));
+        assert!(sub.is_user_subscription());
+    }
+
+    #[test]
+    fn test_subscription_clearinghouse_state_with_dex_creates_correct_subscription() {
+        let sub = Subscription::clearinghouse_state_with_dex("0xefgh", "spot");
+        assert_eq!(sub.channel_name(), "clearinghouseState");
+        if let Subscription::ClearinghouseState { user, dex } = sub {
+            assert_eq!(user, "0xefgh");
+            assert_eq!(dex, Some("spot".to_string()));
+        } else {
+            panic!("Expected ClearinghouseState subscription");
+        }
+    }
+
+    #[test]
+    fn test_subscription_open_orders_creates_correct_subscription() {
+        let sub = Subscription::open_orders("0xijkl");
+        assert_eq!(sub.channel_name(), "openOrders");
+        assert_eq!(sub.user(), Some("0xijkl"));
+        assert!(sub.is_user_subscription());
+    }
+
+    #[test]
+    fn test_subscription_open_orders_with_dex_creates_correct_subscription() {
+        let sub = Subscription::open_orders_with_dex("0xijkl", "perp");
+        assert_eq!(sub.channel_name(), "openOrders");
+        if let Subscription::OpenOrders { user, dex } = sub {
+            assert_eq!(user, "0xijkl");
+            assert_eq!(dex, Some("perp".to_string()));
+        } else {
+            panic!("Expected OpenOrders subscription");
+        }
+    }
+
+    // ============ User Data Subscription JSON Serialization Tests ============
+
+    #[test]
+    fn test_subscribe_notification_serializes_correctly() {
+        let request = SubscriptionRequest::subscribe(Subscription::notification("0x1234"));
+        let json = serde_json::to_string(&request).unwrap();
+        assert!(json.contains("\"method\":\"subscribe\""));
+        assert!(json.contains("\"type\":\"notification\""));
+        assert!(json.contains("\"user\":\"0x1234\""));
+    }
+
+    #[test]
+    fn test_subscribe_web_data3_serializes_correctly() {
+        let request = SubscriptionRequest::subscribe(Subscription::web_data3("0x5678"));
+        let json = serde_json::to_string(&request).unwrap();
+        assert!(json.contains("\"method\":\"subscribe\""));
+        assert!(json.contains("\"type\":\"webData3\""));
+        assert!(json.contains("\"user\":\"0x5678\""));
+    }
+
+    #[test]
+    fn test_subscribe_twap_states_serializes_correctly() {
+        let request = SubscriptionRequest::subscribe(Subscription::twap_states("0xabcd"));
+        let json = serde_json::to_string(&request).unwrap();
+        assert!(json.contains("\"method\":\"subscribe\""));
+        assert!(json.contains("\"type\":\"twapStates\""));
+        assert!(json.contains("\"user\":\"0xabcd\""));
+    }
+
+    #[test]
+    fn test_subscribe_twap_states_with_dex_serializes_correctly() {
+        let request = SubscriptionRequest::subscribe(
+            Subscription::twap_states_with_dex("0xabcd", "perp")
+        );
+        let json = serde_json::to_string(&request).unwrap();
+        assert!(json.contains("\"type\":\"twapStates\""));
+        assert!(json.contains("\"user\":\"0xabcd\""));
+        assert!(json.contains("\"dex\":\"perp\""));
+    }
+
+    #[test]
+    fn test_subscribe_clearinghouse_state_serializes_correctly() {
+        let request = SubscriptionRequest::subscribe(
+            Subscription::clearinghouse_state("0xefgh")
+        );
+        let json = serde_json::to_string(&request).unwrap();
+        assert!(json.contains("\"method\":\"subscribe\""));
+        assert!(json.contains("\"type\":\"clearinghouseState\""));
+        assert!(json.contains("\"user\":\"0xefgh\""));
+    }
+
+    #[test]
+    fn test_subscribe_clearinghouse_state_with_dex_serializes_correctly() {
+        let request = SubscriptionRequest::subscribe(
+            Subscription::clearinghouse_state_with_dex("0xefgh", "spot")
+        );
+        let json = serde_json::to_string(&request).unwrap();
+        assert!(json.contains("\"type\":\"clearinghouseState\""));
+        assert!(json.contains("\"user\":\"0xefgh\""));
+        assert!(json.contains("\"dex\":\"spot\""));
+    }
+
+    #[test]
+    fn test_subscribe_open_orders_serializes_correctly() {
+        let request = SubscriptionRequest::subscribe(Subscription::open_orders("0xijkl"));
+        let json = serde_json::to_string(&request).unwrap();
+        assert!(json.contains("\"method\":\"subscribe\""));
+        assert!(json.contains("\"type\":\"openOrders\""));
+        assert!(json.contains("\"user\":\"0xijkl\""));
+    }
+
+    #[test]
+    fn test_subscribe_open_orders_with_dex_serializes_correctly() {
+        let request = SubscriptionRequest::subscribe(
+            Subscription::open_orders_with_dex("0xijkl", "perp")
+        );
+        let json = serde_json::to_string(&request).unwrap();
+        assert!(json.contains("\"type\":\"openOrders\""));
+        assert!(json.contains("\"user\":\"0xijkl\""));
+        assert!(json.contains("\"dex\":\"perp\""));
+    }
+
+    // ============ User Data Subscription is_user_subscription Tests ============
+
+    #[test]
+    fn test_all_user_data_subscriptions_are_user() {
+        let subscriptions = vec![
+            Subscription::notification("0x1234"),
+            Subscription::web_data3("0x1234"),
+            Subscription::twap_states("0x1234"),
+            Subscription::twap_states_with_dex("0x1234", "perp"),
+            Subscription::clearinghouse_state("0x1234"),
+            Subscription::clearinghouse_state_with_dex("0x1234", "spot"),
+            Subscription::open_orders("0x1234"),
+            Subscription::open_orders_with_dex("0x1234", "perp"),
+        ];
+
+        for sub in subscriptions {
+            assert!(sub.is_user_subscription(), "Expected {:?} to be a user subscription", sub);
+            assert!(!sub.is_market_subscription(), "Expected {:?} to NOT be a market subscription", sub);
+        }
+    }
+
+    // ============ User Data Subscription Integration Tests (require network) ============
+
+    #[tokio::test]
+    #[ignore]
+    async fn test_subscribe_notification_integration() {
+        let client = WsClient::mainnet();
+        client.connect().await.unwrap();
+
+        let result = client.subscribe_notification("0x1234567890123456789012345678901234567890").await;
+        assert!(result.is_ok());
+
+        // Check subscription is tracked
+        let sub = Subscription::notification("0x1234567890123456789012345678901234567890");
+        assert!(client.subscription_manager().contains(&sub).await);
+
+        client.close().await.unwrap();
+    }
+
+    #[tokio::test]
+    #[ignore]
+    async fn test_subscribe_web_data3_integration() {
+        let client = WsClient::mainnet();
+        client.connect().await.unwrap();
+
+        let result = client.subscribe_web_data3("0x1234567890123456789012345678901234567890").await;
+        assert!(result.is_ok());
+
+        // Check subscription is tracked
+        let sub = Subscription::web_data3("0x1234567890123456789012345678901234567890");
+        assert!(client.subscription_manager().contains(&sub).await);
+
+        client.close().await.unwrap();
+    }
+
+    #[tokio::test]
+    #[ignore]
+    async fn test_subscribe_twap_states_integration() {
+        let client = WsClient::mainnet();
+        client.connect().await.unwrap();
+
+        let result = client.subscribe_twap_states("0x1234567890123456789012345678901234567890").await;
+        assert!(result.is_ok());
+
+        // Check subscription is tracked
+        let sub = Subscription::twap_states("0x1234567890123456789012345678901234567890");
+        assert!(client.subscription_manager().contains(&sub).await);
+
+        client.close().await.unwrap();
+    }
+
+    #[tokio::test]
+    #[ignore]
+    async fn test_subscribe_twap_states_with_dex_integration() {
+        let client = WsClient::mainnet();
+        client.connect().await.unwrap();
+
+        let result = client.subscribe_twap_states_with_dex(
+            "0x1234567890123456789012345678901234567890",
+            "perp"
+        ).await;
+        assert!(result.is_ok());
+
+        client.close().await.unwrap();
+    }
+
+    #[tokio::test]
+    #[ignore]
+    async fn test_subscribe_clearinghouse_state_integration() {
+        let client = WsClient::mainnet();
+        client.connect().await.unwrap();
+
+        let result = client.subscribe_clearinghouse_state("0x1234567890123456789012345678901234567890").await;
+        assert!(result.is_ok());
+
+        // Check subscription is tracked
+        let sub = Subscription::clearinghouse_state("0x1234567890123456789012345678901234567890");
+        assert!(client.subscription_manager().contains(&sub).await);
+
+        client.close().await.unwrap();
+    }
+
+    #[tokio::test]
+    #[ignore]
+    async fn test_subscribe_clearinghouse_state_with_dex_integration() {
+        let client = WsClient::mainnet();
+        client.connect().await.unwrap();
+
+        let result = client.subscribe_clearinghouse_state_with_dex(
+            "0x1234567890123456789012345678901234567890",
+            "perp"
+        ).await;
+        assert!(result.is_ok());
+
+        client.close().await.unwrap();
+    }
+
+    #[tokio::test]
+    #[ignore]
+    async fn test_subscribe_open_orders_integration() {
+        let client = WsClient::mainnet();
+        client.connect().await.unwrap();
+
+        let result = client.subscribe_open_orders("0x1234567890123456789012345678901234567890").await;
+        assert!(result.is_ok());
+
+        // Check subscription is tracked
+        let sub = Subscription::open_orders("0x1234567890123456789012345678901234567890");
+        assert!(client.subscription_manager().contains(&sub).await);
+
+        client.close().await.unwrap();
+    }
+
+    #[tokio::test]
+    #[ignore]
+    async fn test_subscribe_open_orders_with_dex_integration() {
+        let client = WsClient::mainnet();
+        client.connect().await.unwrap();
+
+        let result = client.subscribe_open_orders_with_dex(
+            "0x1234567890123456789012345678901234567890",
+            "spot"
+        ).await;
+        assert!(result.is_ok());
+
+        client.close().await.unwrap();
+    }
+
+    #[tokio::test]
+    #[ignore]
+    async fn test_subscribe_multiple_user_data_integration() {
+        let client = WsClient::mainnet();
+        client.connect().await.unwrap();
+
+        let user = "0x1234567890123456789012345678901234567890";
+
+        // Subscribe to multiple user data streams
+        client.subscribe_notification(user).await.unwrap();
+        client.subscribe_web_data3(user).await.unwrap();
+        client.subscribe_twap_states(user).await.unwrap();
+        client.subscribe_clearinghouse_state(user).await.unwrap();
+        client.subscribe_open_orders(user).await.unwrap();
 
         // Verify all subscriptions are tracked
         assert!(client.subscription_manager().total_count().await >= 5);
