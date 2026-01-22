@@ -19,6 +19,8 @@ use tokio_tungstenite::{
 use crate::client::Network;
 use crate::error::{Error, Result};
 
+use super::subscription::{Subscription, SubscriptionManager, SubscriptionRequest};
+
 /// WebSocket URL for mainnet
 pub const MAINNET_WS_URL: &str = "wss://api.hyperliquid.xyz/ws";
 
@@ -146,7 +148,8 @@ type WsStream = SplitStream<WebSocketStream<MaybeTlsStream<TcpStream>>>;
 
 /// WebSocket client for Hyperliquid
 ///
-/// Provides connection management, automatic reconnection, and heartbeat handling.
+/// Provides connection management, automatic reconnection, heartbeat handling,
+/// and subscription management.
 pub struct WsClient {
     /// The network to connect to
     network: Network,
@@ -172,6 +175,8 @@ pub struct WsClient {
     shutdown_tx: watch::Sender<bool>,
     /// Shutdown signal receiver
     shutdown_rx: watch::Receiver<bool>,
+    /// Subscription manager
+    subscriptions: SubscriptionManager,
 }
 
 impl std::fmt::Debug for WsClient {
@@ -208,6 +213,7 @@ impl WsClient {
             last_ping: Arc::new(RwLock::new(None)),
             shutdown_tx,
             shutdown_rx,
+            subscriptions: SubscriptionManager::new(),
         }
     }
 
@@ -527,6 +533,163 @@ impl WsClient {
         }
     }
 
+    // ========== Subscription Methods ==========
+
+    /// Subscribe to a WebSocket channel
+    ///
+    /// Sends a subscription request and tracks the subscription state.
+    /// The subscription is marked as pending until a confirmation is received.
+    ///
+    /// # Example
+    ///
+    /// ```ignore
+    /// use hyperliquid::websocket::{WsClient, Subscription};
+    ///
+    /// let client = WsClient::mainnet();
+    /// client.connect().await?;
+    /// client.subscribe(Subscription::trades("BTC")).await?;
+    /// ```
+    pub async fn subscribe(&self, subscription: Subscription) -> Result<()> {
+        if !self.is_connected().await {
+            return Err(Error::WebSocket("Not connected".to_string()));
+        }
+
+        // Check if already subscribed
+        if self.subscriptions.contains(&subscription).await {
+            return Ok(());
+        }
+
+        // Create subscription request
+        let request = SubscriptionRequest::subscribe(subscription.clone());
+
+        // Send the request
+        self.send_json(&request).await?;
+
+        // Mark as pending
+        self.subscriptions.add_pending(subscription).await;
+
+        Ok(())
+    }
+
+    /// Unsubscribe from a WebSocket channel
+    ///
+    /// Sends an unsubscription request and tracks the state.
+    ///
+    /// # Example
+    ///
+    /// ```ignore
+    /// use hyperliquid::websocket::{WsClient, Subscription};
+    ///
+    /// let client = WsClient::mainnet();
+    /// // ... subscribe first ...
+    /// client.unsubscribe(Subscription::trades("BTC")).await?;
+    /// ```
+    pub async fn unsubscribe(&self, subscription: Subscription) -> Result<()> {
+        if !self.is_connected().await {
+            return Err(Error::WebSocket("Not connected".to_string()));
+        }
+
+        // Check if subscription exists and is active
+        if !self.subscriptions.is_active(&subscription).await {
+            return Err(Error::WebSocket(
+                "Subscription not active or does not exist".to_string(),
+            ));
+        }
+
+        // Create unsubscription request
+        let request = SubscriptionRequest::unsubscribe(subscription.clone());
+
+        // Send the request
+        self.send_json(&request).await?;
+
+        // Mark as unsubscribing
+        self.subscriptions.mark_unsubscribing(&subscription).await;
+
+        Ok(())
+    }
+
+    /// Mark a subscription as active (called when confirmation is received)
+    ///
+    /// This is typically called internally when processing subscription responses,
+    /// but can be used manually if needed.
+    pub async fn confirm_subscription(&self, subscription: &Subscription) -> bool {
+        self.subscriptions.mark_active(subscription).await
+    }
+
+    /// Mark a subscription as removed (called when unsubscribe confirmation is received)
+    ///
+    /// This is typically called internally when processing subscription responses,
+    /// but can be used manually if needed.
+    pub async fn confirm_unsubscription(&self, subscription: &Subscription) -> bool {
+        self.subscriptions.remove(subscription).await
+    }
+
+    /// Get the subscription manager for direct access
+    pub fn subscription_manager(&self) -> &SubscriptionManager {
+        &self.subscriptions
+    }
+
+    /// Check if a subscription is active
+    pub async fn is_subscribed(&self, subscription: &Subscription) -> bool {
+        self.subscriptions.is_active(subscription).await
+    }
+
+    /// Get all active subscriptions
+    pub async fn active_subscriptions(&self) -> Vec<Subscription> {
+        self.subscriptions.active_subscriptions().await
+    }
+
+    /// Get the count of active subscriptions
+    pub async fn subscription_count(&self) -> usize {
+        self.subscriptions.active_count().await
+    }
+
+    /// Resubscribe to all active subscriptions
+    ///
+    /// This is useful after a reconnection to restore all subscriptions.
+    /// Returns the number of subscriptions that were resent.
+    pub async fn resubscribe_all(&self) -> Result<usize> {
+        if !self.is_connected().await {
+            return Err(Error::WebSocket("Not connected".to_string()));
+        }
+
+        let active = self.subscriptions.active_subscriptions().await;
+        let count = active.len();
+
+        for subscription in active {
+            let request = SubscriptionRequest::subscribe(subscription);
+            self.send_json(&request).await?;
+        }
+
+        Ok(count)
+    }
+
+    /// Unsubscribe from all active subscriptions
+    pub async fn unsubscribe_all(&self) -> Result<usize> {
+        if !self.is_connected().await {
+            return Err(Error::WebSocket("Not connected".to_string()));
+        }
+
+        let active = self.subscriptions.active_subscriptions().await;
+        let count = active.len();
+
+        for subscription in active {
+            let request = SubscriptionRequest::unsubscribe(subscription.clone());
+            self.send_json(&request).await?;
+            self.subscriptions.mark_unsubscribing(&subscription).await;
+        }
+
+        Ok(count)
+    }
+
+    /// Clear all subscription tracking (without sending unsubscribe requests)
+    ///
+    /// This is useful when you know the connection has been lost and
+    /// subscriptions are no longer valid on the server.
+    pub async fn clear_subscriptions(&self) {
+        self.subscriptions.clear().await;
+    }
+
     /// Receive the next message from the WebSocket
     ///
     /// Returns `None` if the connection is closed.
@@ -593,6 +756,7 @@ impl Clone for WsClient {
             last_ping: Arc::new(RwLock::new(None)),
             shutdown_tx,
             shutdown_rx,
+            subscriptions: SubscriptionManager::new(),
         }
     }
 }
@@ -956,6 +1120,171 @@ mod tests {
         let result = client.connect().await;
         assert!(result.is_ok());
         assert!(client.is_connected().await);
+        client.close().await.unwrap();
+    }
+
+    // ============ Subscription Tests (without network) ============
+
+    #[tokio::test]
+    async fn test_ws_client_subscribe_not_connected() {
+        let client = WsClient::mainnet();
+        let result = client.subscribe(Subscription::trades("BTC")).await;
+        assert!(result.is_err());
+        let err = result.unwrap_err();
+        assert!(err.to_string().contains("Not connected"));
+    }
+
+    #[tokio::test]
+    async fn test_ws_client_unsubscribe_not_connected() {
+        let client = WsClient::mainnet();
+        let result = client.unsubscribe(Subscription::trades("BTC")).await;
+        assert!(result.is_err());
+        let err = result.unwrap_err();
+        assert!(err.to_string().contains("Not connected"));
+    }
+
+    #[tokio::test]
+    async fn test_ws_client_subscription_manager_access() {
+        let client = WsClient::mainnet();
+        let manager = client.subscription_manager();
+        assert_eq!(manager.total_count().await, 0);
+    }
+
+    #[tokio::test]
+    async fn test_ws_client_initial_subscription_count() {
+        let client = WsClient::mainnet();
+        assert_eq!(client.subscription_count().await, 0);
+        assert!(client.active_subscriptions().await.is_empty());
+    }
+
+    #[tokio::test]
+    async fn test_ws_client_is_subscribed_false_initially() {
+        let client = WsClient::mainnet();
+        let sub = Subscription::trades("BTC");
+        assert!(!client.is_subscribed(&sub).await);
+    }
+
+    #[tokio::test]
+    async fn test_ws_client_clear_subscriptions() {
+        let client = WsClient::mainnet();
+        // Add a subscription manually via the manager
+        client
+            .subscription_manager()
+            .add_pending(Subscription::trades("BTC"))
+            .await;
+        client
+            .subscription_manager()
+            .mark_active(&Subscription::trades("BTC"))
+            .await;
+
+        assert_eq!(client.subscription_count().await, 1);
+
+        client.clear_subscriptions().await;
+        assert_eq!(client.subscription_count().await, 0);
+    }
+
+    #[tokio::test]
+    async fn test_ws_client_confirm_subscription() {
+        let client = WsClient::mainnet();
+        let sub = Subscription::trades("BTC");
+
+        // Add as pending via manager
+        client.subscription_manager().add_pending(sub.clone()).await;
+
+        // Confirm it
+        let result = client.confirm_subscription(&sub).await;
+        assert!(result);
+        assert!(client.is_subscribed(&sub).await);
+    }
+
+    #[tokio::test]
+    async fn test_ws_client_confirm_unsubscription() {
+        let client = WsClient::mainnet();
+        let sub = Subscription::trades("BTC");
+
+        // Add and activate via manager
+        client.subscription_manager().add_pending(sub.clone()).await;
+        client.subscription_manager().mark_active(&sub).await;
+
+        // Confirm unsubscription
+        let result = client.confirm_unsubscription(&sub).await;
+        assert!(result);
+        assert!(!client.is_subscribed(&sub).await);
+    }
+
+    #[tokio::test]
+    async fn test_ws_client_resubscribe_all_not_connected() {
+        let client = WsClient::mainnet();
+        let result = client.resubscribe_all().await;
+        assert!(result.is_err());
+    }
+
+    #[tokio::test]
+    async fn test_ws_client_unsubscribe_all_not_connected() {
+        let client = WsClient::mainnet();
+        let result = client.unsubscribe_all().await;
+        assert!(result.is_err());
+    }
+
+    // ============ Subscription Integration Tests (require network) ============
+
+    #[tokio::test]
+    #[ignore]
+    async fn test_ws_client_subscribe_trades() {
+        let client = WsClient::mainnet();
+        client.connect().await.unwrap();
+
+        let sub = Subscription::trades("BTC");
+        let result = client.subscribe(sub.clone()).await;
+        assert!(result.is_ok());
+
+        // Subscription should be pending (waiting for confirmation)
+        let status = client.subscription_manager().status(&sub).await;
+        assert!(status.is_some());
+
+        client.close().await.unwrap();
+    }
+
+    #[tokio::test]
+    #[ignore]
+    async fn test_ws_client_subscribe_l2_book() {
+        let client = WsClient::mainnet();
+        client.connect().await.unwrap();
+
+        let sub = Subscription::l2_book("ETH");
+        let result = client.subscribe(sub.clone()).await;
+        assert!(result.is_ok());
+
+        client.close().await.unwrap();
+    }
+
+    #[tokio::test]
+    #[ignore]
+    async fn test_ws_client_subscribe_all_mids() {
+        let client = WsClient::mainnet();
+        client.connect().await.unwrap();
+
+        let sub = Subscription::all_mids();
+        let result = client.subscribe(sub.clone()).await;
+        assert!(result.is_ok());
+
+        client.close().await.unwrap();
+    }
+
+    #[tokio::test]
+    #[ignore]
+    async fn test_ws_client_subscribe_duplicate() {
+        let client = WsClient::mainnet();
+        client.connect().await.unwrap();
+
+        let sub = Subscription::trades("BTC");
+
+        // Subscribe first time
+        client.subscribe(sub.clone()).await.unwrap();
+        // Subscribe again - should succeed (idempotent)
+        let result = client.subscribe(sub.clone()).await;
+        assert!(result.is_ok());
+
         client.close().await.unwrap();
     }
 }
