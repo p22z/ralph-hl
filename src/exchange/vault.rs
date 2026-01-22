@@ -26,7 +26,7 @@ pub struct VaultResponse {
 }
 
 /// Response data for vault operations
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct VaultResponseData {
     #[serde(rename = "type")]
     pub response_type: String,
@@ -35,7 +35,7 @@ pub struct VaultResponseData {
 }
 
 /// Result data for vault operations
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct VaultResultData {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub hash: Option<String>,

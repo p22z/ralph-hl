@@ -55,7 +55,7 @@ pub struct MiscResponse {
 }
 
 /// Response data for misc operations
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct MiscResponseData {
     #[serde(rename = "type")]
     pub response_type: String,
@@ -64,7 +64,7 @@ pub struct MiscResponseData {
 }
 
 /// Result data for misc operations
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct MiscResultData {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub hash: Option<String>,

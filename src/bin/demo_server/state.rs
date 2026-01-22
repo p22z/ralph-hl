@@ -8,6 +8,8 @@ use std::sync::Arc;
 pub struct AppState {
     /// SDK client for mainnet
     pub client: Arc<Client>,
+    /// Whether the client is connected to mainnet
+    pub is_mainnet: bool,
 }
 
 impl AppState {
@@ -15,6 +17,15 @@ impl AppState {
     pub fn new() -> Self {
         Self {
             client: Arc::new(Client::new(Network::Mainnet).expect("Failed to create SDK client")),
+            is_mainnet: true,
+        }
+    }
+
+    /// Create a new application state with testnet client
+    pub fn testnet() -> Self {
+        Self {
+            client: Arc::new(Client::new(Network::Testnet).expect("Failed to create SDK client")),
+            is_mainnet: false,
         }
     }
 }

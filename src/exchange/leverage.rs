@@ -29,7 +29,7 @@ pub struct LeverageResponse {
 }
 
 /// Response data for leverage operations
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct LeverageResponseData {
     #[serde(rename = "type")]
     pub response_type: String,
@@ -37,14 +37,14 @@ pub struct LeverageResponseData {
 }
 
 /// Result data for leverage operations
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct LeverageResultData {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub leverage: Option<LeverageResultInfo>,
 }
 
 /// Leverage result info
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct LeverageResultInfo {
     #[serde(rename = "type")]
@@ -55,14 +55,14 @@ pub struct LeverageResultInfo {
 }
 
 /// Exchange API response for isolated margin operations
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct IsolatedMarginResponse {
     pub status: String,
     pub response: Option<IsolatedMarginResponseData>,
 }
 
 /// Response data for isolated margin operations
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct IsolatedMarginResponseData {
     #[serde(rename = "type")]
     pub response_type: String,

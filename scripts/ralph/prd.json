@@ -516,8 +516,8 @@
         "Project compiles and runs"
       ],
       "priority": 5,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed: Axum 0.7 web server with tower-http middleware. CORS configured to allow any origin for demo purposes. SDK Client integrated in AppState with sample /api/info/perp-dexs and /api/info/meta endpoints. Static file serving from /static directory with index.html. Bloomberg-style white theme frontend with monospace fonts, clean borders, and professional dashboard aesthetic. Run with: cargo run --bin demo-server --features demo"
     },
     {
       "id": "US-034",
@@ -531,8 +531,8 @@
         "Request/response JSON formatting"
       ],
       "priority": 5,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed: Comprehensive REST API endpoints implemented. Info endpoints (40+): perpetuals metadata, spot metadata, market data (mids, l2-book, candles), user state (clearinghouse, orders, fills, funding), account info (rate limits, portfolio, fees, subaccounts), staking, vaults, borrow-lend. Exchange endpoints (25+): order placement/cancel/modify, TWAP orders, leverage/margin updates, transfers (USDC, spot, withdraw, spot-perp), staking (deposit, withdraw, delegate, undelegate), vault deposit/withdraw, agent/builder approvals, misc (reserve weight, noop, hip3). WebSocket proxy at /ws forwards to Hyperliquid upstream. Standard ApiResponse wrapper with success/error format. All endpoints return proper JSON with error handling."
     },
     {
       "id": "US-035",

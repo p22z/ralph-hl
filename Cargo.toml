@@ -50,6 +50,7 @@ demo = ["axum", "tower-http", "tracing", "tracing-subscriber"]
 
 [dependencies.axum]
 version = "0.7"
+features = ["ws"]
 optional = true
 
 [dependencies.tower-http]

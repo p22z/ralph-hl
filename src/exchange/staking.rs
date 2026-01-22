@@ -70,7 +70,7 @@ pub struct StakingResponse {
 }
 
 /// Response data for staking operations
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct StakingResponseData {
     #[serde(rename = "type")]
     pub response_type: String,
@@ -79,7 +79,7 @@ pub struct StakingResponseData {
 }
 
 /// Result data for staking operations
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct StakingResultData {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub hash: Option<String>,

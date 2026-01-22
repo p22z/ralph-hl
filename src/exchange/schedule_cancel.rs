@@ -35,7 +35,7 @@ pub struct ScheduleCancelResponse {
 }
 
 /// Response data for schedule cancel operations
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ScheduleCancelResponseData {
     #[serde(rename = "type")]
     pub response_type: String,
@@ -43,7 +43,7 @@ pub struct ScheduleCancelResponseData {
 }
 
 /// Result data for schedule cancel operations
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ScheduleCancelResultData {
     #[serde(rename = "scheduledTime")]
     pub scheduled_time: Option<u64>,

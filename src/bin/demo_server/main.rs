@@ -46,6 +46,8 @@ async fn main() {
         .route("/health", get(health_check))
         // API routes
         .nest("/api", routes::api_routes())
+        // WebSocket proxy for real-time data
+        .merge(routes::ws_routes())
         // Static file serving for frontend
         .nest_service("/", ServeDir::new("static").append_index_html_on_directories(true))
         // Add middleware

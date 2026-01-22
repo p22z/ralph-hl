@@ -33,7 +33,7 @@ pub struct TransferResponse {
 }
 
 /// Response data for transfer operations
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct TransferResponseData {
     #[serde(rename = "type")]
     pub response_type: String,
@@ -42,7 +42,7 @@ pub struct TransferResponseData {
 }
 
 /// Result data for transfer operations
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct TransferResultData {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub hash: Option<String>,

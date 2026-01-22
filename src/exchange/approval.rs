@@ -69,7 +69,7 @@ pub struct ApprovalResponse {
 }
 
 /// Response data for approval operations
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ApprovalResponseData {
     #[serde(rename = "type")]
     pub response_type: String,
@@ -78,7 +78,7 @@ pub struct ApprovalResponseData {
 }
 
 /// Result data for approval operations
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ApprovalResultData {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub hash: Option<String>,
