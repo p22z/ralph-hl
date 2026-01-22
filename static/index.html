@@ -5,325 +5,1155 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hyperliquid SDK Demo</title>
     <style>
+        :root {
+            /* Color palette - Bloomberg-inspired white theme */
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8f9fa;
+            --bg-tertiary: #f0f1f2;
+            --bg-panel: #fafbfc;
+            --border-light: #e8e9eb;
+            --border-medium: #d1d3d6;
+            --text-primary: #1a1d21;
+            --text-secondary: #5c6370;
+            --text-tertiary: #8b919a;
+            --accent-primary: #0066cc;
+            --accent-secondary: #004d99;
+            --success: #00875a;
+            --success-bg: #e3fcef;
+            --warning: #ff8b00;
+            --warning-bg: #fffae6;
+            --error: #de350b;
+            --error-bg: #ffebe6;
+
+            /* Typography */
+            --font-mono: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Mono', 'Droid Sans Mono', 'Consolas', monospace;
+            --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+
+            /* Spacing scale */
+            --space-xs: 4px;
+            --space-sm: 8px;
+            --space-md: 12px;
+            --space-lg: 16px;
+            --space-xl: 24px;
+            --space-2xl: 32px;
+            --space-3xl: 48px;
+
+            /* Font sizes */
+            --text-xs: 10px;
+            --text-sm: 11px;
+            --text-base: 12px;
+            --text-md: 13px;
+            --text-lg: 14px;
+            --text-xl: 16px;
+            --text-2xl: 20px;
+            --text-3xl: 24px;
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
+        html {
+            font-size: 16px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
         body {
-            font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Mono', 'Droid Sans Mono', monospace;
-            background-color: #ffffff;
-            color: #1a1a1a;
+            font-family: var(--font-mono);
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
             line-height: 1.5;
+            min-height: 100vh;
         }
 
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        header {
-            border-bottom: 1px solid #e0e0e0;
-            padding-bottom: 20px;
-            margin-bottom: 30px;
-        }
-
-        h1 {
-            font-size: 24px;
-            font-weight: 600;
-            color: #1a1a1a;
-        }
-
-        .subtitle {
-            font-size: 14px;
-            color: #666;
-            margin-top: 5px;
-        }
-
-        .layout {
+        /* Top Navigation Bar */
+        .top-bar {
+            background-color: var(--bg-primary);
+            border-bottom: 1px solid var(--border-light);
+            padding: var(--space-md) var(--space-xl);
             display: flex;
-            gap: 30px;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
 
-        .sidebar {
-            width: 250px;
-            flex-shrink: 0;
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
         }
 
-        .sidebar h2 {
-            font-size: 12px;
+        .logo {
+            font-size: var(--text-xl);
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -0.5px;
+        }
+
+        .logo-tag {
+            font-size: var(--text-xs);
+            color: var(--text-tertiary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 2px 6px;
+            background-color: var(--bg-tertiary);
+            border-radius: 3px;
+        }
+
+        .status-section {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xl);
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+        }
+
+        .status-dot.connected {
+            background-color: var(--success);
+            box-shadow: 0 0 4px var(--success);
+        }
+
+        .status-dot.disconnected {
+            background-color: var(--error);
+        }
+
+        .network-badge {
+            font-size: var(--text-xs);
+            padding: 2px 8px;
+            background-color: var(--accent-primary);
+            color: white;
+            border-radius: 3px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            color: #666;
-            margin-bottom: 10px;
+            font-weight: 600;
         }
 
-        .sidebar ul {
+        /* Main Layout */
+        .app-container {
+            display: flex;
+            height: calc(100vh - 49px);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 220px;
+            background-color: var(--bg-primary);
+            border-right: 1px solid var(--border-light);
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            overflow-y: auto;
+        }
+
+        .nav-section {
+            padding: var(--space-lg) 0;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .nav-section:last-child {
+            border-bottom: none;
+        }
+
+        .nav-header {
+            font-size: var(--text-xs);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-tertiary);
+            padding: 0 var(--space-lg) var(--space-sm);
+            font-weight: 600;
+        }
+
+        .nav-list {
             list-style: none;
         }
 
-        .sidebar li {
-            padding: 8px 12px;
-            border-radius: 4px;
+        .nav-item {
+            padding: var(--space-sm) var(--space-lg);
+            font-size: var(--text-md);
+            color: var(--text-secondary);
             cursor: pointer;
-            font-size: 13px;
-            transition: background-color 0.15s;
+            transition: all 0.1s ease;
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            border-left: 2px solid transparent;
         }
 
-        .sidebar li:hover {
-            background-color: #f5f5f5;
+        .nav-item:hover {
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
         }
 
-        .sidebar li.active {
-            background-color: #e8f4fd;
-            color: #0066cc;
+        .nav-item.active {
+            background-color: var(--bg-tertiary);
+            color: var(--accent-primary);
+            border-left-color: var(--accent-primary);
+            font-weight: 500;
         }
 
+        .nav-item-count {
+            margin-left: auto;
+            font-size: var(--text-xs);
+            color: var(--text-tertiary);
+            background-color: var(--bg-tertiary);
+            padding: 1px 6px;
+            border-radius: 10px;
+        }
+
+        /* Main Content Area */
         .main-content {
             flex: 1;
+            display: flex;
+            flex-direction: column;
             min-width: 0;
+            overflow: hidden;
         }
 
+        /* Content Header */
+        .content-header {
+            background-color: var(--bg-primary);
+            border-bottom: 1px solid var(--border-light);
+            padding: var(--space-lg) var(--space-xl);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .content-title-section {
+            flex: 1;
+        }
+
+        .content-title {
+            font-size: var(--text-xl);
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: var(--space-xs);
+        }
+
+        .content-description {
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+            max-width: 600px;
+        }
+
+        .content-actions {
+            display: flex;
+            gap: var(--space-sm);
+        }
+
+        /* Buttons */
+        .btn {
+            font-family: var(--font-mono);
+            font-size: var(--text-sm);
+            padding: var(--space-sm) var(--space-lg);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.1s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-sm);
+            font-weight: 500;
+            border: 1px solid transparent;
+        }
+
+        .btn-primary {
+            background-color: var(--accent-primary);
+            color: white;
+            border-color: var(--accent-primary);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--accent-secondary);
+            border-color: var(--accent-secondary);
+        }
+
+        .btn-secondary {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            border-color: var(--border-medium);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--bg-secondary);
+        }
+
+        .btn-icon {
+            padding: var(--space-sm);
+        }
+
+        /* Content Body */
+        .content-body {
+            flex: 1;
+            padding: var(--space-xl);
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-lg);
+        }
+
+        /* Panels */
         .panel {
-            border: 1px solid #e0e0e0;
+            background-color: var(--bg-primary);
+            border: 1px solid var(--border-light);
             border-radius: 6px;
-            margin-bottom: 20px;
+            overflow: hidden;
         }
 
         .panel-header {
-            padding: 12px 16px;
-            border-bottom: 1px solid #e0e0e0;
-            background-color: #fafafa;
+            padding: var(--space-md) var(--space-lg);
+            border-bottom: 1px solid var(--border-light);
+            background-color: var(--bg-panel);
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
-        .panel-header h3 {
-            font-size: 14px;
+        .panel-title {
+            font-size: var(--text-md);
             font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .panel-title-tag {
+            font-size: var(--text-xs);
+            font-weight: 400;
+            color: var(--text-tertiary);
+            padding: 2px 6px;
+            background-color: var(--bg-tertiary);
+            border-radius: 3px;
+        }
+
+        .panel-actions {
+            display: flex;
+            gap: var(--space-sm);
         }
 
         .panel-body {
-            padding: 16px;
+            padding: var(--space-lg);
         }
 
-        .btn {
-            padding: 8px 16px;
-            border: 1px solid #d0d0d0;
+        /* Input Forms */
+        .form-group {
+            margin-bottom: var(--space-lg);
+        }
+
+        .form-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .form-label {
+            display: block;
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+            margin-bottom: var(--space-sm);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: var(--space-sm) var(--space-md);
+            font-family: var(--font-mono);
+            font-size: var(--text-md);
+            border: 1px solid var(--border-medium);
             border-radius: 4px;
-            background-color: #fff;
-            font-family: inherit;
-            font-size: 13px;
-            cursor: pointer;
-            transition: all 0.15s;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            transition: border-color 0.1s ease;
         }
 
-        .btn:hover {
-            background-color: #f5f5f5;
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 2px rgba(0, 102, 204, 0.1);
         }
 
-        .btn-primary {
-            background-color: #0066cc;
-            border-color: #0066cc;
-            color: #fff;
+        .form-input::placeholder {
+            color: var(--text-tertiary);
         }
 
-        .btn-primary:hover {
-            background-color: #0052a3;
+        .form-row {
+            display: flex;
+            gap: var(--space-lg);
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        /* Response Area */
+        .response-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 300px;
         }
 
         .response-area {
-            background-color: #f8f8f8;
-            border: 1px solid #e0e0e0;
+            flex: 1;
+            background-color: var(--bg-tertiary);
             border-radius: 4px;
-            padding: 12px;
-            font-size: 12px;
-            overflow-x: auto;
-            max-height: 500px;
-            overflow-y: auto;
+            padding: var(--space-lg);
+            overflow: auto;
+            font-size: var(--text-base);
+            line-height: 1.6;
         }
 
         .response-area pre {
             white-space: pre-wrap;
             word-wrap: break-word;
+            margin: 0;
         }
 
-        .loading {
-            color: #666;
+        .response-area.loading {
+            color: var(--text-tertiary);
             font-style: italic;
-        }
-
-        .error {
-            color: #cc0000;
-        }
-
-        .success {
-            color: #008000;
-        }
-
-        .status-indicator {
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            margin-right: 8px;
-        }
-
-        .status-connected {
-            background-color: #00cc00;
-        }
-
-        .status-disconnected {
-            background-color: #cc0000;
-        }
-
-        .status-bar {
             display: flex;
             align-items: center;
-            font-size: 12px;
-            color: #666;
+            justify-content: center;
         }
 
-        footer {
-            margin-top: 40px;
-            padding-top: 20px;
-            border-top: 1px solid #e0e0e0;
-            font-size: 12px;
-            color: #666;
+        .response-area.error {
+            background-color: var(--error-bg);
+            color: var(--error);
+        }
+
+        .response-area.success pre {
+            color: var(--text-primary);
+        }
+
+        /* JSON Syntax Highlighting */
+        .json-key {
+            color: #0550ae;
+        }
+
+        .json-string {
+            color: #0a3069;
+        }
+
+        .json-number {
+            color: #0550ae;
+        }
+
+        .json-boolean {
+            color: #cf222e;
+        }
+
+        .json-null {
+            color: #6e7781;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--space-lg);
+            margin-bottom: var(--space-lg);
+        }
+
+        .stat-card {
+            background-color: var(--bg-primary);
+            border: 1px solid var(--border-light);
+            border-radius: 6px;
+            padding: var(--space-lg);
+        }
+
+        .stat-label {
+            font-size: var(--text-xs);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-tertiary);
+            margin-bottom: var(--space-xs);
+        }
+
+        .stat-value {
+            font-size: var(--text-2xl);
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .stat-value.positive {
+            color: var(--success);
+        }
+
+        .stat-value.negative {
+            color: var(--error);
+        }
+
+        .stat-change {
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+            margin-top: var(--space-xs);
+        }
+
+        /* Data Table */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: var(--text-sm);
+        }
+
+        .data-table th {
+            text-align: left;
+            padding: var(--space-sm) var(--space-md);
+            font-size: var(--text-xs);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-tertiary);
+            border-bottom: 1px solid var(--border-light);
+            background-color: var(--bg-panel);
+            font-weight: 600;
+        }
+
+        .data-table td {
+            padding: var(--space-sm) var(--space-md);
+            border-bottom: 1px solid var(--border-light);
+            color: var(--text-primary);
+        }
+
+        .data-table tr:hover td {
+            background-color: var(--bg-secondary);
+        }
+
+        /* Keyboard Shortcuts */
+        kbd {
+            font-family: var(--font-mono);
+            font-size: var(--text-xs);
+            padding: 2px 6px;
+            background-color: var(--bg-tertiary);
+            border: 1px solid var(--border-medium);
+            border-radius: 3px;
+            color: var(--text-secondary);
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-medium);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-tertiary);
+        }
+
+        /* Footer */
+        .footer {
+            padding: var(--space-md) var(--space-xl);
+            border-top: 1px solid var(--border-light);
+            background-color: var(--bg-primary);
+            font-size: var(--text-xs);
+            color: var(--text-tertiary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: var(--space-lg);
+        }
+
+        .footer-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+        }
+
+        .footer-link:hover {
+            color: var(--accent-primary);
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid var(--border-light);
+            border-top-color: var(--accent-primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 992px) {
+            .sidebar {
+                width: 200px;
+            }
+
+            .content-header {
+                flex-direction: column;
+                gap: var(--space-lg);
+            }
+
+            .content-actions {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .top-bar {
+                padding: var(--space-sm) var(--space-lg);
+            }
+
+            .status-section {
+                gap: var(--space-md);
+            }
+
+            .status-item span:last-child {
+                display: none;
+            }
+
+            .app-container {
+                flex-direction: column;
+                height: auto;
+                min-height: calc(100vh - 49px);
+            }
+
+            .sidebar {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid var(--border-light);
+                max-height: 200px;
+                overflow-y: auto;
+            }
+
+            .nav-section {
+                padding: var(--space-md) 0;
+            }
+
+            .nav-list {
+                display: flex;
+                flex-wrap: wrap;
+                padding: 0 var(--space-md);
+                gap: var(--space-xs);
+            }
+
+            .nav-item {
+                padding: var(--space-xs) var(--space-md);
+                border-radius: 20px;
+                border-left: none;
+            }
+
+            .nav-item.active {
+                border-left: none;
+                background-color: var(--accent-primary);
+                color: white;
+            }
+
+            .nav-item-count {
+                display: none;
+            }
+
+            .content-body {
+                padding: var(--space-lg);
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-row {
+                flex-direction: column;
+            }
+
+            .footer {
+                flex-direction: column;
+                gap: var(--space-md);
+                text-align: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .logo-tag {
+                display: none;
+            }
+
+            .network-badge {
+                font-size: 9px;
+                padding: 2px 6px;
+            }
+
+            .btn {
+                padding: var(--space-sm) var(--space-md);
+                font-size: var(--text-xs);
+            }
+
+            .panel-body {
+                padding: var(--space-md);
+            }
+
+            .response-area {
+                font-size: var(--text-sm);
+                padding: var(--space-md);
+            }
+        }
+
+        /* Utility Classes */
+        .hidden {
+            display: none !important;
+        }
+
+        .text-mono {
+            font-family: var(--font-mono);
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .text-center {
             text-align: center;
         }
+
+        .text-success {
+            color: var(--success);
+        }
+
+        .text-error {
+            color: var(--error);
+        }
+
+        .text-warning {
+            color: var(--warning);
+        }
+
+        .text-muted {
+            color: var(--text-tertiary);
+        }
+
+        .mt-sm { margin-top: var(--space-sm); }
+        .mt-md { margin-top: var(--space-md); }
+        .mt-lg { margin-top: var(--space-lg); }
+        .mb-sm { margin-bottom: var(--space-sm); }
+        .mb-md { margin-bottom: var(--space-md); }
+        .mb-lg { margin-bottom: var(--space-lg); }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>Hyperliquid SDK Demo</h1>
-            <p class="subtitle">Bloomberg-style dashboard for the Hyperliquid Rust SDK</p>
-        </header>
+    <!-- Top Navigation Bar -->
+    <header class="top-bar">
+        <div class="logo-section">
+            <span class="logo">HYPERLIQUID</span>
+            <span class="logo-tag">SDK Demo</span>
+        </div>
+        <div class="status-section">
+            <div class="status-item">
+                <span class="status-dot connected" id="connection-status"></span>
+                <span>API Connected</span>
+            </div>
+            <span class="network-badge" id="network-badge">Mainnet</span>
+        </div>
+    </header>
 
-        <div class="layout">
-            <nav class="sidebar">
-                <h2>Info Endpoints</h2>
-                <ul id="info-nav">
-                    <li class="active" data-endpoint="perp-dexs">Perp DEXs</li>
-                    <li data-endpoint="meta">Meta</li>
+    <!-- Main Application Container -->
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <div class="nav-section">
+                <div class="nav-header">Info Endpoints</div>
+                <ul class="nav-list" id="info-nav">
+                    <li class="nav-item active" data-endpoint="perp-dexs">Perp DEXs</li>
+                    <li class="nav-item" data-endpoint="meta">Meta</li>
+                    <li class="nav-item" data-endpoint="all-mids">All Mids</li>
+                    <li class="nav-item" data-endpoint="l2-book">L2 Book</li>
                 </ul>
-
-                <h2 style="margin-top: 20px;">Exchange Endpoints</h2>
-                <ul id="exchange-nav">
-                    <li data-endpoint="coming-soon">Coming Soon</li>
+            </div>
+            <div class="nav-section">
+                <div class="nav-header">User Data</div>
+                <ul class="nav-list" id="user-nav">
+                    <li class="nav-item" data-endpoint="clearinghouse">Clearinghouse</li>
+                    <li class="nav-item" data-endpoint="open-orders">Open Orders</li>
+                    <li class="nav-item" data-endpoint="user-fills">User Fills</li>
                 </ul>
-
-                <h2 style="margin-top: 20px;">WebSocket</h2>
-                <ul id="ws-nav">
-                    <li data-endpoint="ws-demo">Live Data</li>
+            </div>
+            <div class="nav-section">
+                <div class="nav-header">Exchange</div>
+                <ul class="nav-list" id="exchange-nav">
+                    <li class="nav-item" data-endpoint="place-order">Place Order</li>
+                    <li class="nav-item" data-endpoint="cancel-order">Cancel Order</li>
                 </ul>
-            </nav>
+            </div>
+            <div class="nav-section">
+                <div class="nav-header">WebSocket</div>
+                <ul class="nav-list" id="ws-nav">
+                    <li class="nav-item" data-endpoint="ws-demo">Live Data</li>
+                </ul>
+            </div>
+        </nav>
 
-            <main class="main-content">
-                <div class="panel">
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Content Header -->
+            <div class="content-header">
+                <div class="content-title-section">
+                    <h1 class="content-title" id="endpoint-title">Perp DEXs</h1>
+                    <p class="content-description" id="endpoint-description">
+                        Retrieve all perpetual DEXs available on Hyperliquid. Returns DEX names, their indices, and configuration details.
+                    </p>
+                </div>
+                <div class="content-actions">
+                    <button class="btn btn-secondary" id="copy-btn" title="Copy response">
+                        Copy
+                    </button>
+                    <button class="btn btn-primary" id="call-btn">
+                        Call Endpoint
+                    </button>
+                </div>
+            </div>
+
+            <!-- Content Body -->
+            <div class="content-body">
+                <!-- Parameters Panel (hidden by default, shown for endpoints that need params) -->
+                <div class="panel hidden" id="params-panel">
                     <div class="panel-header">
-                        <h3 id="endpoint-title">Perp DEXs</h3>
-                        <div class="status-bar">
-                            <span class="status-indicator status-connected"></span>
-                            <span>Connected to Mainnet</span>
-                        </div>
+                        <span class="panel-title">
+                            Parameters
+                            <span class="panel-title-tag">Optional</span>
+                        </span>
                     </div>
                     <div class="panel-body">
-                        <p style="margin-bottom: 12px; font-size: 13px; color: #666;">
-                            <span id="endpoint-description">Retrieve all perpetual DEXs available on Hyperliquid.</span>
-                        </p>
-                        <button class="btn btn-primary" id="call-btn">Call Endpoint</button>
+                        <div id="params-form">
+                            <!-- Dynamic parameter inputs will be inserted here -->
+                        </div>
                     </div>
                 </div>
 
-                <div class="panel">
+                <!-- Response Panel -->
+                <div class="panel response-container">
                     <div class="panel-header">
-                        <h3>Response</h3>
+                        <span class="panel-title">
+                            Response
+                            <span class="panel-title-tag" id="response-time"></span>
+                        </span>
+                        <div class="panel-actions">
+                            <button class="btn btn-secondary btn-icon" id="format-btn" title="Format JSON">
+                                { }
+                            </button>
+                        </div>
                     </div>
-                    <div class="panel-body">
+                    <div class="panel-body" style="flex: 1; display: flex; flex-direction: column;">
                         <div class="response-area" id="response-area">
                             <pre id="response-content">Click "Call Endpoint" to see the response.</pre>
                         </div>
                     </div>
                 </div>
-            </main>
-        </div>
-
-        <footer>
-            <p>Hyperliquid Rust SDK Demo &mdash; v0.1.0</p>
-        </footer>
+            </div>
+        </main>
     </div>
 
+    <!-- Footer -->
+    <footer class="footer">
+        <div>Hyperliquid Rust SDK v0.1.0</div>
+        <div class="footer-links">
+            <a href="https://hyperliquid.xyz" class="footer-link" target="_blank">Hyperliquid</a>
+            <a href="https://hyperliquid.gitbook.io/hyperliquid-docs" class="footer-link" target="_blank">API Docs</a>
+        </div>
+    </footer>
+
     <script>
+        // Endpoint configuration
         const endpoints = {
             'perp-dexs': {
                 title: 'Perp DEXs',
-                description: 'Retrieve all perpetual DEXs available on Hyperliquid.',
-                url: '/api/info/perp-dexs'
+                description: 'Retrieve all perpetual DEXs available on Hyperliquid. Returns DEX names, their indices, and configuration details.',
+                url: '/api/info/perp-dexs',
+                params: []
             },
             'meta': {
                 title: 'Meta',
-                description: 'Get perpetual metadata including available assets.',
-                url: '/api/info/meta'
+                description: 'Get perpetual metadata including available assets, their parameters, margin requirements, and trading limits.',
+                url: '/api/info/meta',
+                params: []
             },
-            'coming-soon': {
-                title: 'Coming Soon',
-                description: 'Exchange endpoints will be available in a future update.',
-                url: null
+            'all-mids': {
+                title: 'All Mids',
+                description: 'Get all mid prices for perpetual assets. Returns a mapping of asset names to their current mid prices.',
+                url: '/api/info/all-mids',
+                params: []
+            },
+            'l2-book': {
+                title: 'L2 Book',
+                description: 'Get the Level 2 order book snapshot for a specific asset. Returns bids and asks with price and size.',
+                url: '/api/info/l2-book',
+                params: [
+                    { name: 'coin', label: 'Coin', placeholder: 'BTC', required: true }
+                ]
+            },
+            'clearinghouse': {
+                title: 'Clearinghouse State',
+                description: 'Get the clearinghouse state for a user, including positions, margin summary, and account value.',
+                url: '/api/info/clearinghouse-state',
+                params: [
+                    { name: 'user', label: 'User Address', placeholder: '0x...', required: true }
+                ]
+            },
+            'open-orders': {
+                title: 'Open Orders',
+                description: 'Get all open orders for a user. Returns order details including price, size, and status.',
+                url: '/api/info/open-orders',
+                params: [
+                    { name: 'user', label: 'User Address', placeholder: '0x...', required: true }
+                ]
+            },
+            'user-fills': {
+                title: 'User Fills',
+                description: 'Get recent fills for a user. Returns trade history with prices, sizes, and timestamps.',
+                url: '/api/info/user-fills',
+                params: [
+                    { name: 'user', label: 'User Address', placeholder: '0x...', required: true }
+                ]
+            },
+            'place-order': {
+                title: 'Place Order',
+                description: 'Place a new order. Requires wallet authentication. This is a signed exchange action.',
+                url: '/api/exchange/place-order',
+                method: 'POST',
+                params: [
+                    { name: 'private_key', label: 'Private Key', placeholder: '0x...', required: true, type: 'password' },
+                    { name: 'asset', label: 'Asset', placeholder: 'BTC', required: true },
+                    { name: 'is_buy', label: 'Side', placeholder: 'true (buy) or false (sell)', required: true },
+                    { name: 'sz', label: 'Size', placeholder: '0.01', required: true },
+                    { name: 'limit_px', label: 'Limit Price', placeholder: '50000', required: true },
+                    { name: 'reduce_only', label: 'Reduce Only', placeholder: 'false', required: false }
+                ],
+                isExchange: true
+            },
+            'cancel-order': {
+                title: 'Cancel Order',
+                description: 'Cancel an existing order by order ID. Requires wallet authentication.',
+                url: '/api/exchange/cancel-order',
+                method: 'POST',
+                params: [
+                    { name: 'private_key', label: 'Private Key', placeholder: '0x...', required: true, type: 'password' },
+                    { name: 'asset', label: 'Asset', placeholder: 'BTC', required: true },
+                    { name: 'oid', label: 'Order ID', placeholder: '123456', required: true }
+                ],
+                isExchange: true
             },
             'ws-demo': {
                 title: 'WebSocket Demo',
-                description: 'Real-time WebSocket subscriptions will be available in a future update.',
-                url: null
+                description: 'Real-time WebSocket subscriptions for market data and user events. Connect to receive live updates.',
+                url: null,
+                params: []
             }
         };
 
         let currentEndpoint = 'perp-dexs';
 
-        // Set up navigation
-        document.querySelectorAll('.sidebar li').forEach(item => {
-            item.addEventListener('click', () => {
-                const endpoint = item.dataset.endpoint;
-                if (endpoints[endpoint]) {
-                    // Update active state
-                    document.querySelectorAll('.sidebar li').forEach(i => i.classList.remove('active'));
-                    item.classList.add('active');
+        // DOM Elements
+        const paramsPanel = document.getElementById('params-panel');
+        const paramsForm = document.getElementById('params-form');
+        const responseArea = document.getElementById('response-area');
+        const responseContent = document.getElementById('response-content');
+        const responseTime = document.getElementById('response-time');
+        const endpointTitle = document.getElementById('endpoint-title');
+        const endpointDescription = document.getElementById('endpoint-description');
+        const callBtn = document.getElementById('call-btn');
+        const copyBtn = document.getElementById('copy-btn');
+        const formatBtn = document.getElementById('format-btn');
 
-                    // Update UI
-                    currentEndpoint = endpoint;
-                    document.getElementById('endpoint-title').textContent = endpoints[endpoint].title;
-                    document.getElementById('endpoint-description').textContent = endpoints[endpoint].description;
-                    document.getElementById('response-content').textContent = 'Click "Call Endpoint" to see the response.';
+        // Initialize navigation
+        function initNavigation() {
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const endpoint = item.dataset.endpoint;
+                    if (endpoints[endpoint]) {
+                        selectEndpoint(endpoint);
+
+                        // Update active state
+                        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                        item.classList.add('active');
+                    }
+                });
+            });
+        }
+
+        // Select an endpoint
+        function selectEndpoint(endpoint) {
+            currentEndpoint = endpoint;
+            const config = endpoints[endpoint];
+
+            endpointTitle.textContent = config.title;
+            endpointDescription.textContent = config.description;
+            responseContent.textContent = 'Click "Call Endpoint" to see the response.';
+            responseArea.className = 'response-area';
+            responseTime.textContent = '';
+
+            // Update params panel
+            if (config.params && config.params.length > 0) {
+                paramsPanel.classList.remove('hidden');
+                renderParamsForm(config.params);
+            } else {
+                paramsPanel.classList.add('hidden');
+            }
+
+            // Update call button
+            if (!config.url) {
+                callBtn.disabled = true;
+                callBtn.textContent = 'Not Available';
+            } else {
+                callBtn.disabled = false;
+                callBtn.textContent = config.isExchange ? 'Execute Action' : 'Call Endpoint';
+            }
+        }
+
+        // Render parameter form
+        function renderParamsForm(params) {
+            paramsForm.innerHTML = params.map(param => `
+                <div class="form-group">
+                    <label class="form-label">${param.label}${param.required ? ' *' : ''}</label>
+                    <input
+                        type="${param.type || 'text'}"
+                        class="form-input"
+                        name="${param.name}"
+                        placeholder="${param.placeholder}"
+                        ${param.required ? 'required' : ''}
+                    >
+                </div>
+            `).join('');
+        }
+
+        // Collect form parameters
+        function collectParams() {
+            const params = {};
+            paramsForm.querySelectorAll('.form-input').forEach(input => {
+                if (input.value) {
+                    params[input.name] = input.value;
                 }
             });
-        });
+            return params;
+        }
 
-        // Call endpoint button
-        document.getElementById('call-btn').addEventListener('click', async () => {
-            const endpoint = endpoints[currentEndpoint];
-            if (!endpoint.url) {
-                document.getElementById('response-content').textContent = 'This endpoint is not yet implemented.';
+        // Call endpoint
+        async function callEndpoint() {
+            const config = endpoints[currentEndpoint];
+            if (!config.url) {
+                responseContent.textContent = 'This endpoint is not yet implemented.';
                 return;
             }
 
-            const responseEl = document.getElementById('response-content');
-            responseEl.textContent = 'Loading...';
-            responseEl.className = 'loading';
+            const params = collectParams();
+
+            // Validate required params
+            const missingParams = config.params
+                .filter(p => p.required && !params[p.name])
+                .map(p => p.label);
+
+            if (missingParams.length > 0) {
+                responseContent.textContent = `Missing required parameters: ${missingParams.join(', ')}`;
+                responseArea.className = 'response-area error';
+                return;
+            }
+
+            responseContent.textContent = 'Loading...';
+            responseArea.className = 'response-area loading';
+            const startTime = performance.now();
 
             try {
-                const response = await fetch(endpoint.url);
+                let url = config.url;
+                let options = { method: 'GET' };
+
+                if (config.method === 'POST') {
+                    options = {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(params)
+                    };
+                } else if (Object.keys(params).length > 0) {
+                    const searchParams = new URLSearchParams(params);
+                    url = `${config.url}?${searchParams}`;
+                }
+
+                const response = await fetch(url, options);
                 const data = await response.json();
-                responseEl.textContent = JSON.stringify(data, null, 2);
-                responseEl.className = data.success ? 'success' : 'error';
+                const duration = Math.round(performance.now() - startTime);
+
+                responseTime.textContent = `${duration}ms`;
+                responseContent.textContent = JSON.stringify(data, null, 2);
+                responseArea.className = data.success ? 'response-area success' : 'response-area error';
             } catch (error) {
-                responseEl.textContent = 'Error: ' + error.message;
-                responseEl.className = 'error';
+                const duration = Math.round(performance.now() - startTime);
+                responseTime.textContent = `${duration}ms`;
+                responseContent.textContent = `Error: ${error.message}`;
+                responseArea.className = 'response-area error';
+            }
+        }
+
+        // Copy response
+        function copyResponse() {
+            const text = responseContent.textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                const originalText = copyBtn.textContent;
+                copyBtn.textContent = 'Copied!';
+                setTimeout(() => {
+                    copyBtn.textContent = originalText;
+                }, 1500);
+            });
+        }
+
+        // Format JSON
+        function formatJson() {
+            try {
+                const json = JSON.parse(responseContent.textContent);
+                responseContent.textContent = JSON.stringify(json, null, 2);
+            } catch (e) {
+                // Not valid JSON, ignore
+            }
+        }
+
+        // Event listeners
+        callBtn.addEventListener('click', callEndpoint);
+        copyBtn.addEventListener('click', copyResponse);
+        formatBtn.addEventListener('click', formatJson);
+
+        // Keyboard shortcut: Enter to call endpoint
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && e.ctrlKey) {
+                callEndpoint();
             }
         });
+
+        // Initialize
+        initNavigation();
     </script>
 </body>
 </html>
