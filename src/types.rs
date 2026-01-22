@@ -1558,6 +1558,109 @@ pub struct PerpDexLimits {
     pub coin_to_oi_cap: Vec<(String, String)>,
 }
 
+/// Non-funding ledger update entry
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct LedgerUpdate {
+    pub hash: String,
+    pub time: u64,
+    pub delta: LedgerDelta,
+}
+
+/// Ledger delta - represents the change in a ledger update
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct LedgerDelta {
+    #[serde(rename = "type")]
+    pub delta_type: String,
+    pub usdc: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub fee: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub nonce: Option<u64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub destination: Option<String>,
+}
+
+/// Rate limit information
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct RateLimitInfo {
+    pub cum_vlm: String,
+    pub n_request_ids: u64,
+    pub n_request_weights: u64,
+}
+
+/// Portfolio summary response
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Portfolio {
+    pub account_value: String,
+    pub total_margin_used: String,
+    pub total_ntl_pos: String,
+    pub cum_vlm: String,
+    pub cum_trading_fee: String,
+    pub cum_funding: String,
+    pub cum_referral_fee: String,
+    pub user_pnl: String,
+}
+
+/// Fee schedule entry
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct FeeSchedule {
+    pub taker: String,
+    pub maker: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub add_liquidity_rebate: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub referral_discount: Option<String>,
+}
+
+/// User fees response
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct UserFees {
+    pub active_referral_discount: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub daily_user_vlm: Option<Vec<DailyUserVlm>>,
+    pub fee_schedule: FeeSchedule,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub trial_active: Option<bool>,
+    pub user_add_rate: String,
+    pub user_cross_rate: String,
+}
+
+/// Daily user volume entry
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct DailyUserVlm {
+    pub date: String,
+    pub exchange_vlm: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub user_vlm: Option<String>,
+}
+
+/// User role response
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct UserRole {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub role: Option<String>,
+    pub is_vip: bool,
+    pub is_mm: bool,
+}
+
+/// Subaccount entry
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Subaccount {
+    pub sub_account_user: String,
+    pub name: String,
+    pub master: String,
+    pub clearinghouse_state: Option<ClearinghouseState>,
+}
+
 // ============================================================================
 // Exchange Endpoint Types
 // ============================================================================

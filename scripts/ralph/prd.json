@@ -155,8 +155,8 @@
         "Unit tests for each function"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed: User clearinghouse state module with clearinghouse_state(user, dex?) and spot_clearinghouse_state(user) methods implemented as Client extensions. 12 unit tests with mocked responses covering all endpoints, optional dex parameter, multiple positions, empty balances, and error handling."
     },
     {
       "id": "US-010",
@@ -170,8 +170,8 @@
         "Unit tests for each function"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed: Orders info module with open_orders(user, dex?), frontend_open_orders(user, dex?), historical_orders(user), and order_status(user, oid) methods implemented as Client extensions. Added HistoricalOrder response type. 22 unit tests with mocked responses covering all endpoints, optional dex parameter, order ID types (oid/cloid), and error handling."
     },
     {
       "id": "US-011",
@@ -184,8 +184,8 @@
         "Unit tests for each function"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed: Fills module with user_fills(user, dex?), user_fills_by_time(user, start_time, end_time?), and user_twap_slice_fills(user) methods implemented as Client extensions. Added TwapSliceFill response type. 21 unit tests with mocked responses covering all endpoints, optional parameters, and error handling."
     },
     {
       "id": "US-012",
@@ -198,8 +198,8 @@
         "Unit tests for each function"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed: Funding module with user_funding(user, start_time, end_time?), funding_history(coin, start_time, end_time?), and predicted_fundings() methods implemented as Client extensions. 16 unit tests with mocked responses covering all endpoints, optional parameters, empty responses, and error handling."
     },
     {
       "id": "US-013",
@@ -215,8 +215,8 @@
         "Unit tests for each function"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed: Account module with user_non_funding_ledger_updates(user, start_time, end_time?), rate_limits(user), portfolio(user), user_fees(user), user_role(user), and subaccounts(user) methods implemented as Client extensions. Added LedgerUpdate, LedgerDelta, RateLimitInfo, Portfolio, FeeSchedule, UserFees, DailyUserVlm, UserRole, and Subaccount response types. 19 unit tests with mocked responses covering all endpoints, optional parameters, and error handling."
     },
     {
       "id": "US-014",
