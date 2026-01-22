@@ -20,4 +20,5 @@ pub use exchange::modify::{ModifyOrderBuilder, ModifyTriggerOrderBuilder, Modify
 pub use exchange::orders::{
     get_order_id, is_order_successful, LimitOrderBuilder, TriggerOrderBuilder,
 };
+pub use exchange::twap::{get_twap_error, get_twap_id, is_twap_running};
 pub use types::*;
