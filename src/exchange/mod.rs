@@ -4,4 +4,5 @@
 //! on the Hyperliquid exchange, including order placement, cancellation,
 //! and account management.
 
+pub mod cancel;
 pub mod orders;

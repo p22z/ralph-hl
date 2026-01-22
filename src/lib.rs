@@ -15,6 +15,7 @@ pub mod types;
 pub use auth::{Signature, Wallet};
 pub use client::{Client, Network, MAINNET_URL, TESTNET_URL};
 pub use error::{Error, Result};
+pub use exchange::cancel::is_cancel_successful;
 pub use exchange::orders::{
     get_order_id, is_order_successful, LimitOrderBuilder, TriggerOrderBuilder,
 };
