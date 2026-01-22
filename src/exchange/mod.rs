@@ -4,6 +4,7 @@
 //! on the Hyperliquid exchange, including order placement, cancellation,
 //! modification, and account management.
 
+pub mod approval;
 pub mod cancel;
 pub mod leverage;
 pub mod modify;

@@ -15,6 +15,7 @@ pub mod types;
 pub use auth::{Signature, Wallet};
 pub use client::{Client, Network, MAINNET_URL, TESTNET_URL};
 pub use error::{Error, Result};
+pub use exchange::approval::{get_approval_hash, is_approval_successful};
 pub use exchange::cancel::is_cancel_successful;
 pub use exchange::leverage::{get_updated_leverage, is_leverage_update_successful};
 pub use exchange::modify::{ModifyOrderBuilder, ModifyTriggerOrderBuilder, ModifyWire};
