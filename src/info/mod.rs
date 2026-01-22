@@ -12,3 +12,9 @@ mod perpetuals;
 mod spot;
 mod staking;
 mod user;
+mod vault;
+
+// Re-export vault types
+pub use vault::{
+    BuilderFeeApprovalInfo, Hip3State, PerpDexStatus, ReferralInfo, UserVaultDeposit, VaultDetails,
+};
