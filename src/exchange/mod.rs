@@ -7,6 +7,7 @@
 pub mod approval;
 pub mod cancel;
 pub mod leverage;
+pub mod misc;
 pub mod modify;
 pub mod orders;
 pub mod schedule_cancel;

@@ -18,6 +18,7 @@ pub use error::{Error, Result};
 pub use exchange::approval::{get_approval_hash, is_approval_successful};
 pub use exchange::cancel::is_cancel_successful;
 pub use exchange::leverage::{get_updated_leverage, is_leverage_update_successful};
+pub use exchange::misc::{get_misc_hash, is_misc_successful};
 pub use exchange::modify::{ModifyOrderBuilder, ModifyTriggerOrderBuilder, ModifyWire};
 pub use exchange::orders::{
     get_order_id, is_order_successful, LimitOrderBuilder, TriggerOrderBuilder,

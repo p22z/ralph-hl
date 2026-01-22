@@ -348,8 +348,8 @@
         "Unit tests for each function"
       ],
       "priority": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed: Leverage module with update_leverage() and update_isolated_margin() methods implemented as Client extensions. Both methods support optional vault_address for vault trading. Helper functions is_leverage_update_successful() and get_updated_leverage() for response handling. 27 unit tests with mocked responses covering all endpoints, validation, error handling, and wallet signing."
     },
     {
       "id": "US-023",
@@ -364,8 +364,8 @@
         "Unit tests for each function"
       ],
       "priority": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed: Transfer module with usd_transfer(), spot_transfer(), send_asset(), withdraw(), and spot_perp_transfer() methods implemented as Client extensions. All methods support optional vault_address for vault trading. Helper functions is_transfer_successful() and get_transfer_hash() for response handling. 35 unit tests with mocked responses covering all endpoints, validation, error handling, and wallet signing."
     },
     {
       "id": "US-024",
@@ -379,8 +379,8 @@
         "Unit tests for each function"
       ],
       "priority": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed: Staking action module with stake_deposit(), stake_withdraw(), delegate(), and undelegate() methods implemented as Client extensions. Helper functions is_staking_successful() and get_staking_hash() for response handling. 31 unit tests with mocked responses covering all endpoints, validation, error handling, and wallet signing."
     },
     {
       "id": "US-025",
@@ -392,8 +392,8 @@
         "Unit tests for each function"
       ],
       "priority": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed: Vault module with vault_deposit() and vault_withdraw() methods implemented as Client extensions. Helper functions is_vault_action_successful() and get_vault_hash() for response handling. 28 unit tests with mocked responses covering all endpoints, validation, error handling, and wallet signing."
     },
     {
       "id": "US-026",
@@ -405,8 +405,8 @@
         "Unit tests for each function"
       ],
       "priority": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed: Approval module with approve_agent() and approve_builder_fee() methods implemented as Client extensions. Both methods support mainnet/testnet chain configuration. Helper functions is_approval_successful() and get_approval_hash() for response handling. 29 unit tests with mocked responses covering all endpoints, validation, error handling, and wallet signing."
     },
     {
       "id": "US-027",
@@ -419,8 +419,8 @@
         "Unit tests for each function"
       ],
       "priority": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed: Misc module with reserve_request_weight(), noop(), and set_hip3_enabled() methods implemented as Client extensions. Helper functions is_misc_successful() and get_misc_hash() for response handling. 28 unit tests with mocked responses covering all endpoints, validation, error handling, and wallet signing."
     },
     {
       "id": "US-028",
