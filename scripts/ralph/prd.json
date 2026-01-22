@@ -1,0 +1,613 @@
+{
+  "projectName": "Hyperliquid Rust SDK & Demo Dashboard",
+  "branchName": "ralph/feature",
+  "phases": [
+    {
+      "id": "PHASE-1",
+      "name": "SDK Foundation & Core Infrastructure",
+      "description": "Set up Rust project structure, core client, types, and authentication"
+    },
+    {
+      "id": "PHASE-2",
+      "name": "Info Endpoints Implementation",
+      "description": "Implement all read-only info endpoints for market data and user queries"
+    },
+    {
+      "id": "PHASE-3",
+      "name": "Exchange Endpoints Implementation",
+      "description": "Implement all trading/exchange action endpoints"
+    },
+    {
+      "id": "PHASE-4",
+      "name": "WebSocket Implementation",
+      "description": "Implement real-time WebSocket subscriptions"
+    },
+    {
+      "id": "PHASE-5",
+      "name": "Demo Website",
+      "description": "Build Bloomberg-style white theme dashboard to demonstrate all API calls"
+    }
+  ],
+  "userStories": [
+    {
+      "id": "US-001",
+      "phase": "PHASE-1",
+      "title": "Initialize Rust project with Cargo",
+      "acceptanceCriteria": [
+        "Cargo.toml with required dependencies (reqwest, tokio, serde, serde_json, thiserror, ethers)",
+        "Project compiles successfully",
+        "Basic module structure created (lib.rs, client.rs, types.rs, error.rs)"
+      ],
+      "priority": 1,
+      "passes": true,
+      "notes": "Completed: Cargo.toml created with all dependencies, basic module structure (lib.rs, client.rs, types.rs, error.rs) implemented with unit tests."
+    },
+    {
+      "id": "US-002",
+      "phase": "PHASE-1",
+      "title": "Define core types and models",
+      "acceptanceCriteria": [
+        "Request/Response structs for all endpoints with Serde derive",
+        "Enum types for TimeInForce, OrderType, etc.",
+        "Types compile and serialize/deserialize correctly",
+        "Unit tests for type serialization"
+      ],
+      "priority": 1,
+      "passes": true,
+      "notes": "Completed: Comprehensive type definitions for all Info and Exchange endpoints. Includes 29 unit tests for serialization/deserialization covering enums, request structs, and response types."
+    },
+    {
+      "id": "US-003",
+      "phase": "PHASE-1",
+      "title": "Implement error handling module",
+      "acceptanceCriteria": [
+        "Custom error enum with thiserror",
+        "Error variants for HTTP, parsing, authentication, API errors",
+        "Result type alias for SDK",
+        "Unit tests for error conversions"
+      ],
+      "priority": 1,
+      "passes": true,
+      "notes": "Completed: Custom Error enum with Http, Json, Api, Auth, InvalidParameter, and WebSocket variants. Result type alias defined. Comprehensive unit tests for all error conversions and Display implementations."
+    },
+    {
+      "id": "US-004",
+      "phase": "PHASE-1",
+      "title": "Implement HTTP client wrapper",
+      "acceptanceCriteria": [
+        "Async HTTP client using reqwest",
+        "Base URL configuration (mainnet/testnet)",
+        "POST request helper for /info and /exchange endpoints",
+        "Response parsing with error handling",
+        "Unit tests with mocked responses"
+      ],
+      "priority": 1,
+      "passes": true,
+      "notes": "Completed: Async HTTP client with post_info() and post_exchange() methods. Response parsing handles HTTP errors, API error responses, and JSON parsing failures. Includes 10 comprehensive mocked tests using mockito."
+    },
+    {
+      "id": "US-005",
+      "phase": "PHASE-1",
+      "title": "Implement EIP-712 signing for authentication",
+      "acceptanceCriteria": [
+        "Wallet/private key handling",
+        "Nonce generation (timestamp in ms)",
+        "EIP-712 typed data signing",
+        "Signature formatting for API",
+        "Unit tests for signature generation"
+      ],
+      "priority": 1,
+      "passes": true,
+      "notes": "Completed: Wallet struct with from_private_key() and from_bytes() constructors. Nonce generation via generate_nonce() returning millisecond timestamps. EIP-712 signing using phantom agent construction with domain (Exchange, v1, chainId 1337). Signature formatting as {r, s, v} JSON. 14 unit tests covering wallet creation, nonce generation, connection ID computation, signing for mainnet/testnet, vault addresses, and serialization."
+    },
+    {
+      "id": "US-006",
+      "phase": "PHASE-2",
+      "title": "Implement Perpetuals metadata endpoints",
+      "acceptanceCriteria": [
+        "perpDexs() - retrieve all perp DEXs",
+        "meta(dex?) - get perp metadata",
+        "metaAndAssetCtxs(dex?) - metadata with asset contexts",
+        "allPerpMetas() - all perp DEX metadata",
+        "Unit tests for each function"
+      ],
+      "priority": 2,
+      "passes": true,
+      "notes": "Completed: Info module with perpetuals metadata endpoints. perp_dexs(), meta(dex?), meta_and_asset_ctxs(dex?), and all_perp_metas() methods implemented as Client extensions. 13 unit tests with mocked responses covering all endpoints, optional dex parameter, and error handling."
+    },
+    {
+      "id": "US-007",
+      "phase": "PHASE-2",
+      "title": "Implement Spot metadata endpoints",
+      "acceptanceCriteria": [
+        "spotMeta() - retrieve spot metadata",
+        "spotMetaAndAssetCtxs() - spot metadata with contexts",
+        "tokenDetails(tokenId) - get token details",
+        "spotDeployState(user) - deployment auction state",
+        "spotPairDeployAuctionStatus() - pair auction status",
+        "Unit tests for each function"
+      ],
+      "priority": 2,
+      "passes": true,
+      "notes": "Completed: Spot module with all metadata endpoints. spot_meta(), spot_meta_and_asset_ctxs(), token_details(tokenId), spot_deploy_state(user), and spot_pair_deploy_auction_status() methods implemented as Client extensions. Added SpotAssetCtx, TokenDetails, SpotDeployState, and SpotPairAuctionStatus response types. 17 unit tests with mocked responses covering all endpoints and error handling."
+    },
+    {
+      "id": "US-008",
+      "phase": "PHASE-2",
+      "title": "Implement market data endpoints",
+      "acceptanceCriteria": [
+        "allMids(dex?) - all mid prices",
+        "l2Book(coin, nSigFigs?, aggregationLevel?) - order book snapshot",
+        "candle(coin, interval, startTime, endTime?) - OHLCV candles",
+        "Unit tests for each function"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-009",
+      "phase": "PHASE-2",
+      "title": "Implement user clearinghouse state endpoints",
+      "acceptanceCriteria": [
+        "clearinghouseState(user, dex?) - perp account state",
+        "spotClearinghouseState(user) - spot balances",
+        "Unit tests for each function"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-010",
+      "phase": "PHASE-2",
+      "title": "Implement user orders endpoints",
+      "acceptanceCriteria": [
+        "openOrders(user, dex?) - open orders",
+        "frontendOpenOrders(user, dex?) - orders with frontend info",
+        "historicalOrders(user) - order history",
+        "orderStatus(user, oid | cloid) - query order by ID",
+        "Unit tests for each function"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-011",
+      "phase": "PHASE-2",
+      "title": "Implement user fills endpoints",
+      "acceptanceCriteria": [
+        "userFills(user, dex?) - recent fills",
+        "userFillsByTime(user, startTime, endTime?) - fills by time range",
+        "userTwapSliceFills(user) - TWAP slice fills",
+        "Unit tests for each function"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-012",
+      "phase": "PHASE-2",
+      "title": "Implement funding endpoints",
+      "acceptanceCriteria": [
+        "userFunding(user, startTime, endTime?) - user funding history",
+        "fundingHistory(coin, startTime, endTime?) - historical rates",
+        "predictedFundings() - predicted funding rates",
+        "Unit tests for each function"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-013",
+      "phase": "PHASE-2",
+      "title": "Implement user account info endpoints",
+      "acceptanceCriteria": [
+        "userNonFundingLedgerUpdates(user, startTime, endTime?)",
+        "rateLimits(user) - query rate limits",
+        "portfolio(user) - portfolio summary",
+        "userFees(user) - fee structure",
+        "userRole(user) - account role",
+        "subaccounts(user) - list subaccounts",
+        "Unit tests for each function"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-014",
+      "phase": "PHASE-2",
+      "title": "Implement staking info endpoints",
+      "acceptanceCriteria": [
+        "stakingDelegations(user) - delegations",
+        "stakingSummary(user) - staking summary",
+        "stakingHistory(user) - staking history",
+        "stakingRewards(user) - rewards",
+        "Unit tests for each function"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-015",
+      "phase": "PHASE-2",
+      "title": "Implement vault and misc info endpoints",
+      "acceptanceCriteria": [
+        "vaultDetails(vaultAddress) - vault info",
+        "userVaults(user) - user vault deposits",
+        "builderFeeApproval(user, builder) - check approval",
+        "referral(user) - referral info",
+        "hip3State(user) - HIP-3 abstraction state",
+        "activeAssetData(user, coin) - user asset data",
+        "perpsAtOpenInterestCap(dex?) - OI cap status",
+        "perpDexLimits(dex) - market limits",
+        "perpDexStatus(dex) - market status",
+        "perpDeployAuctionStatus() - deployment auction",
+        "Unit tests for each function"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-016",
+      "phase": "PHASE-2",
+      "title": "Implement borrow/lend info endpoints",
+      "acceptanceCriteria": [
+        "borrowLendUserState(user) - user borrow/lend state",
+        "borrowLendReserveState(coin) - reserve state",
+        "allBorrowLendReserveStates() - all reserves",
+        "alignedQuoteToken(coin) - quote token status",
+        "Unit tests for each function"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-017",
+      "phase": "PHASE-3",
+      "title": "Implement order placement endpoints",
+      "acceptanceCriteria": [
+        "placeOrder(order) - single order",
+        "placeBatchOrders(orders) - multiple orders",
+        "Supports limit, market, trigger orders",
+        "Supports all TimeInForce options (GTC, IOC, ALO)",
+        "Unit tests with mocked exchange responses"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-018",
+      "phase": "PHASE-3",
+      "title": "Implement order cancellation endpoints",
+      "acceptanceCriteria": [
+        "cancelOrder(asset, oid) - cancel by order ID",
+        "cancelOrderByCloid(asset, cloid) - cancel by client ID",
+        "cancelBatchOrders(cancels) - batch cancel",
+        "cancelBatchOrdersByCloid(cancels) - batch cancel by cloid",
+        "Unit tests for each function"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-019",
+      "phase": "PHASE-3",
+      "title": "Implement order modification endpoints",
+      "acceptanceCriteria": [
+        "modifyOrder(oid, newParams) - modify single order",
+        "modifyBatchOrders(modifications) - batch modify",
+        "Unit tests for each function"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-020",
+      "phase": "PHASE-3",
+      "title": "Implement TWAP order endpoints",
+      "acceptanceCriteria": [
+        "placeTwapOrder(asset, isBuy, size, minutes, randomize)",
+        "cancelTwapOrder(asset, twapId)",
+        "Unit tests for each function"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-021",
+      "phase": "PHASE-3",
+      "title": "Implement schedule cancel (dead man's switch)",
+      "acceptanceCriteria": [
+        "scheduleCancel(timestamp) - set auto-cancel time",
+        "Validates timestamp is >= 5 seconds in future",
+        "Unit tests for function"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-022",
+      "phase": "PHASE-3",
+      "title": "Implement leverage and margin endpoints",
+      "acceptanceCriteria": [
+        "updateLeverage(asset, isCross, leverage)",
+        "updateIsolatedMargin(asset, marginDelta)",
+        "Unit tests for each function"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-023",
+      "phase": "PHASE-3",
+      "title": "Implement transfer endpoints",
+      "acceptanceCriteria": [
+        "usdTransfer(destination, amount) - USDC transfer",
+        "spotTransfer(destination, token, amount) - spot token transfer",
+        "sendAsset(params) - generalized transfer",
+        "withdraw(destination, amount) - L1 withdrawal",
+        "spotPerpTransfer(amount, toPerp) - internal transfer",
+        "Unit tests for each function"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-024",
+      "phase": "PHASE-3",
+      "title": "Implement staking action endpoints",
+      "acceptanceCriteria": [
+        "stakeDeposit(weiAmount) - deposit to staking",
+        "stakeWithdraw(weiAmount) - withdraw from staking",
+        "delegate(validator, amount) - delegate to validator",
+        "undelegate(validator, amount) - undelegate",
+        "Unit tests for each function"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-025",
+      "phase": "PHASE-3",
+      "title": "Implement vault action endpoints",
+      "acceptanceCriteria": [
+        "vaultDeposit(vaultAddress, amount)",
+        "vaultWithdraw(vaultAddress, amount)",
+        "Unit tests for each function"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-026",
+      "phase": "PHASE-3",
+      "title": "Implement wallet and builder approval endpoints",
+      "acceptanceCriteria": [
+        "approveAgent(agentAddress, agentName?) - API wallet approval",
+        "approveBuilderFee(builder, maxFeeRate) - builder fee approval",
+        "Unit tests for each function"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-027",
+      "phase": "PHASE-3",
+      "title": "Implement misc exchange endpoints",
+      "acceptanceCriteria": [
+        "reserveRequestWeight(weight) - purchase rate limit",
+        "noop() - no-op action",
+        "setHip3Enabled(enabled) - HIP-3 abstraction toggle",
+        "Unit tests for each function"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-028",
+      "phase": "PHASE-4",
+      "title": "Implement WebSocket client foundation",
+      "acceptanceCriteria": [
+        "WebSocket connection to wss://api.hyperliquid.xyz/ws",
+        "Connection state management",
+        "Automatic reconnection logic",
+        "Heartbeat/ping handling",
+        "Unit tests for connection lifecycle"
+      ],
+      "priority": 4,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-029",
+      "phase": "PHASE-4",
+      "title": "Implement subscription management",
+      "acceptanceCriteria": [
+        "subscribe(subscription) - generic subscribe",
+        "unsubscribe(subscription) - unsubscribe",
+        "Subscription message formatting",
+        "Response parsing and routing",
+        "Unit tests for subscription flow"
+      ],
+      "priority": 4,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-030",
+      "phase": "PHASE-4",
+      "title": "Implement market data subscriptions",
+      "acceptanceCriteria": [
+        "subscribeAllMids(dex?) - all mid prices",
+        "subscribeL2Book(coin) - order book updates",
+        "subscribeTrades(coin) - trade stream",
+        "subscribeCandle(coin, interval) - candle updates",
+        "subscribeBbo(coin) - best bid/offer",
+        "subscribeActiveAssetCtx(coin) - asset context",
+        "Unit tests for each subscription"
+      ],
+      "priority": 4,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-031",
+      "phase": "PHASE-4",
+      "title": "Implement user data subscriptions",
+      "acceptanceCriteria": [
+        "subscribeNotification(user) - notifications",
+        "subscribeWebData3(user) - aggregate user data",
+        "subscribeTwapStates(user, dex?) - TWAP states",
+        "subscribeClearinghouseState(user, dex?) - account state",
+        "subscribeOpenOrders(user, dex?) - open orders",
+        "Unit tests for each subscription"
+      ],
+      "priority": 4,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-032",
+      "phase": "PHASE-4",
+      "title": "Implement user event subscriptions",
+      "acceptanceCriteria": [
+        "subscribeOrderUpdates(user) - order status changes",
+        "subscribeUserEvents(user) - general events",
+        "subscribeUserFills(user) - fill stream",
+        "subscribeUserFundings(user) - funding payments",
+        "subscribeUserNonFundingLedger(user) - ledger updates",
+        "subscribeActiveAssetData(user, coin) - user asset data",
+        "subscribeUserTwapSliceFills(user) - TWAP fills",
+        "subscribeUserTwapHistory(user) - TWAP history",
+        "Unit tests for each subscription"
+      ],
+      "priority": 4,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-033",
+      "phase": "PHASE-5",
+      "title": "Set up web project with Rust backend",
+      "acceptanceCriteria": [
+        "Axum/Actix web server setup",
+        "CORS configuration",
+        "SDK integration in backend",
+        "Static file serving for frontend",
+        "Project compiles and runs"
+      ],
+      "priority": 5,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-034",
+      "phase": "PHASE-5",
+      "title": "Create API endpoints for SDK functions",
+      "acceptanceCriteria": [
+        "REST endpoints wrapping each SDK info function",
+        "REST endpoints wrapping each SDK exchange function",
+        "WebSocket proxy for real-time data",
+        "Proper error responses",
+        "Request/response JSON formatting"
+      ],
+      "priority": 5,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-035",
+      "phase": "PHASE-5",
+      "title": "Design Bloomberg-style white theme UI",
+      "acceptanceCriteria": [
+        "Clean white background with minimal borders",
+        "Monospace fonts for data display",
+        "Professional financial dashboard aesthetic",
+        "Consistent spacing and typography",
+        "Responsive layout for different screen sizes"
+      ],
+      "priority": 5,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-036",
+      "phase": "PHASE-5",
+      "title": "Build Info Endpoints demo section",
+      "acceptanceCriteria": [
+        "Sidebar navigation for all info endpoints",
+        "Input forms for endpoint parameters",
+        "JSON response display with syntax highlighting",
+        "Re-call button for each endpoint",
+        "Loading states and error handling"
+      ],
+      "priority": 5,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-037",
+      "phase": "PHASE-5",
+      "title": "Build Exchange Endpoints demo section",
+      "acceptanceCriteria": [
+        "Forms for all trading actions",
+        "Wallet connection/private key input (with warnings)",
+        "Response display for each action",
+        "Clear success/error feedback",
+        "Re-call button functionality"
+      ],
+      "priority": 5,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-038",
+      "phase": "PHASE-5",
+      "title": "Build WebSocket demo section",
+      "acceptanceCriteria": [
+        "Connection status indicator",
+        "Subscription toggle buttons for each type",
+        "Live data feed display panel",
+        "Message history with timestamps",
+        "Clear/pause functionality"
+      ],
+      "priority": 5,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-039",
+      "phase": "PHASE-5",
+      "title": "Final integration and testing",
+      "acceptanceCriteria": [
+        "All SDK functions accessible from UI",
+        "WebSocket subscriptions working in real-time",
+        "Error handling throughout application",
+        "Documentation for running the demo",
+        "All unit tests passing"
+      ],
+      "priority": 5,
+      "passes": false,
+      "notes": ""
+    }
+  ]
+}

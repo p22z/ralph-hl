@@ -4,3 +4,4 @@
 //! from the Hyperliquid info endpoints.
 
 mod perpetuals;
+mod spot;

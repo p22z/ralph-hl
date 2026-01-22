@@ -1154,6 +1154,89 @@ pub struct SpotMetaResponse {
     pub universe: Vec<SpotPair>,
 }
 
+/// Spot asset context
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SpotAssetCtx {
+    pub day_ntl_vlm: String,
+    pub mark_px: String,
+    pub mid_px: Option<String>,
+    pub prev_day_px: String,
+    pub circulating_supply: String,
+}
+
+/// Token details response
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct TokenDetails {
+    pub name: String,
+    pub sz_decimals: u8,
+    pub wei_decimals: u8,
+    pub token_id: String,
+    pub is_canonical: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub evm_contract: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub full_name: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub deployer: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub deploy_gas: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub deploy_time: Option<u64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub seeded_usdc: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub non_circulating_user_balances: Option<Vec<(String, String)>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub future_emissions: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub genesis: Option<Vec<(String, String)>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub max_supply: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub total_supply: Option<String>,
+}
+
+/// Spot deploy state for a user
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SpotDeployState {
+    pub tokens: Vec<SpotDeployTokenState>,
+}
+
+/// Individual token deploy state
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SpotDeployTokenState {
+    pub token: SpotToken,
+    pub spec: TokenSpec,
+    pub existing_token_and_should_register: Option<(String, bool)>,
+}
+
+/// Token specification
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct TokenSpec {
+    pub name: String,
+    pub sz_decimals: u8,
+    pub wei_decimals: u8,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub full_name: Option<String>,
+}
+
+/// Spot pair deploy auction status
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SpotPairAuctionStatus {
+    pub start_time_seconds: u64,
+    pub duration_seconds: u64,
+    pub start_gas: String,
+    pub current_gas: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub end_gas: Option<String>,
+}
+
 /// L2 book level
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct L2BookLevel {
