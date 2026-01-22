@@ -7,4 +7,5 @@
 pub mod cancel;
 pub mod modify;
 pub mod orders;
+pub mod schedule_cancel;
 pub mod twap;

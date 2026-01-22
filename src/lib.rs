@@ -21,4 +21,5 @@ pub use exchange::orders::{
     get_order_id, is_order_successful, LimitOrderBuilder, TriggerOrderBuilder,
 };
 pub use exchange::twap::{get_twap_error, get_twap_id, is_twap_running};
+pub use exchange::schedule_cancel::{get_scheduled_time, is_schedule_cancel_successful};
 pub use types::*;

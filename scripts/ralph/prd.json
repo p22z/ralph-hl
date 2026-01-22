@@ -230,8 +230,8 @@
         "Unit tests for each function"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed: Staking module with staking_delegations(user), staking_summary(user), staking_history(user), and staking_rewards(user) methods implemented as Client extensions. Added StakingDelegation, StakingSummary, StakingHistoryEntry, and StakingReward response types. 18 unit tests with mocked responses covering all endpoints and error handling."
     },
     {
       "id": "US-015",
@@ -251,8 +251,8 @@
         "Unit tests for each function"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed: Vault module with 10 info endpoints implemented as Client extensions. Added response types VaultDetails, UserVaultDeposit, BuilderFeeApprovalInfo, ReferralInfo, Hip3State, PerpDexStatus. 45 unit tests with mocked responses covering all endpoints, optional parameters, and error handling."
     },
     {
       "id": "US-016",
@@ -266,8 +266,8 @@
         "Unit tests for each function"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed: Borrow/lend module with borrow_lend_user_state(user), borrow_lend_reserve_state(coin), all_borrow_lend_reserve_states(), and aligned_quote_token(coin) methods implemented as Client extensions. Added BorrowLendUserState, BorrowLendPosition, BorrowLendReserveState, and AlignedQuoteToken response types. 23 unit tests with mocked responses covering all endpoints and error handling."
     },
     {
       "id": "US-017",
@@ -281,8 +281,8 @@
         "Unit tests with mocked exchange responses"
       ],
       "priority": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed: Exchange module with place_order() and place_batch_orders() methods implemented as Client extensions. LimitOrderBuilder and TriggerOrderBuilder for ergonomic order construction. Supports all TimeInForce options (GTC, IOC, ALO), trigger orders (stop loss, take profit), reduce_only, client_order_id, and vault trading. 28 unit tests with mocked responses covering all order types, batch orders, partial success, and error handling."
     },
     {
       "id": "US-018",
@@ -296,8 +296,8 @@
         "Unit tests for each function"
       ],
       "priority": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed: Cancel module with cancel_order(), cancel_order_by_cloid(), cancel_batch_orders(), and cancel_batch_orders_by_cloid() methods implemented as Client extensions. All methods support optional vault_address for vault trading. 22 unit tests with mocked responses covering all endpoints, batch operations, partial success scenarios, and error handling."
     },
     {
       "id": "US-019",
@@ -309,8 +309,8 @@
         "Unit tests for each function"
       ],
       "priority": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed: Modify module with modify_order() and modify_batch_orders() methods implemented as Client extensions. ModifyOrderBuilder and ModifyTriggerOrderBuilder for ergonomic order modification. All methods support optional vault_address for vault trading. 22 unit tests with mocked responses covering all endpoints, batch operations, partial success scenarios, and error handling."
     },
     {
       "id": "US-020",
@@ -322,8 +322,8 @@
         "Unit tests for each function"
       ],
       "priority": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed: TWAP module with place_twap_order() and cancel_twap_order() methods implemented as Client extensions. Both methods support optional vault_address and reduce_only options. Helper functions is_twap_running(), get_twap_id(), and get_twap_error() for response handling. 22 unit tests with mocked responses covering all endpoints, validation, error handling, and wallet signing."
     },
     {
       "id": "US-021",
@@ -335,8 +335,8 @@
         "Unit tests for function"
       ],
       "priority": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed: Schedule cancel (dead man's switch) module with schedule_cancel() and schedule_cancel_with_options() methods implemented as Client extensions. Validates timestamp is at least 5 seconds in the future. Helper functions is_schedule_cancel_successful() and get_scheduled_time() for response handling. 18 unit tests with mocked responses covering all endpoints, validation, error handling, and wallet signing."
     },
     {
       "id": "US-022",
