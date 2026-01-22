@@ -4,6 +4,7 @@
 //! from the Hyperliquid info endpoints.
 
 mod fills;
+mod funding;
 mod market;
 mod orders;
 mod perpetuals;
