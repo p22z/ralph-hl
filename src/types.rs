@@ -2052,6 +2052,20 @@ pub struct SpotPerpTransferAction {
     pub to_perp: bool,
 }
 
+/// Send asset action (generalized transfer supporting USDC, spot tokens, and vault withdrawals)
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SendAssetAction {
+    #[serde(rename = "type")]
+    pub action_type: String,
+    pub hyperliquid_chain: String,
+    pub signature_chain_id: String,
+    pub destination: String,
+    pub token: String,
+    pub amount: String,
+    pub time: u64,
+}
+
 /// Vault deposit action
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]

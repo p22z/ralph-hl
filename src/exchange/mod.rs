@@ -9,4 +9,5 @@ pub mod leverage;
 pub mod modify;
 pub mod orders;
 pub mod schedule_cancel;
+pub mod transfer;
 pub mod twap;

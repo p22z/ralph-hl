@@ -79,6 +79,11 @@ impl Client {
         self.network
     }
 
+    /// Check if this client is connected to mainnet
+    pub fn is_mainnet(&self) -> bool {
+        self.network == Network::Mainnet
+    }
+
     /// Send a POST request to the info endpoint and deserialize the response
     ///
     /// This is used for all read-only queries like market data and user state.
