@@ -8,10 +8,14 @@
 pub mod auth;
 pub mod client;
 pub mod error;
+pub mod exchange;
 pub mod info;
 pub mod types;
 
 pub use auth::{Signature, Wallet};
 pub use client::{Client, Network, MAINNET_URL, TESTNET_URL};
 pub use error::{Error, Result};
+pub use exchange::orders::{
+    get_order_id, is_order_successful, LimitOrderBuilder, TriggerOrderBuilder,
+};
 pub use types::*;
