@@ -297,7 +297,9 @@ mod tests {
         let mock = server
             .mock("POST", "/info")
             .match_header("content-type", "application/json")
-            .match_body(Matcher::Json(serde_json::json!({"type": "metaAndAssetCtxs"})))
+            .match_body(Matcher::Json(
+                serde_json::json!({"type": "metaAndAssetCtxs"}),
+            ))
             .with_status(200)
             .with_header("content-type", "application/json")
             .with_body(

@@ -794,11 +794,7 @@ mod tests {
         let wallet = Wallet::from_private_key(TEST_PRIVATE_KEY, true).unwrap();
 
         let response = client
-            .approve_agent(
-                &wallet,
-                "0xagent1234567890123456789012345678901234",
-                None,
-            )
+            .approve_agent(&wallet, "0xagent1234567890123456789012345678901234", None)
             .await
             .unwrap();
 
@@ -905,11 +901,7 @@ mod tests {
         let wallet = Wallet::from_private_key(TEST_PRIVATE_KEY, true).unwrap();
 
         let result = client
-            .approve_agent(
-                &wallet,
-                "0xagent1234567890123456789012345678901234",
-                None,
-            )
+            .approve_agent(&wallet, "0xagent1234567890123456789012345678901234", None)
             .await;
 
         assert!(result.is_err());
@@ -938,11 +930,7 @@ mod tests {
         let wallet = Wallet::from_private_key(TEST_PRIVATE_KEY, true).unwrap();
 
         let result = client
-            .approve_agent(
-                &wallet,
-                "0xagent1234567890123456789012345678901234",
-                None,
-            )
+            .approve_agent(&wallet, "0xagent1234567890123456789012345678901234", None)
             .await;
 
         assert!(result.is_err());

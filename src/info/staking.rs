@@ -550,9 +550,7 @@ mod tests {
             .await;
 
         let client = TestClient::new(&server.url());
-        let result: Result<StakingSummary> = client
-            .staking_summary("invalid-address")
-            .await;
+        let result: Result<StakingSummary> = client.staking_summary("invalid-address").await;
 
         assert!(result.is_err());
         let err = result.unwrap_err();
@@ -563,8 +561,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_staking_delegations_request_serialization() {
-        let request =
-            StakingDelegationsRequest::new("0x1234567890123456789012345678901234567890");
+        let request = StakingDelegationsRequest::new("0x1234567890123456789012345678901234567890");
         let json = serde_json::to_string(&request).unwrap();
         assert_eq!(
             json,

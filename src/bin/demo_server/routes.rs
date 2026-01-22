@@ -72,17 +72,26 @@ fn info_routes() -> Router<AppState> {
         .route("/all-perp-metas", get(get_all_perp_metas))
         // Spot metadata
         .route("/spot-meta", get(get_spot_meta))
-        .route("/spot-meta-and-asset-ctxs", get(get_spot_meta_and_asset_ctxs))
+        .route(
+            "/spot-meta-and-asset-ctxs",
+            get(get_spot_meta_and_asset_ctxs),
+        )
         .route("/token-details", get(get_token_details))
         .route("/spot-deploy-state", get(get_spot_deploy_state))
-        .route("/spot-pair-deploy-auction-status", get(get_spot_pair_deploy_auction_status))
+        .route(
+            "/spot-pair-deploy-auction-status",
+            get(get_spot_pair_deploy_auction_status),
+        )
         // Market data
         .route("/all-mids", get(get_all_mids))
         .route("/l2-book", get(get_l2_book))
         .route("/candle", get(get_candle))
         // User clearinghouse state
         .route("/clearinghouse-state", get(get_clearinghouse_state))
-        .route("/spot-clearinghouse-state", get(get_spot_clearinghouse_state))
+        .route(
+            "/spot-clearinghouse-state",
+            get(get_spot_clearinghouse_state),
+        )
         // User orders
         .route("/open-orders", get(get_open_orders))
         .route("/frontend-open-orders", get(get_frontend_open_orders))
@@ -97,7 +106,10 @@ fn info_routes() -> Router<AppState> {
         .route("/funding-history", get(get_funding_history))
         .route("/predicted-fundings", get(get_predicted_fundings))
         // Account info
-        .route("/user-non-funding-ledger-updates", get(get_user_non_funding_ledger_updates))
+        .route(
+            "/user-non-funding-ledger-updates",
+            get(get_user_non_funding_ledger_updates),
+        )
         .route("/rate-limits", get(get_rate_limits))
         .route("/portfolio", get(get_portfolio))
         .route("/user-fees", get(get_user_fees))
@@ -115,14 +127,26 @@ fn info_routes() -> Router<AppState> {
         .route("/referral", get(get_referral))
         .route("/hip3-state", get(get_hip3_state))
         .route("/active-asset-data", get(get_active_asset_data))
-        .route("/perps-at-open-interest-cap", get(get_perps_at_open_interest_cap))
+        .route(
+            "/perps-at-open-interest-cap",
+            get(get_perps_at_open_interest_cap),
+        )
         .route("/perp-dex-limits", get(get_perp_dex_limits))
         .route("/perp-dex-status", get(get_perp_dex_status))
-        .route("/perp-deploy-auction-status", get(get_perp_deploy_auction_status))
+        .route(
+            "/perp-deploy-auction-status",
+            get(get_perp_deploy_auction_status),
+        )
         // Borrow/lend info
         .route("/borrow-lend-user-state", get(get_borrow_lend_user_state))
-        .route("/borrow-lend-reserve-state", get(get_borrow_lend_reserve_state))
-        .route("/all-borrow-lend-reserve-states", get(get_all_borrow_lend_reserve_states))
+        .route(
+            "/borrow-lend-reserve-state",
+            get(get_borrow_lend_reserve_state),
+        )
+        .route(
+            "/all-borrow-lend-reserve-states",
+            get(get_all_borrow_lend_reserve_states),
+        )
         .route("/aligned-quote-token", get(get_aligned_quote_token))
 }
 
@@ -250,7 +274,11 @@ async fn get_meta_and_asset_ctxs(
     State(state): State<AppState>,
     Query(params): Query<OptionalDexQuery>,
 ) -> impl IntoResponse {
-    match state.client.meta_and_asset_ctxs(params.dex.as_deref()).await {
+    match state
+        .client
+        .meta_and_asset_ctxs(params.dex.as_deref())
+        .await
+    {
         Ok((meta, ctxs)) => Json(ApiResponse::success(serde_json::json!({
             "meta": meta,
             "assetCtxs": ctxs
@@ -1313,7 +1341,10 @@ async fn post_place_order(
         Err(e) => {
             return (
                 StatusCode::BAD_REQUEST,
-                Json(ApiResponse::<()>::error(format!("Invalid private key: {}", e))),
+                Json(ApiResponse::<()>::error(format!(
+                    "Invalid private key: {}",
+                    e
+                ))),
             )
                 .into_response();
         }
@@ -1328,8 +1359,14 @@ async fn post_place_order(
             Some("sl") => TriggerType::Sl,
             _ => TriggerType::Sl,
         };
-        let mut builder =
-            TriggerOrderBuilder::new(payload.asset, payload.is_buy, &payload.price, &payload.size, trigger_px, trigger_type);
+        let mut builder = TriggerOrderBuilder::new(
+            payload.asset,
+            payload.is_buy,
+            &payload.price,
+            &payload.size,
+            trigger_px,
+            trigger_type,
+        );
         builder = builder.reduce_only(payload.reduce_only);
         if let Some(cloid) = &payload.client_order_id {
             builder = builder.client_order_id(cloid);
@@ -1350,7 +1387,11 @@ async fn post_place_order(
         builder.build()
     };
 
-    match state.client.place_order(&wallet, order, OrderGrouping::Na).await {
+    match state
+        .client
+        .place_order(&wallet, order, OrderGrouping::Na)
+        .await
+    {
         Ok(response) => Json(ApiResponse::success(response)).into_response(),
         Err(e) => (
             StatusCode::INTERNAL_SERVER_ERROR,
@@ -1374,7 +1415,10 @@ async fn post_place_batch_orders(
         Err(e) => {
             return (
                 StatusCode::BAD_REQUEST,
-                Json(ApiResponse::<()>::error(format!("Invalid private key: {}", e))),
+                Json(ApiResponse::<()>::error(format!(
+                    "Invalid private key: {}",
+                    e
+                ))),
             )
                 .into_response();
         }
@@ -1410,8 +1454,7 @@ async fn post_place_batch_orders(
                     Some("Alo") | Some("alo") | Some("ALO") => TimeInForce::Alo,
                     _ => TimeInForce::Gtc,
                 };
-                let mut builder =
-                    LimitOrderBuilder::new(o.asset, o.is_buy, &o.price, &o.size);
+                let mut builder = LimitOrderBuilder::new(o.asset, o.is_buy, &o.price, &o.size);
                 builder = builder.time_in_force(tif).reduce_only(o.reduce_only);
                 if let Some(cloid) = &o.client_order_id {
                     builder = builder.client_order_id(cloid);
@@ -1447,7 +1490,10 @@ async fn post_cancel_order(
         Err(e) => {
             return (
                 StatusCode::BAD_REQUEST,
-                Json(ApiResponse::<()>::error(format!("Invalid private key: {}", e))),
+                Json(ApiResponse::<()>::error(format!(
+                    "Invalid private key: {}",
+                    e
+                ))),
             )
                 .into_response();
         }
@@ -1479,7 +1525,10 @@ async fn post_cancel_batch_orders(
         Err(e) => {
             return (
                 StatusCode::BAD_REQUEST,
-                Json(ApiResponse::<()>::error(format!("Invalid private key: {}", e))),
+                Json(ApiResponse::<()>::error(format!(
+                    "Invalid private key: {}",
+                    e
+                ))),
             )
                 .into_response();
         }
@@ -1514,7 +1563,10 @@ async fn post_cancel_order_by_cloid(
         Err(e) => {
             return (
                 StatusCode::BAD_REQUEST,
-                Json(ApiResponse::<()>::error(format!("Invalid private key: {}", e))),
+                Json(ApiResponse::<()>::error(format!(
+                    "Invalid private key: {}",
+                    e
+                ))),
             )
                 .into_response();
         }
@@ -1546,7 +1598,10 @@ async fn post_modify_order(
         Err(e) => {
             return (
                 StatusCode::BAD_REQUEST,
-                Json(ApiResponse::<()>::error(format!("Invalid private key: {}", e))),
+                Json(ApiResponse::<()>::error(format!(
+                    "Invalid private key: {}",
+                    e
+                ))),
             )
                 .into_response();
         }
@@ -1593,7 +1648,10 @@ async fn post_modify_batch_orders(
         Err(e) => {
             return (
                 StatusCode::BAD_REQUEST,
-                Json(ApiResponse::<()>::error(format!("Invalid private key: {}", e))),
+                Json(ApiResponse::<()>::error(format!(
+                    "Invalid private key: {}",
+                    e
+                ))),
             )
                 .into_response();
         }
@@ -1609,8 +1667,7 @@ async fn post_modify_batch_orders(
                 Some("Alo") | Some("alo") | Some("ALO") => TimeInForce::Alo,
                 _ => TimeInForce::Gtc,
             };
-            let mut builder =
-                ModifyOrderBuilder::new(m.oid, m.asset, m.is_buy, &m.price, &m.size);
+            let mut builder = ModifyOrderBuilder::new(m.oid, m.asset, m.is_buy, &m.price, &m.size);
             builder = builder.time_in_force(tif).reduce_only(m.reduce_only);
             if let Some(cloid) = &m.client_order_id {
                 builder = builder.client_order_id(cloid);
@@ -1645,7 +1702,10 @@ async fn post_place_twap_order(
         Err(e) => {
             return (
                 StatusCode::BAD_REQUEST,
-                Json(ApiResponse::<()>::error(format!("Invalid private key: {}", e))),
+                Json(ApiResponse::<()>::error(format!(
+                    "Invalid private key: {}",
+                    e
+                ))),
             )
                 .into_response();
         }
@@ -1685,7 +1745,10 @@ async fn post_cancel_twap_order(
         Err(e) => {
             return (
                 StatusCode::BAD_REQUEST,
-                Json(ApiResponse::<()>::error(format!("Invalid private key: {}", e))),
+                Json(ApiResponse::<()>::error(format!(
+                    "Invalid private key: {}",
+                    e
+                ))),
             )
                 .into_response();
         }
@@ -1717,7 +1780,10 @@ async fn post_schedule_cancel(
         Err(e) => {
             return (
                 StatusCode::BAD_REQUEST,
-                Json(ApiResponse::<()>::error(format!("Invalid private key: {}", e))),
+                Json(ApiResponse::<()>::error(format!(
+                    "Invalid private key: {}",
+                    e
+                ))),
             )
                 .into_response();
         }
@@ -1749,7 +1815,10 @@ async fn post_update_leverage(
         Err(e) => {
             return (
                 StatusCode::BAD_REQUEST,
-                Json(ApiResponse::<()>::error(format!("Invalid private key: {}", e))),
+                Json(ApiResponse::<()>::error(format!(
+                    "Invalid private key: {}",
+                    e
+                ))),
             )
                 .into_response();
         }
@@ -1782,7 +1851,10 @@ async fn post_update_isolated_margin(
         Err(e) => {
             return (
                 StatusCode::BAD_REQUEST,
-                Json(ApiResponse::<()>::error(format!("Invalid private key: {}", e))),
+                Json(ApiResponse::<()>::error(format!(
+                    "Invalid private key: {}",
+                    e
+                ))),
             )
                 .into_response();
         }
@@ -1815,7 +1887,10 @@ async fn post_usd_transfer(
         Err(e) => {
             return (
                 StatusCode::BAD_REQUEST,
-                Json(ApiResponse::<()>::error(format!("Invalid private key: {}", e))),
+                Json(ApiResponse::<()>::error(format!(
+                    "Invalid private key: {}",
+                    e
+                ))),
             )
                 .into_response();
         }
@@ -1847,7 +1922,10 @@ async fn post_spot_transfer(
         Err(e) => {
             return (
                 StatusCode::BAD_REQUEST,
-                Json(ApiResponse::<()>::error(format!("Invalid private key: {}", e))),
+                Json(ApiResponse::<()>::error(format!(
+                    "Invalid private key: {}",
+                    e
+                ))),
             )
                 .into_response();
         }
@@ -1856,7 +1934,12 @@ async fn post_spot_transfer(
     let payload = &req.payload;
     match state
         .client
-        .spot_transfer(&wallet, &payload.destination, &payload.token, &payload.amount)
+        .spot_transfer(
+            &wallet,
+            &payload.destination,
+            &payload.token,
+            &payload.amount,
+        )
         .await
     {
         Ok(response) => Json(ApiResponse::success(response)).into_response(),
@@ -1880,7 +1963,10 @@ async fn post_withdraw(
         Err(e) => {
             return (
                 StatusCode::BAD_REQUEST,
-                Json(ApiResponse::<()>::error(format!("Invalid private key: {}", e))),
+                Json(ApiResponse::<()>::error(format!(
+                    "Invalid private key: {}",
+                    e
+                ))),
             )
                 .into_response();
         }
@@ -1912,7 +1998,10 @@ async fn post_spot_perp_transfer(
         Err(e) => {
             return (
                 StatusCode::BAD_REQUEST,
-                Json(ApiResponse::<()>::error(format!("Invalid private key: {}", e))),
+                Json(ApiResponse::<()>::error(format!(
+                    "Invalid private key: {}",
+                    e
+                ))),
             )
                 .into_response();
         }
@@ -1944,7 +2033,10 @@ async fn post_stake_deposit(
         Err(e) => {
             return (
                 StatusCode::BAD_REQUEST,
-                Json(ApiResponse::<()>::error(format!("Invalid private key: {}", e))),
+                Json(ApiResponse::<()>::error(format!(
+                    "Invalid private key: {}",
+                    e
+                ))),
             )
                 .into_response();
         }
@@ -1976,7 +2068,10 @@ async fn post_stake_withdraw(
         Err(e) => {
             return (
                 StatusCode::BAD_REQUEST,
-                Json(ApiResponse::<()>::error(format!("Invalid private key: {}", e))),
+                Json(ApiResponse::<()>::error(format!(
+                    "Invalid private key: {}",
+                    e
+                ))),
             )
                 .into_response();
         }
@@ -2008,7 +2103,10 @@ async fn post_delegate(
         Err(e) => {
             return (
                 StatusCode::BAD_REQUEST,
-                Json(ApiResponse::<()>::error(format!("Invalid private key: {}", e))),
+                Json(ApiResponse::<()>::error(format!(
+                    "Invalid private key: {}",
+                    e
+                ))),
             )
                 .into_response();
         }
@@ -2040,7 +2138,10 @@ async fn post_undelegate(
         Err(e) => {
             return (
                 StatusCode::BAD_REQUEST,
-                Json(ApiResponse::<()>::error(format!("Invalid private key: {}", e))),
+                Json(ApiResponse::<()>::error(format!(
+                    "Invalid private key: {}",
+                    e
+                ))),
             )
                 .into_response();
         }
@@ -2072,7 +2173,10 @@ async fn post_vault_deposit(
         Err(e) => {
             return (
                 StatusCode::BAD_REQUEST,
-                Json(ApiResponse::<()>::error(format!("Invalid private key: {}", e))),
+                Json(ApiResponse::<()>::error(format!(
+                    "Invalid private key: {}",
+                    e
+                ))),
             )
                 .into_response();
         }
@@ -2104,7 +2208,10 @@ async fn post_vault_withdraw(
         Err(e) => {
             return (
                 StatusCode::BAD_REQUEST,
-                Json(ApiResponse::<()>::error(format!("Invalid private key: {}", e))),
+                Json(ApiResponse::<()>::error(format!(
+                    "Invalid private key: {}",
+                    e
+                ))),
             )
                 .into_response();
         }
@@ -2136,7 +2243,10 @@ async fn post_approve_agent(
         Err(e) => {
             return (
                 StatusCode::BAD_REQUEST,
-                Json(ApiResponse::<()>::error(format!("Invalid private key: {}", e))),
+                Json(ApiResponse::<()>::error(format!(
+                    "Invalid private key: {}",
+                    e
+                ))),
             )
                 .into_response();
         }
@@ -2144,7 +2254,11 @@ async fn post_approve_agent(
 
     match state
         .client
-        .approve_agent(&wallet, &req.payload.agent_address, req.payload.agent_name.clone())
+        .approve_agent(
+            &wallet,
+            &req.payload.agent_address,
+            req.payload.agent_name.clone(),
+        )
         .await
     {
         Ok(response) => Json(ApiResponse::success(response)).into_response(),
@@ -2168,7 +2282,10 @@ async fn post_approve_builder_fee(
         Err(e) => {
             return (
                 StatusCode::BAD_REQUEST,
-                Json(ApiResponse::<()>::error(format!("Invalid private key: {}", e))),
+                Json(ApiResponse::<()>::error(format!(
+                    "Invalid private key: {}",
+                    e
+                ))),
             )
                 .into_response();
         }
@@ -2200,7 +2317,10 @@ async fn post_reserve_request_weight(
         Err(e) => {
             return (
                 StatusCode::BAD_REQUEST,
-                Json(ApiResponse::<()>::error(format!("Invalid private key: {}", e))),
+                Json(ApiResponse::<()>::error(format!(
+                    "Invalid private key: {}",
+                    e
+                ))),
             )
                 .into_response();
         }
@@ -2232,7 +2352,10 @@ async fn post_noop(
         Err(e) => {
             return (
                 StatusCode::BAD_REQUEST,
-                Json(ApiResponse::<()>::error(format!("Invalid private key: {}", e))),
+                Json(ApiResponse::<()>::error(format!(
+                    "Invalid private key: {}",
+                    e
+                ))),
             )
                 .into_response();
         }
@@ -2260,7 +2383,10 @@ async fn post_set_hip3_enabled(
         Err(e) => {
             return (
                 StatusCode::BAD_REQUEST,
-                Json(ApiResponse::<()>::error(format!("Invalid private key: {}", e))),
+                Json(ApiResponse::<()>::error(format!(
+                    "Invalid private key: {}",
+                    e
+                ))),
             )
                 .into_response();
         }
@@ -2285,10 +2411,7 @@ async fn post_set_hip3_enabled(
 // =============================================================================
 
 /// WebSocket proxy handler that forwards messages between client and Hyperliquid
-async fn ws_handler(
-    ws: WebSocketUpgrade,
-    State(state): State<AppState>,
-) -> impl IntoResponse {
+async fn ws_handler(ws: WebSocketUpgrade, State(state): State<AppState>) -> impl IntoResponse {
     ws.on_upgrade(move |socket| handle_websocket(socket, state))
 }
 
@@ -2361,22 +2484,38 @@ async fn handle_websocket(socket: WebSocket, state: AppState) {
         while let Some(msg) = upstream_receiver.next().await {
             match msg {
                 Ok(TungsteniteMessage::Text(text)) => {
-                    if client_sender.send(Message::Text(text.into())).await.is_err() {
+                    if client_sender
+                        .send(Message::Text(text.into()))
+                        .await
+                        .is_err()
+                    {
                         break;
                     }
                 }
                 Ok(TungsteniteMessage::Binary(data)) => {
-                    if client_sender.send(Message::Binary(data.into())).await.is_err() {
+                    if client_sender
+                        .send(Message::Binary(data.into()))
+                        .await
+                        .is_err()
+                    {
                         break;
                     }
                 }
                 Ok(TungsteniteMessage::Ping(data)) => {
-                    if client_sender.send(Message::Ping(data.into())).await.is_err() {
+                    if client_sender
+                        .send(Message::Ping(data.into()))
+                        .await
+                        .is_err()
+                    {
                         break;
                     }
                 }
                 Ok(TungsteniteMessage::Pong(data)) => {
-                    if client_sender.send(Message::Pong(data.into())).await.is_err() {
+                    if client_sender
+                        .send(Message::Pong(data.into()))
+                        .await
+                        .is_err()
+                    {
                         break;
                     }
                 }

@@ -728,10 +728,7 @@ mod tests {
         let client = TestClient::new(&server.url());
         let wallet = Wallet::from_private_key(TEST_PRIVATE_KEY, true).unwrap();
 
-        let response = client
-            .update_leverage(&wallet, 0, true, 10)
-            .await
-            .unwrap();
+        let response = client.update_leverage(&wallet, 0, true, 10).await.unwrap();
 
         assert_eq!(response.response_type, "updateLeverage");
         assert!(is_leverage_update_successful(&response));
@@ -769,10 +766,7 @@ mod tests {
         let client = TestClient::new(&server.url());
         let wallet = Wallet::from_private_key(TEST_PRIVATE_KEY, true).unwrap();
 
-        let response = client
-            .update_leverage(&wallet, 1, false, 5)
-            .await
-            .unwrap();
+        let response = client.update_leverage(&wallet, 1, false, 5).await.unwrap();
 
         let leverage = get_updated_leverage(&response).unwrap();
         assert_eq!(leverage.leverage_type, "isolated");

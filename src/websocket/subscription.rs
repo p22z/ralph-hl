@@ -60,7 +60,10 @@ pub enum Subscription {
 
     /// Candlestick data
     #[serde(rename = "candle")]
-    Candle { coin: String, interval: CandleInterval },
+    Candle {
+        coin: String,
+        interval: CandleInterval,
+    },
 
     /// L2 order book
     #[serde(rename = "l2Book")]
@@ -588,7 +591,9 @@ impl SubscriptionManager {
     /// Get all subscriptions with their status
     pub async fn all_subscriptions(&self) -> Vec<(Subscription, SubscriptionStatus)> {
         let subs = self.subscriptions.read().await;
-        subs.iter().map(|(sub, status)| (sub.clone(), *status)).collect()
+        subs.iter()
+            .map(|(sub, status)| (sub.clone(), *status))
+            .collect()
     }
 
     /// Get the count of active subscriptions
@@ -857,7 +862,10 @@ mod tests {
         manager.add_pending(sub.clone()).await;
 
         assert!(manager.contains(&sub).await);
-        assert_eq!(manager.status(&sub).await, Some(SubscriptionStatus::Pending));
+        assert_eq!(
+            manager.status(&sub).await,
+            Some(SubscriptionStatus::Pending)
+        );
         assert!(!manager.is_active(&sub).await);
         assert_eq!(manager.total_count().await, 1);
         assert_eq!(manager.active_count().await, 0);

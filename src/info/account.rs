@@ -696,9 +696,7 @@ mod tests {
             .await;
 
         let client = TestClient::new(&server.url());
-        let result: Result<RateLimitInfo> = client
-            .rate_limits("invalid-address")
-            .await;
+        let result: Result<RateLimitInfo> = client.rate_limits("invalid-address").await;
 
         assert!(result.is_err());
         let err = result.unwrap_err();

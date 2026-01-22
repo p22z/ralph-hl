@@ -582,10 +582,17 @@ mod tests {
 
     #[test]
     fn test_modify_trigger_order_builder() {
-        let modify =
-            ModifyTriggerOrderBuilder::new(12345, 0, false, "48000.0", "0.1", "49000.0", TriggerType::Sl)
-                .reduce_only(true)
-                .build();
+        let modify = ModifyTriggerOrderBuilder::new(
+            12345,
+            0,
+            false,
+            "48000.0",
+            "0.1",
+            "49000.0",
+            TriggerType::Sl,
+        )
+        .reduce_only(true)
+        .build();
 
         assert_eq!(modify.oid, 12345);
         assert_eq!(modify.order.a, 0);
@@ -606,11 +613,18 @@ mod tests {
 
     #[test]
     fn test_modify_trigger_order_builder_market() {
-        let modify =
-            ModifyTriggerOrderBuilder::new(12345, 0, false, "52000.0", "0.1", "51000.0", TriggerType::Tp)
-                .market()
-                .client_order_id("tp-modified-1")
-                .build();
+        let modify = ModifyTriggerOrderBuilder::new(
+            12345,
+            0,
+            false,
+            "52000.0",
+            "0.1",
+            "51000.0",
+            TriggerType::Tp,
+        )
+        .market()
+        .client_order_id("tp-modified-1")
+        .build();
 
         assert_eq!(modify.order.c, Some("tp-modified-1".to_string()));
 
@@ -1112,11 +1126,18 @@ mod tests {
         let client = TestClient::new(&server.url());
         let wallet = Wallet::from_private_key(TEST_PRIVATE_KEY, true).unwrap();
 
-        let modify =
-            ModifyTriggerOrderBuilder::new(12345, 0, false, "48000.0", "0.1", "49000.0", TriggerType::Sl)
-                .market()
-                .reduce_only(true)
-                .build();
+        let modify = ModifyTriggerOrderBuilder::new(
+            12345,
+            0,
+            false,
+            "48000.0",
+            "0.1",
+            "49000.0",
+            TriggerType::Sl,
+        )
+        .market()
+        .reduce_only(true)
+        .build();
 
         let response = client.modify_order(&wallet, modify).await.unwrap();
 

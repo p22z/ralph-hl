@@ -454,7 +454,10 @@ mod tests {
             .await;
 
         let client = TestClient::new(&server.url());
-        let rates = client.funding_history("BTC", 1700000000000, None).await.unwrap();
+        let rates = client
+            .funding_history("BTC", 1700000000000, None)
+            .await
+            .unwrap();
 
         assert_eq!(rates.len(), 3);
         assert_eq!(rates[0].coin, "BTC");

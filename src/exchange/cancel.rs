@@ -9,7 +9,9 @@ use serde::{Deserialize, Serialize};
 use crate::auth::{Signature, Wallet};
 use crate::client::Client;
 use crate::error::{Error, Result};
-use crate::types::{CancelAction, CancelByCloidAction, CancelByCloidWire, CancelResponse, CancelWire};
+use crate::types::{
+    CancelAction, CancelByCloidAction, CancelByCloidWire, CancelResponse, CancelWire,
+};
 
 /// Exchange request wrapper with authentication
 #[derive(Debug, Clone, Serialize)]
@@ -57,7 +59,8 @@ impl Client {
         asset: u32,
         oid: u64,
     ) -> Result<CancelResponse> {
-        self.cancel_order_with_options(wallet, asset, oid, None).await
+        self.cancel_order_with_options(wallet, asset, oid, None)
+            .await
     }
 
     /// Cancel a single order by order ID with additional options
@@ -809,10 +812,7 @@ mod tests {
         let client = TestClient::new(&server.url());
         let wallet = Wallet::from_private_key(TEST_PRIVATE_KEY, true).unwrap();
 
-        let cancels = vec![
-            (0, "order-1".to_string()),
-            (0, "order-2".to_string()),
-        ];
+        let cancels = vec![(0, "order-1".to_string()), (0, "order-2".to_string())];
 
         let response = client
             .cancel_batch_orders_by_cloid(&wallet, cancels)
@@ -830,9 +830,7 @@ mod tests {
         let client = TestClient::new("http://localhost:12345");
         let wallet = Wallet::from_private_key(TEST_PRIVATE_KEY, true).unwrap();
 
-        let result = client
-            .cancel_batch_orders_by_cloid(&wallet, vec![])
-            .await;
+        let result = client.cancel_batch_orders_by_cloid(&wallet, vec![]).await;
 
         assert!(result.is_err());
         match result.unwrap_err() {

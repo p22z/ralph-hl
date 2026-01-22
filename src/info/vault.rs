@@ -603,10 +603,7 @@ mod tests {
         assert_eq!(vaults[0].value, Some("10500.00".to_string()));
         assert!(vaults[0].pending_withdrawal.is_none());
 
-        assert_eq!(
-            vaults[1].pending_withdrawal,
-            Some("1000.00".to_string())
-        );
+        assert_eq!(vaults[1].pending_withdrawal, Some("1000.00".to_string()));
 
         mock.assert_async().await;
     }
@@ -1032,8 +1029,14 @@ mod tests {
         assert_eq!(limits.oi_sz_cap_per_perp, "50000000.00");
         assert_eq!(limits.max_transfer_ntl, "10000000.00");
         assert_eq!(limits.coin_to_oi_cap.len(), 2);
-        assert_eq!(limits.coin_to_oi_cap[0], ("BTC".to_string(), "100000000.00".to_string()));
-        assert_eq!(limits.coin_to_oi_cap[1], ("ETH".to_string(), "50000000.00".to_string()));
+        assert_eq!(
+            limits.coin_to_oi_cap[0],
+            ("BTC".to_string(), "100000000.00".to_string())
+        );
+        assert_eq!(
+            limits.coin_to_oi_cap[1],
+            ("ETH".to_string(), "50000000.00".to_string())
+        );
 
         mock.assert_async().await;
     }
@@ -1187,9 +1190,7 @@ mod tests {
             .await;
 
         let client = TestClient::new(&server.url());
-        let result: Result<Vec<UserVaultDeposit>> = client
-            .user_vaults("invalid-address")
-            .await;
+        let result: Result<Vec<UserVaultDeposit>> = client.user_vaults("invalid-address").await;
 
         assert!(result.is_err());
         let err = result.unwrap_err();
@@ -1204,8 +1205,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_vault_details_request_serialization() {
-        let request =
-            VaultDetailsRequest::new("0xvault1234567890123456789012345678901234567890");
+        let request = VaultDetailsRequest::new("0xvault1234567890123456789012345678901234567890");
         let json = serde_json::to_string(&request).unwrap();
         assert_eq!(
             json,
@@ -1276,20 +1276,14 @@ mod tests {
     async fn test_perp_dex_limits_request_serialization() {
         let request = PerpDexLimitsRequest::new("hyperliquid");
         let json = serde_json::to_string(&request).unwrap();
-        assert_eq!(
-            json,
-            r#"{"type":"perpDexLimits","dex":"hyperliquid"}"#
-        );
+        assert_eq!(json, r#"{"type":"perpDexLimits","dex":"hyperliquid"}"#);
     }
 
     #[tokio::test]
     async fn test_perp_dex_status_request_serialization() {
         let request = PerpDexStatusRequest::new("hyperliquid");
         let json = serde_json::to_string(&request).unwrap();
-        assert_eq!(
-            json,
-            r#"{"type":"perpDexStatus","dex":"hyperliquid"}"#
-        );
+        assert_eq!(json, r#"{"type":"perpDexStatus","dex":"hyperliquid"}"#);
     }
 
     #[tokio::test]

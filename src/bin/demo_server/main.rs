@@ -3,11 +3,7 @@
 //! A Bloomberg-style demo website showcasing all SDK functionality.
 //! Run with: `cargo run --bin demo-server --features demo`
 
-use axum::{
-    response::IntoResponse,
-    routing::get,
-    Json, Router,
-};
+use axum::{response::IntoResponse, routing::get, Json, Router};
 use std::net::SocketAddr;
 use tower_http::{
     cors::{Any, CorsLayer},
@@ -49,7 +45,10 @@ async fn main() {
         // WebSocket proxy for real-time data
         .merge(routes::ws_routes())
         // Static file serving for frontend
-        .nest_service("/", ServeDir::new("static").append_index_html_on_directories(true))
+        .nest_service(
+            "/",
+            ServeDir::new("static").append_index_html_on_directories(true),
+        )
         // Add middleware
         .layer(cors)
         .with_state(state);

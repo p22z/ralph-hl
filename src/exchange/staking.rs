@@ -866,11 +866,8 @@ mod tests {
         let wallet = Wallet::from_private_key(TEST_PRIVATE_KEY, true).unwrap();
 
         let rt = tokio::runtime::Runtime::new().unwrap();
-        let result = rt.block_on(client.delegate(
-            &wallet,
-            "0x1234567890123456789012345678901234567890",
-            "",
-        ));
+        let result =
+            rt.block_on(client.delegate(&wallet, "0x1234567890123456789012345678901234567890", ""));
 
         assert!(result.is_err());
         match result.unwrap_err() {
@@ -1092,9 +1089,7 @@ mod tests {
         let client = TestClient::new(&server.url());
         let wallet = Wallet::from_private_key(TEST_PRIVATE_KEY, true).unwrap();
 
-        let result = client
-            .stake_deposit(&wallet, "1000000000000000000")
-            .await;
+        let result = client.stake_deposit(&wallet, "1000000000000000000").await;
 
         assert!(result.is_err());
         match result.unwrap_err() {
@@ -1121,9 +1116,7 @@ mod tests {
         let client = TestClient::new(&server.url());
         let wallet = Wallet::from_private_key(TEST_PRIVATE_KEY, true).unwrap();
 
-        let result = client
-            .stake_deposit(&wallet, "1000000000000000000")
-            .await;
+        let result = client.stake_deposit(&wallet, "1000000000000000000").await;
 
         assert!(result.is_err());
         match result.unwrap_err() {
@@ -1150,9 +1143,7 @@ mod tests {
         let client = TestClient::new(&server.url());
         let wallet = Wallet::from_private_key(TEST_PRIVATE_KEY, true).unwrap();
 
-        let result = client
-            .stake_withdraw(&wallet, "500000000000000000")
-            .await;
+        let result = client.stake_withdraw(&wallet, "500000000000000000").await;
 
         assert!(result.is_err());
         match result.unwrap_err() {

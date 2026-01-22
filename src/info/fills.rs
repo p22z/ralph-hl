@@ -865,8 +865,10 @@ mod tests {
 
     #[tokio::test]
     async fn test_user_fills_by_time_request_serialization_without_end() {
-        let request =
-            UserFillsByTimeRequest::new("0x1234567890123456789012345678901234567890", 1700000000000);
+        let request = UserFillsByTimeRequest::new(
+            "0x1234567890123456789012345678901234567890",
+            1700000000000,
+        );
         let json = serde_json::to_string(&request).unwrap();
         assert!(json.contains("\"type\":\"userFillsByTime\""));
         assert!(json.contains("\"user\":\"0x1234567890123456789012345678901234567890\""));
@@ -876,9 +878,11 @@ mod tests {
 
     #[tokio::test]
     async fn test_user_fills_by_time_request_serialization_with_end() {
-        let request =
-            UserFillsByTimeRequest::new("0x1234567890123456789012345678901234567890", 1700000000000)
-                .with_end_time(1700100000000);
+        let request = UserFillsByTimeRequest::new(
+            "0x1234567890123456789012345678901234567890",
+            1700000000000,
+        )
+        .with_end_time(1700100000000);
         let json = serde_json::to_string(&request).unwrap();
         assert!(json.contains("\"type\":\"userFillsByTime\""));
         assert!(json.contains("\"startTime\":1700000000000"));

@@ -670,11 +670,7 @@ mod tests {
         let wallet = Wallet::from_private_key(TEST_PRIVATE_KEY, true).unwrap();
 
         let response = client
-            .vault_withdraw(
-                &wallet,
-                "0xvault1234567890123456789012345678901234",
-                "50.0",
-            )
+            .vault_withdraw(&wallet, "0xvault1234567890123456789012345678901234", "50.0")
             .await
             .unwrap();
 
@@ -838,11 +834,7 @@ mod tests {
         let wallet = Wallet::from_private_key(TEST_PRIVATE_KEY, true).unwrap();
 
         let result = client
-            .vault_withdraw(
-                &wallet,
-                "0xvault1234567890123456789012345678901234",
-                "50.0",
-            )
+            .vault_withdraw(&wallet, "0xvault1234567890123456789012345678901234", "50.0")
             .await;
 
         assert!(result.is_err());
@@ -871,11 +863,7 @@ mod tests {
         let wallet = Wallet::from_private_key(TEST_PRIVATE_KEY, true).unwrap();
 
         let result = client
-            .vault_withdraw(
-                &wallet,
-                "0xvault1234567890123456789012345678901234",
-                "50.0",
-            )
+            .vault_withdraw(&wallet, "0xvault1234567890123456789012345678901234", "50.0")
             .await;
 
         assert!(result.is_err());

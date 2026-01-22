@@ -360,12 +360,18 @@ mod tests {
         // Check BTC position (long)
         assert_eq!(state.asset_positions[0].position.coin, "BTC");
         assert_eq!(state.asset_positions[0].position.szi, "0.1");
-        assert_eq!(state.asset_positions[0].position.leverage.leverage_type, "cross");
+        assert_eq!(
+            state.asset_positions[0].position.leverage.leverage_type,
+            "cross"
+        );
 
         // Check ETH position (short)
         assert_eq!(state.asset_positions[1].position.coin, "ETH");
         assert_eq!(state.asset_positions[1].position.szi, "-0.5");
-        assert_eq!(state.asset_positions[1].position.leverage.leverage_type, "isolated");
+        assert_eq!(
+            state.asset_positions[1].position.leverage.leverage_type,
+            "isolated"
+        );
 
         mock.assert_async().await;
     }
@@ -506,9 +512,8 @@ mod tests {
             .await;
 
         let client = TestClient::new(&server.url());
-        let result: Result<ClearinghouseState> = client
-            .clearinghouse_state("invalid-address", None)
-            .await;
+        let result: Result<ClearinghouseState> =
+            client.clearinghouse_state("invalid-address", None).await;
 
         assert!(result.is_err());
         let err = result.unwrap_err();
@@ -539,7 +544,8 @@ mod tests {
 
     #[tokio::test]
     async fn test_spot_clearinghouse_state_request_serialization() {
-        let request = SpotClearinghouseStateRequest::new("0x1234567890123456789012345678901234567890");
+        let request =
+            SpotClearinghouseStateRequest::new("0x1234567890123456789012345678901234567890");
         let json = serde_json::to_string(&request).unwrap();
         assert_eq!(
             json,

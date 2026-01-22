@@ -11,8 +11,7 @@ use crate::auth::{Signature, Wallet};
 use crate::client::Client;
 use crate::error::{Error, Result};
 use crate::types::{
-    SendAssetAction, SpotPerpTransferAction, SpotTransferAction, UsdTransferAction,
-    WithdrawAction,
+    SendAssetAction, SpotPerpTransferAction, SpotTransferAction, UsdTransferAction, WithdrawAction,
 };
 
 /// Exchange request wrapper with authentication for transfer operations
@@ -227,9 +226,7 @@ impl Client {
             ));
         }
         if token.is_empty() {
-            return Err(Error::InvalidParameter(
-                "Token cannot be empty".to_string(),
-            ));
+            return Err(Error::InvalidParameter("Token cannot be empty".to_string()));
         }
         if amount.is_empty() {
             return Err(Error::InvalidParameter(
@@ -355,9 +352,7 @@ impl Client {
             ));
         }
         if token.is_empty() {
-            return Err(Error::InvalidParameter(
-                "Token cannot be empty".to_string(),
-            ));
+            return Err(Error::InvalidParameter("Token cannot be empty".to_string()));
         }
         if amount.is_empty() {
             return Err(Error::InvalidParameter(
@@ -779,9 +774,7 @@ mod tests {
                 ));
             }
             if token.is_empty() {
-                return Err(Error::InvalidParameter(
-                    "Token cannot be empty".to_string(),
-                ));
+                return Err(Error::InvalidParameter("Token cannot be empty".to_string()));
             }
             if amount.is_empty() {
                 return Err(Error::InvalidParameter(
@@ -847,9 +840,7 @@ mod tests {
                 ));
             }
             if token.is_empty() {
-                return Err(Error::InvalidParameter(
-                    "Token cannot be empty".to_string(),
-                ));
+                return Err(Error::InvalidParameter("Token cannot be empty".to_string()));
             }
             if amount.is_empty() {
                 return Err(Error::InvalidParameter(

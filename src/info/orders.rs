@@ -708,9 +708,8 @@ mod tests {
             .await;
 
         let client = TestClient::new(&server.url());
-        let result: Result<Vec<FrontendOpenOrder>> = client
-            .frontend_open_orders("invalid-address", None)
-            .await;
+        let result: Result<Vec<FrontendOpenOrder>> =
+            client.frontend_open_orders("invalid-address", None).await;
 
         assert!(result.is_err());
         let err = result.unwrap_err();
@@ -782,8 +781,8 @@ mod tests {
 
     #[tokio::test]
     async fn test_open_orders_request_serialization_with_dex() {
-        let request =
-            OpenOrdersRequest::new("0x1234567890123456789012345678901234567890").with_dex("testdex");
+        let request = OpenOrdersRequest::new("0x1234567890123456789012345678901234567890")
+            .with_dex("testdex");
         let json = serde_json::to_string(&request).unwrap();
         assert!(json.contains("\"type\":\"openOrders\""));
         assert!(json.contains("\"user\":\"0x1234567890123456789012345678901234567890\""));

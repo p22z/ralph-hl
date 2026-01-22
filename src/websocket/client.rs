@@ -511,8 +511,8 @@ impl WsClient {
 
     /// Send a JSON message over the WebSocket
     pub async fn send_json<T: serde::Serialize>(&self, value: &T) -> Result<()> {
-        let text =
-            serde_json::to_string(value).map_err(|e| Error::WebSocket(format!("JSON error: {e}")))?;
+        let text = serde_json::to_string(value)
+            .map_err(|e| Error::WebSocket(format!("JSON error: {e}")))?;
         self.send_text(&text).await
     }
 
@@ -772,8 +772,10 @@ impl WsClient {
         n_sig_figs: Option<u8>,
         mantissa: Option<u8>,
     ) -> Result<()> {
-        self.subscribe(Subscription::l2_book_with_params(coin, n_sig_figs, mantissa))
-            .await
+        self.subscribe(Subscription::l2_book_with_params(
+            coin, n_sig_figs, mantissa,
+        ))
+        .await
     }
 
     /// Subscribe to trade stream for a coin
@@ -977,7 +979,8 @@ impl WsClient {
     /// client.subscribe_clearinghouse_state("0x1234567890123456789012345678901234567890").await?;
     /// ```
     pub async fn subscribe_clearinghouse_state(&self, user: impl Into<String>) -> Result<()> {
-        self.subscribe(Subscription::clearinghouse_state(user)).await
+        self.subscribe(Subscription::clearinghouse_state(user))
+            .await
     }
 
     /// Subscribe to clearinghouse state updates for a specific DEX
@@ -1142,8 +1145,11 @@ impl WsClient {
         user: impl Into<String>,
         aggregate_by_time: bool,
     ) -> Result<()> {
-        self.subscribe(Subscription::user_fills_with_aggregation(user, aggregate_by_time))
-            .await
+        self.subscribe(Subscription::user_fills_with_aggregation(
+            user,
+            aggregate_by_time,
+        ))
+        .await
     }
 
     /// Subscribe to user funding payments
@@ -1239,7 +1245,8 @@ impl WsClient {
     /// client.subscribe_user_twap_slice_fills("0x1234567890123456789012345678901234567890").await?;
     /// ```
     pub async fn subscribe_user_twap_slice_fills(&self, user: impl Into<String>) -> Result<()> {
-        self.subscribe(Subscription::user_twap_slice_fills(user)).await
+        self.subscribe(Subscription::user_twap_slice_fills(user))
+            .await
     }
 
     /// Subscribe to user TWAP history
@@ -1831,7 +1838,9 @@ mod tests {
     #[tokio::test]
     async fn test_subscribe_l2_book_with_params_not_connected() {
         let client = WsClient::mainnet();
-        let result = client.subscribe_l2_book_with_params("BTC", Some(5), Some(2)).await;
+        let result = client
+            .subscribe_l2_book_with_params("BTC", Some(5), Some(2))
+            .await;
         assert!(result.is_err());
         let err = result.unwrap_err();
         assert!(err.to_string().contains("Not connected"));
@@ -1850,7 +1859,9 @@ mod tests {
     async fn test_subscribe_candle_not_connected() {
         use crate::types::CandleInterval;
         let client = WsClient::mainnet();
-        let result = client.subscribe_candle("BTC", CandleInterval::OneHour).await;
+        let result = client
+            .subscribe_candle("BTC", CandleInterval::OneHour)
+            .await;
         assert!(result.is_err());
         let err = result.unwrap_err();
         assert!(err.to_string().contains("Not connected"));
@@ -1905,7 +1916,12 @@ mod tests {
     fn test_subscription_l2_book_with_params_creates_correct_subscription() {
         let sub = Subscription::l2_book_with_params("SOL", Some(4), Some(1));
         assert_eq!(sub.channel_name(), "l2Book");
-        if let Subscription::L2Book { coin, n_sig_figs, mantissa } = sub {
+        if let Subscription::L2Book {
+            coin,
+            n_sig_figs,
+            mantissa,
+        } = sub
+        {
             assert_eq!(coin, "SOL");
             assert_eq!(n_sig_figs, Some(4));
             assert_eq!(mantissa, Some(1));
@@ -1978,9 +1994,11 @@ mod tests {
 
     #[test]
     fn test_subscribe_l2_book_with_params_serializes_correctly() {
-        let request = SubscriptionRequest::subscribe(
-            Subscription::l2_book_with_params("ETH", Some(5), Some(2))
-        );
+        let request = SubscriptionRequest::subscribe(Subscription::l2_book_with_params(
+            "ETH",
+            Some(5),
+            Some(2),
+        ));
         let json = serde_json::to_string(&request).unwrap();
         assert!(json.contains("\"type\":\"l2Book\""));
         assert!(json.contains("\"coin\":\"ETH\""));
@@ -2000,9 +2018,8 @@ mod tests {
     #[test]
     fn test_subscribe_candle_serializes_correctly() {
         use crate::types::CandleInterval;
-        let request = SubscriptionRequest::subscribe(
-            Subscription::candle("BTC", CandleInterval::OneHour)
-        );
+        let request =
+            SubscriptionRequest::subscribe(Subscription::candle("BTC", CandleInterval::OneHour));
         let json = serde_json::to_string(&request).unwrap();
         assert!(json.contains("\"method\":\"subscribe\""));
         assert!(json.contains("\"type\":\"candle\""));
@@ -2046,8 +2063,16 @@ mod tests {
         ];
 
         for sub in subscriptions {
-            assert!(sub.is_market_subscription(), "Expected {:?} to be a market subscription", sub);
-            assert!(!sub.is_user_subscription(), "Expected {:?} to NOT be a user subscription", sub);
+            assert!(
+                sub.is_market_subscription(),
+                "Expected {:?} to be a market subscription",
+                sub
+            );
+            assert!(
+                !sub.is_user_subscription(),
+                "Expected {:?} to NOT be a user subscription",
+                sub
+            );
         }
     }
 
@@ -2165,7 +2190,9 @@ mod tests {
         let client = WsClient::mainnet();
         client.connect().await.unwrap();
 
-        let result = client.subscribe_l2_book_with_params("ETH", Some(5), Some(2)).await;
+        let result = client
+            .subscribe_l2_book_with_params("ETH", Some(5), Some(2))
+            .await;
         assert!(result.is_ok());
 
         client.close().await.unwrap();
@@ -2195,7 +2222,9 @@ mod tests {
         let client = WsClient::mainnet();
         client.connect().await.unwrap();
 
-        let result = client.subscribe_candle("BTC", CandleInterval::OneHour).await;
+        let result = client
+            .subscribe_candle("BTC", CandleInterval::OneHour)
+            .await;
         assert!(result.is_ok());
 
         // Check subscription is tracked
@@ -2249,7 +2278,10 @@ mod tests {
         client.subscribe_all_mids().await.unwrap();
         client.subscribe_l2_book("BTC").await.unwrap();
         client.subscribe_trades("ETH").await.unwrap();
-        client.subscribe_candle("SOL", CandleInterval::FifteenMinutes).await.unwrap();
+        client
+            .subscribe_candle("SOL", CandleInterval::FifteenMinutes)
+            .await
+            .unwrap();
         client.subscribe_bbo("AVAX").await.unwrap();
 
         // Verify all subscriptions are tracked
@@ -2263,7 +2295,9 @@ mod tests {
     #[tokio::test]
     async fn test_subscribe_notification_not_connected() {
         let client = WsClient::mainnet();
-        let result = client.subscribe_notification("0x1234567890123456789012345678901234567890").await;
+        let result = client
+            .subscribe_notification("0x1234567890123456789012345678901234567890")
+            .await;
         assert!(result.is_err());
         let err = result.unwrap_err();
         assert!(err.to_string().contains("Not connected"));
@@ -2272,7 +2306,9 @@ mod tests {
     #[tokio::test]
     async fn test_subscribe_web_data3_not_connected() {
         let client = WsClient::mainnet();
-        let result = client.subscribe_web_data3("0x1234567890123456789012345678901234567890").await;
+        let result = client
+            .subscribe_web_data3("0x1234567890123456789012345678901234567890")
+            .await;
         assert!(result.is_err());
         let err = result.unwrap_err();
         assert!(err.to_string().contains("Not connected"));
@@ -2281,7 +2317,9 @@ mod tests {
     #[tokio::test]
     async fn test_subscribe_twap_states_not_connected() {
         let client = WsClient::mainnet();
-        let result = client.subscribe_twap_states("0x1234567890123456789012345678901234567890").await;
+        let result = client
+            .subscribe_twap_states("0x1234567890123456789012345678901234567890")
+            .await;
         assert!(result.is_err());
         let err = result.unwrap_err();
         assert!(err.to_string().contains("Not connected"));
@@ -2290,7 +2328,9 @@ mod tests {
     #[tokio::test]
     async fn test_subscribe_twap_states_with_dex_not_connected() {
         let client = WsClient::mainnet();
-        let result = client.subscribe_twap_states_with_dex("0x123...", "perp").await;
+        let result = client
+            .subscribe_twap_states_with_dex("0x123...", "perp")
+            .await;
         assert!(result.is_err());
         let err = result.unwrap_err();
         assert!(err.to_string().contains("Not connected"));
@@ -2299,7 +2339,9 @@ mod tests {
     #[tokio::test]
     async fn test_subscribe_clearinghouse_state_not_connected() {
         let client = WsClient::mainnet();
-        let result = client.subscribe_clearinghouse_state("0x1234567890123456789012345678901234567890").await;
+        let result = client
+            .subscribe_clearinghouse_state("0x1234567890123456789012345678901234567890")
+            .await;
         assert!(result.is_err());
         let err = result.unwrap_err();
         assert!(err.to_string().contains("Not connected"));
@@ -2308,7 +2350,9 @@ mod tests {
     #[tokio::test]
     async fn test_subscribe_clearinghouse_state_with_dex_not_connected() {
         let client = WsClient::mainnet();
-        let result = client.subscribe_clearinghouse_state_with_dex("0x123...", "perp").await;
+        let result = client
+            .subscribe_clearinghouse_state_with_dex("0x123...", "perp")
+            .await;
         assert!(result.is_err());
         let err = result.unwrap_err();
         assert!(err.to_string().contains("Not connected"));
@@ -2317,7 +2361,9 @@ mod tests {
     #[tokio::test]
     async fn test_subscribe_open_orders_not_connected() {
         let client = WsClient::mainnet();
-        let result = client.subscribe_open_orders("0x1234567890123456789012345678901234567890").await;
+        let result = client
+            .subscribe_open_orders("0x1234567890123456789012345678901234567890")
+            .await;
         assert!(result.is_err());
         let err = result.unwrap_err();
         assert!(err.to_string().contains("Not connected"));
@@ -2326,7 +2372,9 @@ mod tests {
     #[tokio::test]
     async fn test_subscribe_open_orders_with_dex_not_connected() {
         let client = WsClient::mainnet();
-        let result = client.subscribe_open_orders_with_dex("0x123...", "spot").await;
+        let result = client
+            .subscribe_open_orders_with_dex("0x123...", "spot")
+            .await;
         assert!(result.is_err());
         let err = result.unwrap_err();
         assert!(err.to_string().contains("Not connected"));
@@ -2443,9 +2491,8 @@ mod tests {
 
     #[test]
     fn test_subscribe_twap_states_with_dex_serializes_correctly() {
-        let request = SubscriptionRequest::subscribe(
-            Subscription::twap_states_with_dex("0xabcd", "perp")
-        );
+        let request =
+            SubscriptionRequest::subscribe(Subscription::twap_states_with_dex("0xabcd", "perp"));
         let json = serde_json::to_string(&request).unwrap();
         assert!(json.contains("\"type\":\"twapStates\""));
         assert!(json.contains("\"user\":\"0xabcd\""));
@@ -2454,9 +2501,7 @@ mod tests {
 
     #[test]
     fn test_subscribe_clearinghouse_state_serializes_correctly() {
-        let request = SubscriptionRequest::subscribe(
-            Subscription::clearinghouse_state("0xefgh")
-        );
+        let request = SubscriptionRequest::subscribe(Subscription::clearinghouse_state("0xefgh"));
         let json = serde_json::to_string(&request).unwrap();
         assert!(json.contains("\"method\":\"subscribe\""));
         assert!(json.contains("\"type\":\"clearinghouseState\""));
@@ -2465,9 +2510,9 @@ mod tests {
 
     #[test]
     fn test_subscribe_clearinghouse_state_with_dex_serializes_correctly() {
-        let request = SubscriptionRequest::subscribe(
-            Subscription::clearinghouse_state_with_dex("0xefgh", "spot")
-        );
+        let request = SubscriptionRequest::subscribe(Subscription::clearinghouse_state_with_dex(
+            "0xefgh", "spot",
+        ));
         let json = serde_json::to_string(&request).unwrap();
         assert!(json.contains("\"type\":\"clearinghouseState\""));
         assert!(json.contains("\"user\":\"0xefgh\""));
@@ -2485,9 +2530,8 @@ mod tests {
 
     #[test]
     fn test_subscribe_open_orders_with_dex_serializes_correctly() {
-        let request = SubscriptionRequest::subscribe(
-            Subscription::open_orders_with_dex("0xijkl", "perp")
-        );
+        let request =
+            SubscriptionRequest::subscribe(Subscription::open_orders_with_dex("0xijkl", "perp"));
         let json = serde_json::to_string(&request).unwrap();
         assert!(json.contains("\"type\":\"openOrders\""));
         assert!(json.contains("\"user\":\"0xijkl\""));
@@ -2510,8 +2554,16 @@ mod tests {
         ];
 
         for sub in subscriptions {
-            assert!(sub.is_user_subscription(), "Expected {:?} to be a user subscription", sub);
-            assert!(!sub.is_market_subscription(), "Expected {:?} to NOT be a market subscription", sub);
+            assert!(
+                sub.is_user_subscription(),
+                "Expected {:?} to be a user subscription",
+                sub
+            );
+            assert!(
+                !sub.is_market_subscription(),
+                "Expected {:?} to NOT be a market subscription",
+                sub
+            );
         }
     }
 
@@ -2523,7 +2575,9 @@ mod tests {
         let client = WsClient::mainnet();
         client.connect().await.unwrap();
 
-        let result = client.subscribe_notification("0x1234567890123456789012345678901234567890").await;
+        let result = client
+            .subscribe_notification("0x1234567890123456789012345678901234567890")
+            .await;
         assert!(result.is_ok());
 
         // Check subscription is tracked
@@ -2539,7 +2593,9 @@ mod tests {
         let client = WsClient::mainnet();
         client.connect().await.unwrap();
 
-        let result = client.subscribe_web_data3("0x1234567890123456789012345678901234567890").await;
+        let result = client
+            .subscribe_web_data3("0x1234567890123456789012345678901234567890")
+            .await;
         assert!(result.is_ok());
 
         // Check subscription is tracked
@@ -2555,7 +2611,9 @@ mod tests {
         let client = WsClient::mainnet();
         client.connect().await.unwrap();
 
-        let result = client.subscribe_twap_states("0x1234567890123456789012345678901234567890").await;
+        let result = client
+            .subscribe_twap_states("0x1234567890123456789012345678901234567890")
+            .await;
         assert!(result.is_ok());
 
         // Check subscription is tracked
@@ -2571,10 +2629,9 @@ mod tests {
         let client = WsClient::mainnet();
         client.connect().await.unwrap();
 
-        let result = client.subscribe_twap_states_with_dex(
-            "0x1234567890123456789012345678901234567890",
-            "perp"
-        ).await;
+        let result = client
+            .subscribe_twap_states_with_dex("0x1234567890123456789012345678901234567890", "perp")
+            .await;
         assert!(result.is_ok());
 
         client.close().await.unwrap();
@@ -2586,7 +2643,9 @@ mod tests {
         let client = WsClient::mainnet();
         client.connect().await.unwrap();
 
-        let result = client.subscribe_clearinghouse_state("0x1234567890123456789012345678901234567890").await;
+        let result = client
+            .subscribe_clearinghouse_state("0x1234567890123456789012345678901234567890")
+            .await;
         assert!(result.is_ok());
 
         // Check subscription is tracked
@@ -2602,10 +2661,12 @@ mod tests {
         let client = WsClient::mainnet();
         client.connect().await.unwrap();
 
-        let result = client.subscribe_clearinghouse_state_with_dex(
-            "0x1234567890123456789012345678901234567890",
-            "perp"
-        ).await;
+        let result = client
+            .subscribe_clearinghouse_state_with_dex(
+                "0x1234567890123456789012345678901234567890",
+                "perp",
+            )
+            .await;
         assert!(result.is_ok());
 
         client.close().await.unwrap();
@@ -2617,7 +2678,9 @@ mod tests {
         let client = WsClient::mainnet();
         client.connect().await.unwrap();
 
-        let result = client.subscribe_open_orders("0x1234567890123456789012345678901234567890").await;
+        let result = client
+            .subscribe_open_orders("0x1234567890123456789012345678901234567890")
+            .await;
         assert!(result.is_ok());
 
         // Check subscription is tracked
@@ -2633,10 +2696,9 @@ mod tests {
         let client = WsClient::mainnet();
         client.connect().await.unwrap();
 
-        let result = client.subscribe_open_orders_with_dex(
-            "0x1234567890123456789012345678901234567890",
-            "spot"
-        ).await;
+        let result = client
+            .subscribe_open_orders_with_dex("0x1234567890123456789012345678901234567890", "spot")
+            .await;
         assert!(result.is_ok());
 
         client.close().await.unwrap();
@@ -2668,7 +2730,9 @@ mod tests {
     #[tokio::test]
     async fn test_subscribe_order_updates_not_connected() {
         let client = WsClient::mainnet();
-        let result = client.subscribe_order_updates("0x1234567890123456789012345678901234567890").await;
+        let result = client
+            .subscribe_order_updates("0x1234567890123456789012345678901234567890")
+            .await;
         assert!(result.is_err());
         let err = result.unwrap_err();
         assert!(err.to_string().contains("Not connected"));
@@ -2677,7 +2741,9 @@ mod tests {
     #[tokio::test]
     async fn test_subscribe_user_events_not_connected() {
         let client = WsClient::mainnet();
-        let result = client.subscribe_user_events("0x1234567890123456789012345678901234567890").await;
+        let result = client
+            .subscribe_user_events("0x1234567890123456789012345678901234567890")
+            .await;
         assert!(result.is_err());
         let err = result.unwrap_err();
         assert!(err.to_string().contains("Not connected"));
@@ -2686,7 +2752,9 @@ mod tests {
     #[tokio::test]
     async fn test_subscribe_user_fills_not_connected() {
         let client = WsClient::mainnet();
-        let result = client.subscribe_user_fills("0x1234567890123456789012345678901234567890").await;
+        let result = client
+            .subscribe_user_fills("0x1234567890123456789012345678901234567890")
+            .await;
         assert!(result.is_err());
         let err = result.unwrap_err();
         assert!(err.to_string().contains("Not connected"));
@@ -2695,7 +2763,9 @@ mod tests {
     #[tokio::test]
     async fn test_subscribe_user_fills_with_aggregation_not_connected() {
         let client = WsClient::mainnet();
-        let result = client.subscribe_user_fills_with_aggregation("0x123...", true).await;
+        let result = client
+            .subscribe_user_fills_with_aggregation("0x123...", true)
+            .await;
         assert!(result.is_err());
         let err = result.unwrap_err();
         assert!(err.to_string().contains("Not connected"));
@@ -2704,7 +2774,9 @@ mod tests {
     #[tokio::test]
     async fn test_subscribe_user_fundings_not_connected() {
         let client = WsClient::mainnet();
-        let result = client.subscribe_user_fundings("0x1234567890123456789012345678901234567890").await;
+        let result = client
+            .subscribe_user_fundings("0x1234567890123456789012345678901234567890")
+            .await;
         assert!(result.is_err());
         let err = result.unwrap_err();
         assert!(err.to_string().contains("Not connected"));
@@ -2713,7 +2785,9 @@ mod tests {
     #[tokio::test]
     async fn test_subscribe_user_non_funding_ledger_updates_not_connected() {
         let client = WsClient::mainnet();
-        let result = client.subscribe_user_non_funding_ledger_updates("0x1234567890123456789012345678901234567890").await;
+        let result = client
+            .subscribe_user_non_funding_ledger_updates("0x1234567890123456789012345678901234567890")
+            .await;
         assert!(result.is_err());
         let err = result.unwrap_err();
         assert!(err.to_string().contains("Not connected"));
@@ -2722,7 +2796,9 @@ mod tests {
     #[tokio::test]
     async fn test_subscribe_active_asset_data_not_connected() {
         let client = WsClient::mainnet();
-        let result = client.subscribe_active_asset_data("0x1234567890123456789012345678901234567890", "BTC").await;
+        let result = client
+            .subscribe_active_asset_data("0x1234567890123456789012345678901234567890", "BTC")
+            .await;
         assert!(result.is_err());
         let err = result.unwrap_err();
         assert!(err.to_string().contains("Not connected"));
@@ -2731,7 +2807,9 @@ mod tests {
     #[tokio::test]
     async fn test_subscribe_user_twap_slice_fills_not_connected() {
         let client = WsClient::mainnet();
-        let result = client.subscribe_user_twap_slice_fills("0x1234567890123456789012345678901234567890").await;
+        let result = client
+            .subscribe_user_twap_slice_fills("0x1234567890123456789012345678901234567890")
+            .await;
         assert!(result.is_err());
         let err = result.unwrap_err();
         assert!(err.to_string().contains("Not connected"));
@@ -2740,7 +2818,9 @@ mod tests {
     #[tokio::test]
     async fn test_subscribe_user_twap_history_not_connected() {
         let client = WsClient::mainnet();
-        let result = client.subscribe_user_twap_history("0x1234567890123456789012345678901234567890").await;
+        let result = client
+            .subscribe_user_twap_history("0x1234567890123456789012345678901234567890")
+            .await;
         assert!(result.is_err());
         let err = result.unwrap_err();
         assert!(err.to_string().contains("Not connected"));
@@ -2778,7 +2858,11 @@ mod tests {
         let sub = Subscription::user_fills_with_aggregation("0xabcd", true);
         assert_eq!(sub.channel_name(), "userFills");
         assert_eq!(sub.user(), Some("0xabcd"));
-        if let Subscription::UserFills { user, aggregate_by_time } = sub {
+        if let Subscription::UserFills {
+            user,
+            aggregate_by_time,
+        } = sub
+        {
             assert_eq!(user, "0xabcd");
             assert_eq!(aggregate_by_time, Some(true));
         } else {
@@ -2858,9 +2942,9 @@ mod tests {
 
     #[test]
     fn test_subscribe_user_fills_with_aggregation_serializes_correctly() {
-        let request = SubscriptionRequest::subscribe(
-            Subscription::user_fills_with_aggregation("0xabcd", true)
-        );
+        let request = SubscriptionRequest::subscribe(Subscription::user_fills_with_aggregation(
+            "0xabcd", true,
+        ));
         let json = serde_json::to_string(&request).unwrap();
         assert!(json.contains("\"type\":\"userFills\""));
         assert!(json.contains("\"user\":\"0xabcd\""));
@@ -2878,9 +2962,8 @@ mod tests {
 
     #[test]
     fn test_subscribe_user_non_funding_ledger_updates_serializes_correctly() {
-        let request = SubscriptionRequest::subscribe(
-            Subscription::user_non_funding_ledger_updates("0xijkl")
-        );
+        let request =
+            SubscriptionRequest::subscribe(Subscription::user_non_funding_ledger_updates("0xijkl"));
         let json = serde_json::to_string(&request).unwrap();
         assert!(json.contains("\"method\":\"subscribe\""));
         assert!(json.contains("\"type\":\"userNonFundingLedgerUpdates\""));
@@ -2889,9 +2972,8 @@ mod tests {
 
     #[test]
     fn test_subscribe_active_asset_data_serializes_correctly() {
-        let request = SubscriptionRequest::subscribe(
-            Subscription::active_asset_data("0xmnop", "BTC")
-        );
+        let request =
+            SubscriptionRequest::subscribe(Subscription::active_asset_data("0xmnop", "BTC"));
         let json = serde_json::to_string(&request).unwrap();
         assert!(json.contains("\"method\":\"subscribe\""));
         assert!(json.contains("\"type\":\"activeAssetData\""));
@@ -2901,9 +2983,7 @@ mod tests {
 
     #[test]
     fn test_subscribe_user_twap_slice_fills_serializes_correctly() {
-        let request = SubscriptionRequest::subscribe(
-            Subscription::user_twap_slice_fills("0xqrst")
-        );
+        let request = SubscriptionRequest::subscribe(Subscription::user_twap_slice_fills("0xqrst"));
         let json = serde_json::to_string(&request).unwrap();
         assert!(json.contains("\"method\":\"subscribe\""));
         assert!(json.contains("\"type\":\"userTwapSliceFills\""));
@@ -2912,9 +2992,7 @@ mod tests {
 
     #[test]
     fn test_subscribe_user_twap_history_serializes_correctly() {
-        let request = SubscriptionRequest::subscribe(
-            Subscription::user_twap_history("0xuvwx")
-        );
+        let request = SubscriptionRequest::subscribe(Subscription::user_twap_history("0xuvwx"));
         let json = serde_json::to_string(&request).unwrap();
         assert!(json.contains("\"method\":\"subscribe\""));
         assert!(json.contains("\"type\":\"userTwapHistory\""));
@@ -2938,8 +3016,16 @@ mod tests {
         ];
 
         for sub in subscriptions {
-            assert!(sub.is_user_subscription(), "Expected {:?} to be a user subscription", sub);
-            assert!(!sub.is_market_subscription(), "Expected {:?} to NOT be a market subscription", sub);
+            assert!(
+                sub.is_user_subscription(),
+                "Expected {:?} to be a user subscription",
+                sub
+            );
+            assert!(
+                !sub.is_market_subscription(),
+                "Expected {:?} to NOT be a market subscription",
+                sub
+            );
         }
     }
 
@@ -2951,7 +3037,9 @@ mod tests {
         let client = WsClient::mainnet();
         client.connect().await.unwrap();
 
-        let result = client.subscribe_order_updates("0x1234567890123456789012345678901234567890").await;
+        let result = client
+            .subscribe_order_updates("0x1234567890123456789012345678901234567890")
+            .await;
         assert!(result.is_ok());
 
         // Check subscription is tracked
@@ -2967,7 +3055,9 @@ mod tests {
         let client = WsClient::mainnet();
         client.connect().await.unwrap();
 
-        let result = client.subscribe_user_events("0x1234567890123456789012345678901234567890").await;
+        let result = client
+            .subscribe_user_events("0x1234567890123456789012345678901234567890")
+            .await;
         assert!(result.is_ok());
 
         // Check subscription is tracked
@@ -2983,7 +3073,9 @@ mod tests {
         let client = WsClient::mainnet();
         client.connect().await.unwrap();
 
-        let result = client.subscribe_user_fills("0x1234567890123456789012345678901234567890").await;
+        let result = client
+            .subscribe_user_fills("0x1234567890123456789012345678901234567890")
+            .await;
         assert!(result.is_ok());
 
         // Check subscription is tracked
@@ -2999,10 +3091,12 @@ mod tests {
         let client = WsClient::mainnet();
         client.connect().await.unwrap();
 
-        let result = client.subscribe_user_fills_with_aggregation(
-            "0x1234567890123456789012345678901234567890",
-            true
-        ).await;
+        let result = client
+            .subscribe_user_fills_with_aggregation(
+                "0x1234567890123456789012345678901234567890",
+                true,
+            )
+            .await;
         assert!(result.is_ok());
 
         client.close().await.unwrap();
@@ -3014,7 +3108,9 @@ mod tests {
         let client = WsClient::mainnet();
         client.connect().await.unwrap();
 
-        let result = client.subscribe_user_fundings("0x1234567890123456789012345678901234567890").await;
+        let result = client
+            .subscribe_user_fundings("0x1234567890123456789012345678901234567890")
+            .await;
         assert!(result.is_ok());
 
         // Check subscription is tracked
@@ -3030,11 +3126,15 @@ mod tests {
         let client = WsClient::mainnet();
         client.connect().await.unwrap();
 
-        let result = client.subscribe_user_non_funding_ledger_updates("0x1234567890123456789012345678901234567890").await;
+        let result = client
+            .subscribe_user_non_funding_ledger_updates("0x1234567890123456789012345678901234567890")
+            .await;
         assert!(result.is_ok());
 
         // Check subscription is tracked
-        let sub = Subscription::user_non_funding_ledger_updates("0x1234567890123456789012345678901234567890");
+        let sub = Subscription::user_non_funding_ledger_updates(
+            "0x1234567890123456789012345678901234567890",
+        );
         assert!(client.subscription_manager().contains(&sub).await);
 
         client.close().await.unwrap();
@@ -3046,17 +3146,14 @@ mod tests {
         let client = WsClient::mainnet();
         client.connect().await.unwrap();
 
-        let result = client.subscribe_active_asset_data(
-            "0x1234567890123456789012345678901234567890",
-            "BTC"
-        ).await;
+        let result = client
+            .subscribe_active_asset_data("0x1234567890123456789012345678901234567890", "BTC")
+            .await;
         assert!(result.is_ok());
 
         // Check subscription is tracked
-        let sub = Subscription::active_asset_data(
-            "0x1234567890123456789012345678901234567890",
-            "BTC"
-        );
+        let sub =
+            Subscription::active_asset_data("0x1234567890123456789012345678901234567890", "BTC");
         assert!(client.subscription_manager().contains(&sub).await);
 
         client.close().await.unwrap();
@@ -3068,7 +3165,9 @@ mod tests {
         let client = WsClient::mainnet();
         client.connect().await.unwrap();
 
-        let result = client.subscribe_user_twap_slice_fills("0x1234567890123456789012345678901234567890").await;
+        let result = client
+            .subscribe_user_twap_slice_fills("0x1234567890123456789012345678901234567890")
+            .await;
         assert!(result.is_ok());
 
         // Check subscription is tracked
@@ -3084,7 +3183,9 @@ mod tests {
         let client = WsClient::mainnet();
         client.connect().await.unwrap();
 
-        let result = client.subscribe_user_twap_history("0x1234567890123456789012345678901234567890").await;
+        let result = client
+            .subscribe_user_twap_history("0x1234567890123456789012345678901234567890")
+            .await;
         assert!(result.is_ok());
 
         // Check subscription is tracked
@@ -3107,8 +3208,14 @@ mod tests {
         client.subscribe_user_events(user).await.unwrap();
         client.subscribe_user_fills(user).await.unwrap();
         client.subscribe_user_fundings(user).await.unwrap();
-        client.subscribe_user_non_funding_ledger_updates(user).await.unwrap();
-        client.subscribe_active_asset_data(user, "BTC").await.unwrap();
+        client
+            .subscribe_user_non_funding_ledger_updates(user)
+            .await
+            .unwrap();
+        client
+            .subscribe_active_asset_data(user, "BTC")
+            .await
+            .unwrap();
         client.subscribe_user_twap_slice_fills(user).await.unwrap();
         client.subscribe_user_twap_history(user).await.unwrap();
 

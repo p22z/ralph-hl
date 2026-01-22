@@ -368,10 +368,7 @@ mod tests {
         assert_eq!(reserve.supply_apy, "0.045");
         assert_eq!(reserve.borrow_apy, "0.06");
         assert_eq!(reserve.utilization_rate, "0.75");
-        assert_eq!(
-            reserve.available_liquidity,
-            Some("25000000.00".to_string())
-        );
+        assert_eq!(reserve.available_liquidity, Some("25000000.00".to_string()));
         assert_eq!(reserve.ltv, Some("0.8".to_string()));
         assert_eq!(reserve.liquidation_threshold, Some("0.85".to_string()));
 
@@ -527,10 +524,7 @@ mod tests {
 
         assert_eq!(reserves[2].coin, "BTC");
         assert_eq!(reserves[2].total_supplied, "1000.00");
-        assert_eq!(
-            reserves[2].available_liquidity,
-            Some("500.00".to_string())
-        );
+        assert_eq!(reserves[2].available_liquidity, Some("500.00".to_string()));
 
         mock.assert_async().await;
     }
@@ -726,8 +720,7 @@ mod tests {
 
     #[test]
     fn test_borrow_lend_user_state_request_serialization() {
-        let request =
-            BorrowLendUserStateRequest::new("0x1234567890123456789012345678901234567890");
+        let request = BorrowLendUserStateRequest::new("0x1234567890123456789012345678901234567890");
         let json = serde_json::to_string(&request).unwrap();
         assert_eq!(
             json,
