@@ -6,3 +6,4 @@
 mod market;
 mod perpetuals;
 mod spot;
+mod user;
