@@ -1337,6 +1337,16 @@ pub struct UserFill {
     pub builder_fee: Option<String>,
 }
 
+/// TWAP slice fill - a fill from a TWAP order execution
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct TwapSliceFill {
+    /// The underlying fill details
+    pub fill: UserFill,
+    /// The TWAP order ID this slice belongs to
+    pub twap_id: u64,
+}
+
 /// Order status response
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct OrderStatusResponse {
