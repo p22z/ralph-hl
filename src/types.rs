@@ -1065,6 +1065,23 @@ impl Hip3StateRequest {
     }
 }
 
+/// Request for aligned quote token status
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AlignedQuoteTokenRequest {
+    #[serde(rename = "type")]
+    pub request_type: String,
+    pub coin: String,
+}
+
+impl AlignedQuoteTokenRequest {
+    pub fn new(coin: impl Into<String>) -> Self {
+        Self {
+            request_type: "alignedQuoteToken".to_string(),
+            coin: coin.into(),
+        }
+    }
+}
+
 // ============================================================================
 // Info Endpoint Response Types
 // ============================================================================
@@ -1724,6 +1741,88 @@ pub struct StakingReward {
     pub amount: String,
     /// Time at which reward was earned/distributed
     pub time: u64,
+}
+
+// ============================================================================
+// Borrow/Lend Response Types
+// ============================================================================
+
+/// User's borrow/lend position for a specific asset
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct BorrowLendPosition {
+    /// The asset symbol
+    pub coin: String,
+    /// Amount supplied (positive means lending)
+    pub supplied: String,
+    /// Amount borrowed (positive means borrowing)
+    pub borrowed: String,
+    /// Current supply APY
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub supply_apy: Option<String>,
+    /// Current borrow APY
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub borrow_apy: Option<String>,
+    /// Accrued interest
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub accrued_interest: Option<String>,
+}
+
+/// User's overall borrow/lend state
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct BorrowLendUserState {
+    /// List of user's positions across all assets
+    pub positions: Vec<BorrowLendPosition>,
+    /// Total supplied value in USD
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub total_supplied_value: Option<String>,
+    /// Total borrowed value in USD
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub total_borrowed_value: Option<String>,
+    /// Health factor (ratio of collateral to borrowed)
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub health_factor: Option<String>,
+}
+
+/// Reserve state for a single asset in the borrow/lend protocol
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct BorrowLendReserveState {
+    /// The asset symbol
+    pub coin: String,
+    /// Total amount supplied to the reserve
+    pub total_supplied: String,
+    /// Total amount borrowed from the reserve
+    pub total_borrowed: String,
+    /// Current supply APY
+    pub supply_apy: String,
+    /// Current borrow APY
+    pub borrow_apy: String,
+    /// Utilization rate (borrowed / supplied)
+    pub utilization_rate: String,
+    /// Available liquidity for borrowing
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub available_liquidity: Option<String>,
+    /// Loan-to-value ratio (collateral factor)
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub ltv: Option<String>,
+    /// Liquidation threshold
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub liquidation_threshold: Option<String>,
+}
+
+/// Aligned quote token status
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct AlignedQuoteToken {
+    /// The asset symbol
+    pub coin: String,
+    /// Whether the token is aligned as a quote token
+    pub is_aligned: bool,
+    /// Quote token index (if aligned)
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub quote_token_index: Option<u32>,
 }
 
 // ============================================================================

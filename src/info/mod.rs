@@ -4,6 +4,7 @@
 //! from the Hyperliquid info endpoints.
 
 mod account;
+mod borrow_lend;
 mod fills;
 mod funding;
 mod market;
