@@ -1662,6 +1662,71 @@ pub struct Subaccount {
 }
 
 // ============================================================================
+// Staking Response Types
+// ============================================================================
+
+/// Staking delegation entry - represents a delegation to a validator
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct StakingDelegation {
+    /// Validator address
+    pub validator: String,
+    /// Amount delegated in wei
+    pub amount: String,
+    /// Amount pending undelegation
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub pending_undelegation: Option<String>,
+    /// Locked until timestamp (for undelegating stakes)
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub locked_until: Option<u64>,
+}
+
+/// Staking summary - overall staking state for a user
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct StakingSummary {
+    /// Total amount staked in wei
+    pub staked: String,
+    /// Total pending undelegation amount in wei
+    pub pending_undelegation: String,
+    /// Total rewards earned (unclaimed)
+    pub unclaimed_rewards: String,
+    /// Total rewards claimed over all time
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub total_claimed_rewards: Option<String>,
+}
+
+/// Staking history entry - represents a staking-related action
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct StakingHistoryEntry {
+    /// Transaction hash
+    pub hash: String,
+    /// Timestamp of the action
+    pub time: u64,
+    /// Type of staking action (delegate, undelegate, claim, etc.)
+    #[serde(rename = "type")]
+    pub action_type: String,
+    /// Amount involved in the action (in wei)
+    pub amount: String,
+    /// Validator address (if applicable)
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub validator: Option<String>,
+}
+
+/// Staking reward entry - represents a reward earned from staking
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct StakingReward {
+    /// Validator address
+    pub validator: String,
+    /// Reward amount in wei
+    pub amount: String,
+    /// Time at which reward was earned/distributed
+    pub time: u64,
+}
+
+// ============================================================================
 // Exchange Endpoint Types
 // ============================================================================
 

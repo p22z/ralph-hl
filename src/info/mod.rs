@@ -10,4 +10,5 @@ mod market;
 mod orders;
 mod perpetuals;
 mod spot;
+mod staking;
 mod user;
