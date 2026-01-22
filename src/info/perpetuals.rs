@@ -24,7 +24,8 @@ impl Client {
     /// ```
     pub async fn perp_dexs(&self) -> Result<Vec<PerpDexInfo>> {
         let request = PerpDexsRequest::default();
-        self.post_info(&request).await
+        let response: Option<Vec<PerpDexInfo>> = self.post_info(&request).await?;
+        Ok(response.unwrap_or_default())
     }
 
     /// Retrieve perpetuals metadata
@@ -155,7 +156,8 @@ mod tests {
 
         async fn perp_dexs(&self) -> Result<Vec<PerpDexInfo>> {
             let request = PerpDexsRequest::default();
-            self.post_info(&request).await
+            let response: Option<Vec<PerpDexInfo>> = self.post_info(&request).await?;
+            Ok(response.unwrap_or_default())
         }
 
         async fn meta(&self, dex: Option<&str>) -> Result<PerpMetaResponse> {
@@ -210,6 +212,27 @@ mod tests {
         assert_eq!(dexs.len(), 1);
         assert_eq!(dexs[0].name, "HL");
         assert_eq!(dexs[0].full_name, "Hyperliquid");
+
+        mock.assert_async().await;
+    }
+
+    #[tokio::test]
+    async fn test_perp_dexs_null_returns_empty() {
+        let mut server = Server::new_async().await;
+        let mock = server
+            .mock("POST", "/info")
+            .match_header("content-type", "application/json")
+            .match_body(Matcher::Json(serde_json::json!({"type": "perpDexs"})))
+            .with_status(200)
+            .with_header("content-type", "application/json")
+            .with_body("null")
+            .create_async()
+            .await;
+
+        let client = TestClient::new(&server.url());
+        let dexs = client.perp_dexs().await.unwrap();
+
+        assert!(dexs.is_empty());
 
         mock.assert_async().await;
     }
