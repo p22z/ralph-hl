@@ -5,6 +5,7 @@
 //! modification, and account management.
 
 pub mod cancel;
+pub mod leverage;
 pub mod modify;
 pub mod orders;
 pub mod schedule_cancel;
