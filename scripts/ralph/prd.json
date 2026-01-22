@@ -142,8 +142,8 @@
         "Unit tests for each function"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed: Market data module with all_mids(dex?), l2_book(coin, n_sig_figs?, mantissa?), and candle(coin, interval, start_time, end_time?) methods implemented as Client extensions. 22 unit tests with mocked responses covering all endpoints, optional parameters, empty responses, and error handling."
     },
     {
       "id": "US-009",
