@@ -11,6 +11,7 @@ pub mod error;
 pub mod exchange;
 pub mod info;
 pub mod types;
+pub mod websocket;
 
 pub use auth::{Signature, Wallet};
 pub use client::{Client, Network, MAINNET_URL, TESTNET_URL};
@@ -28,3 +29,6 @@ pub use exchange::schedule_cancel::{get_scheduled_time, is_schedule_cancel_succe
 pub use exchange::transfer::{get_transfer_hash, is_transfer_successful};
 pub use exchange::vault::{get_vault_hash, is_vault_action_successful};
 pub use types::*;
+pub use websocket::{
+    ConnectionState, ReconnectConfig, WsClient, WsMessage, MAINNET_WS_URL, TESTNET_WS_URL,
+};
