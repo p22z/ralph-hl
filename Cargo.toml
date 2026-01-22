@@ -25,6 +25,12 @@ thiserror = "1.0"
 # Ethereum/EIP-712 signing
 ethers = { version = "2.0", features = ["legacy"] }
 
+# MessagePack serialization (for action hashing)
+rmp-serde = "1.1"
+
+# Hex encoding/decoding
+hex = "0.4"
+
 # WebSocket client
 tokio-tungstenite = { version = "0.21", features = ["native-tls"] }
 futures-util = "0.3"
