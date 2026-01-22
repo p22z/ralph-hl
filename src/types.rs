@@ -1938,10 +1938,7 @@ mod tests {
 
     #[test]
     fn test_order_grouping_serialization() {
-        assert_eq!(
-            serde_json::to_string(&OrderGrouping::Na).unwrap(),
-            "\"na\""
-        );
+        assert_eq!(serde_json::to_string(&OrderGrouping::Na).unwrap(), "\"na\"");
         assert_eq!(
             serde_json::to_string(&OrderGrouping::NormalTpsl).unwrap(),
             "\"normalTpsl\""
