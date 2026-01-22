@@ -794,6 +794,424 @@
             background-color: #e67e00;
             border-color: #e67e00;
         }
+
+        /* ============================================
+           WebSocket Demo Styles
+           ============================================ */
+
+        /* WebSocket Status Indicator */
+        .ws-status {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            padding: var(--space-sm) var(--space-md);
+            background-color: var(--bg-secondary);
+            border-radius: 4px;
+            font-size: var(--text-sm);
+        }
+
+        .ws-status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .ws-status-dot.disconnected {
+            background-color: var(--text-tertiary);
+        }
+
+        .ws-status-dot.connecting {
+            background-color: var(--warning);
+            animation: pulse 1s infinite;
+        }
+
+        .ws-status-dot.connected {
+            background-color: var(--success);
+            box-shadow: 0 0 6px var(--success);
+        }
+
+        .ws-status-dot.error {
+            background-color: var(--error);
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Subscription Controls */
+        .ws-subscription-categories {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-lg);
+        }
+
+        .ws-category {
+            border: 1px solid var(--border-light);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .ws-category-header {
+            padding: var(--space-sm) var(--space-md);
+            background-color: var(--bg-panel);
+            border-bottom: 1px solid var(--border-light);
+            font-size: var(--text-sm);
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .ws-category-count {
+            font-size: var(--text-xs);
+            font-weight: 400;
+            color: var(--text-tertiary);
+            background-color: var(--bg-tertiary);
+            padding: 2px 6px;
+            border-radius: 10px;
+        }
+
+        .ws-subscription-list {
+            padding: var(--space-md);
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-sm);
+        }
+
+        .ws-subscription-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+            padding: var(--space-xs) var(--space-sm);
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border-light);
+            border-radius: 4px;
+            font-size: var(--text-xs);
+            cursor: pointer;
+            transition: all 0.15s ease;
+            user-select: none;
+        }
+
+        .ws-subscription-item:hover {
+            border-color: var(--accent-primary);
+            background-color: var(--bg-tertiary);
+        }
+
+        .ws-subscription-item.active {
+            background-color: var(--accent-primary);
+            border-color: var(--accent-primary);
+            color: white;
+        }
+
+        .ws-subscription-item.active:hover {
+            background-color: var(--accent-secondary);
+        }
+
+        .ws-subscription-item .sub-indicator {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background-color: var(--text-tertiary);
+            transition: all 0.15s ease;
+        }
+
+        .ws-subscription-item.active .sub-indicator {
+            background-color: white;
+            box-shadow: 0 0 4px rgba(255, 255, 255, 0.5);
+        }
+
+        /* Subscription Form */
+        .ws-subscription-form {
+            padding: var(--space-md);
+            border-top: 1px solid var(--border-light);
+            background-color: var(--bg-panel);
+        }
+
+        .ws-form-row {
+            display: flex;
+            gap: var(--space-sm);
+            flex-wrap: wrap;
+            align-items: flex-end;
+        }
+
+        .ws-form-group {
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .ws-form-group label {
+            display: block;
+            font-size: var(--text-xs);
+            color: var(--text-secondary);
+            margin-bottom: var(--space-xs);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .ws-form-group input,
+        .ws-form-group select {
+            width: 100%;
+            padding: var(--space-xs) var(--space-sm);
+            font-family: var(--font-mono);
+            font-size: var(--text-sm);
+            border: 1px solid var(--border-medium);
+            border-radius: 4px;
+            background-color: var(--bg-primary);
+        }
+
+        .ws-form-group input:focus,
+        .ws-form-group select:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+        }
+
+        /* Message Feed */
+        .ws-message-feed {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 400px;
+            max-height: 600px;
+        }
+
+        .ws-feed-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--space-md);
+            border-bottom: 1px solid var(--border-light);
+            background-color: var(--bg-panel);
+        }
+
+        .ws-feed-title {
+            font-size: var(--text-md);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .ws-feed-count {
+            font-size: var(--text-xs);
+            font-weight: 400;
+            color: var(--text-tertiary);
+            background-color: var(--bg-tertiary);
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+
+        .ws-feed-controls {
+            display: flex;
+            gap: var(--space-sm);
+        }
+
+        .ws-feed-messages {
+            flex: 1;
+            overflow-y: auto;
+            background-color: #1e1e1e;
+            padding: var(--space-sm);
+        }
+
+        .ws-message {
+            padding: var(--space-sm) var(--space-md);
+            margin-bottom: var(--space-xs);
+            border-radius: 4px;
+            font-size: var(--text-xs);
+            line-height: 1.4;
+            animation: fadeIn 0.2s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .ws-message.data {
+            background-color: rgba(156, 220, 254, 0.1);
+            border-left: 2px solid #9cdcfe;
+        }
+
+        .ws-message.subscribe {
+            background-color: rgba(0, 135, 90, 0.1);
+            border-left: 2px solid var(--success);
+        }
+
+        .ws-message.unsubscribe {
+            background-color: rgba(255, 139, 0, 0.15);
+            border-left: 2px solid var(--warning);
+        }
+
+        .ws-message.error {
+            background-color: rgba(222, 53, 11, 0.1);
+            border-left: 2px solid var(--error);
+        }
+
+        .ws-message.system {
+            background-color: rgba(100, 100, 100, 0.1);
+            border-left: 2px solid var(--text-tertiary);
+        }
+
+        .ws-message-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-xs);
+        }
+
+        .ws-message-type {
+            font-weight: 600;
+            color: #d4d4d4;
+        }
+
+        .ws-message-time {
+            font-size: 10px;
+            color: #6a737d;
+        }
+
+        .ws-message-content {
+            color: #d4d4d4;
+            white-space: pre-wrap;
+            word-break: break-all;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .ws-message-content.collapsed {
+            max-height: 60px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .ws-message-content.collapsed::after {
+            content: '...';
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            background: linear-gradient(to right, transparent, #1e1e1e);
+            padding-left: 20px;
+        }
+
+        .ws-expand-btn {
+            font-size: 10px;
+            color: var(--accent-primary);
+            cursor: pointer;
+            margin-top: var(--space-xs);
+        }
+
+        .ws-expand-btn:hover {
+            text-decoration: underline;
+        }
+
+        /* Empty State */
+        .ws-empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            min-height: 300px;
+            color: #6a737d;
+            text-align: center;
+        }
+
+        .ws-empty-state-icon {
+            font-size: 48px;
+            margin-bottom: var(--space-lg);
+            opacity: 0.5;
+        }
+
+        .ws-empty-state-title {
+            font-size: var(--text-lg);
+            font-weight: 600;
+            color: #d4d4d4;
+            margin-bottom: var(--space-sm);
+        }
+
+        .ws-empty-state-text {
+            font-size: var(--text-sm);
+            max-width: 300px;
+        }
+
+        /* Pause overlay */
+        .ws-feed-messages.paused::before {
+            content: 'PAUSED';
+            position: sticky;
+            top: 0;
+            display: block;
+            background-color: var(--warning);
+            color: white;
+            text-align: center;
+            padding: var(--space-xs) var(--space-sm);
+            font-size: var(--text-xs);
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        /* Button states for pause/resume */
+        .btn.paused {
+            background-color: var(--warning);
+            border-color: var(--warning);
+            color: white;
+        }
+
+        /* WebSocket Main Container */
+        .ws-main-container {
+            display: none;
+            flex-direction: column;
+            gap: var(--space-lg);
+        }
+
+        .ws-main-container.active {
+            display: flex;
+        }
+
+        /* Connection info panel */
+        .ws-connection-info {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: var(--space-md);
+        }
+
+        .ws-connection-left {
+            display: flex;
+            align-items: center;
+            gap: var(--space-lg);
+        }
+
+        .ws-connection-url {
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+            font-family: var(--font-mono);
+        }
+
+        /* Responsive adjustments for WebSocket panel */
+        @media (max-width: 768px) {
+            .ws-subscription-list {
+                flex-direction: column;
+            }
+
+            .ws-subscription-item {
+                width: 100%;
+            }
+
+            .ws-form-row {
+                flex-direction: column;
+            }
+
+            .ws-form-group {
+                width: 100%;
+            }
+
+            .ws-connection-info {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1065,10 +1483,10 @@
             <div class="nav-section">
                 <div class="nav-header">
                     WebSocket
-                    <span class="nav-header-count">1</span>
+                    <span class="nav-header-count">19</span>
                 </div>
                 <ul class="nav-list">
-                    <li class="nav-item" data-endpoint="ws-demo">Live Data<span class="nav-item-tag">WS</span></li>
+                    <li class="nav-item" data-endpoint="ws-demo">Live Demo<span class="nav-item-tag">WS</span></li>
                 </ul>
             </div>
         </nav>
@@ -1130,7 +1548,7 @@
                 </div>
 
                 <!-- Response Panel -->
-                <div class="panel response-container">
+                <div class="panel response-container" id="rest-response-panel">
                     <div class="panel-header">
                         <span class="panel-title">
                             Response
@@ -1145,6 +1563,204 @@
                     <div class="panel-body" style="flex: 1; display: flex; flex-direction: column;">
                         <div class="response-area" id="response-area">
                             <pre id="response-content">Click "Call Endpoint" to see the response.</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- WebSocket Demo Container -->
+                <div class="ws-main-container" id="ws-container">
+                    <!-- Connection Panel -->
+                    <div class="panel">
+                        <div class="panel-header">
+                            <span class="panel-title">Connection</span>
+                            <div class="ws-status" id="ws-status">
+                                <span class="ws-status-dot disconnected" id="ws-status-dot"></span>
+                                <span id="ws-status-text">Disconnected</span>
+                            </div>
+                        </div>
+                        <div class="panel-body">
+                            <div class="ws-connection-info">
+                                <div class="ws-connection-left">
+                                    <span class="ws-connection-url">wss://api.hyperliquid.xyz/ws</span>
+                                </div>
+                                <div class="content-actions">
+                                    <button class="btn btn-primary" id="ws-connect-btn">Connect</button>
+                                    <button class="btn btn-secondary" id="ws-disconnect-btn" disabled>Disconnect</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Subscriptions Panel -->
+                    <div class="panel">
+                        <div class="panel-header">
+                            <span class="panel-title">
+                                Subscriptions
+                                <span class="panel-title-tag" id="ws-active-subs">0 active</span>
+                            </span>
+                        </div>
+                        <div class="panel-body">
+                            <div class="ws-subscription-categories">
+                                <!-- Market Data Subscriptions -->
+                                <div class="ws-category">
+                                    <div class="ws-category-header">
+                                        Market Data
+                                        <span class="ws-category-count">6</span>
+                                    </div>
+                                    <div class="ws-subscription-list">
+                                        <div class="ws-subscription-item" data-sub="allMids">
+                                            <span class="sub-indicator"></span>
+                                            <span>All Mids</span>
+                                        </div>
+                                        <div class="ws-subscription-item" data-sub="l2Book" data-needs="coin">
+                                            <span class="sub-indicator"></span>
+                                            <span>L2 Book</span>
+                                        </div>
+                                        <div class="ws-subscription-item" data-sub="trades" data-needs="coin">
+                                            <span class="sub-indicator"></span>
+                                            <span>Trades</span>
+                                        </div>
+                                        <div class="ws-subscription-item" data-sub="candle" data-needs="coin,interval">
+                                            <span class="sub-indicator"></span>
+                                            <span>Candles</span>
+                                        </div>
+                                        <div class="ws-subscription-item" data-sub="bbo" data-needs="coin">
+                                            <span class="sub-indicator"></span>
+                                            <span>BBO</span>
+                                        </div>
+                                        <div class="ws-subscription-item" data-sub="activeAssetCtx" data-needs="coin">
+                                            <span class="sub-indicator"></span>
+                                            <span>Asset Context</span>
+                                        </div>
+                                    </div>
+                                    <div class="ws-subscription-form" id="market-data-form">
+                                        <div class="ws-form-row">
+                                            <div class="ws-form-group">
+                                                <label>Coin</label>
+                                                <input type="text" id="ws-coin" placeholder="BTC" value="BTC">
+                                            </div>
+                                            <div class="ws-form-group">
+                                                <label>Interval</label>
+                                                <select id="ws-interval">
+                                                    <option value="1m">1m</option>
+                                                    <option value="5m">5m</option>
+                                                    <option value="15m">15m</option>
+                                                    <option value="1h">1h</option>
+                                                    <option value="4h">4h</option>
+                                                    <option value="1d">1d</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- User Data Subscriptions -->
+                                <div class="ws-category">
+                                    <div class="ws-category-header">
+                                        User Data
+                                        <span class="ws-category-count">5</span>
+                                    </div>
+                                    <div class="ws-subscription-list">
+                                        <div class="ws-subscription-item" data-sub="notification" data-needs="user">
+                                            <span class="sub-indicator"></span>
+                                            <span>Notifications</span>
+                                        </div>
+                                        <div class="ws-subscription-item" data-sub="webData3" data-needs="user">
+                                            <span class="sub-indicator"></span>
+                                            <span>Web Data</span>
+                                        </div>
+                                        <div class="ws-subscription-item" data-sub="twapStates" data-needs="user">
+                                            <span class="sub-indicator"></span>
+                                            <span>TWAP States</span>
+                                        </div>
+                                        <div class="ws-subscription-item" data-sub="clearinghouseState" data-needs="user">
+                                            <span class="sub-indicator"></span>
+                                            <span>Clearinghouse</span>
+                                        </div>
+                                        <div class="ws-subscription-item" data-sub="openOrders" data-needs="user">
+                                            <span class="sub-indicator"></span>
+                                            <span>Open Orders</span>
+                                        </div>
+                                    </div>
+                                    <div class="ws-subscription-form" id="user-data-form">
+                                        <div class="ws-form-row">
+                                            <div class="ws-form-group">
+                                                <label>User Address</label>
+                                                <input type="text" id="ws-user" placeholder="0x..." value="">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- User Events Subscriptions -->
+                                <div class="ws-category">
+                                    <div class="ws-category-header">
+                                        User Events
+                                        <span class="ws-category-count">8</span>
+                                    </div>
+                                    <div class="ws-subscription-list">
+                                        <div class="ws-subscription-item" data-sub="orderUpdates" data-needs="user">
+                                            <span class="sub-indicator"></span>
+                                            <span>Order Updates</span>
+                                        </div>
+                                        <div class="ws-subscription-item" data-sub="userEvents" data-needs="user">
+                                            <span class="sub-indicator"></span>
+                                            <span>User Events</span>
+                                        </div>
+                                        <div class="ws-subscription-item" data-sub="userFills" data-needs="user">
+                                            <span class="sub-indicator"></span>
+                                            <span>Fills</span>
+                                        </div>
+                                        <div class="ws-subscription-item" data-sub="userFundings" data-needs="user">
+                                            <span class="sub-indicator"></span>
+                                            <span>Fundings</span>
+                                        </div>
+                                        <div class="ws-subscription-item" data-sub="userNonFundingLedgerUpdates" data-needs="user">
+                                            <span class="sub-indicator"></span>
+                                            <span>Ledger Updates</span>
+                                        </div>
+                                        <div class="ws-subscription-item" data-sub="activeAssetData" data-needs="user,coin">
+                                            <span class="sub-indicator"></span>
+                                            <span>Active Asset Data</span>
+                                        </div>
+                                        <div class="ws-subscription-item" data-sub="userTwapSliceFills" data-needs="user">
+                                            <span class="sub-indicator"></span>
+                                            <span>TWAP Fills</span>
+                                        </div>
+                                        <div class="ws-subscription-item" data-sub="userTwapHistory" data-needs="user">
+                                            <span class="sub-indicator"></span>
+                                            <span>TWAP History</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Live Message Feed -->
+                    <div class="panel ws-message-feed">
+                        <div class="ws-feed-header">
+                            <span class="ws-feed-title">
+                                Live Feed
+                                <span class="ws-feed-count" id="ws-message-count">0 messages</span>
+                            </span>
+                            <div class="ws-feed-controls">
+                                <button class="btn btn-secondary btn-icon" id="ws-pause-btn" title="Pause feed">
+                                    ⏸
+                                </button>
+                                <button class="btn btn-secondary btn-icon" id="ws-clear-btn" title="Clear messages">
+                                    ✕
+                                </button>
+                            </div>
+                        </div>
+                        <div class="ws-feed-messages" id="ws-messages">
+                            <div class="ws-empty-state">
+                                <div class="ws-empty-state-icon">📡</div>
+                                <div class="ws-empty-state-title">No messages yet</div>
+                                <div class="ws-empty-state-text">
+                                    Connect to the WebSocket and subscribe to channels to see live data.
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -2001,10 +2617,11 @@
             // === WEBSOCKET ===
             'ws-demo': {
                 title: 'WebSocket Demo',
-                description: 'Real-time WebSocket subscriptions for market data and user events. Connect to receive live updates.',
-                url: null,
+                description: 'Real-time WebSocket subscriptions for market data and user events. Connect to receive live updates from Hyperliquid.',
+                url: 'wss://api.hyperliquid.xyz/ws',
                 method: 'WS',
-                params: []
+                params: [],
+                isWebSocket: true
             }
         };
 
@@ -2046,6 +2663,9 @@
             currentEndpoint = endpoint;
             const config = endpoints[endpoint];
             const exchangeWarning = document.getElementById('exchange-warning');
+            const wsContainer = document.getElementById('ws-container');
+            const restResponsePanel = document.getElementById('rest-response-panel');
+            const contentActions = document.querySelector('.content-actions');
 
             endpointTitle.textContent = config.title;
             endpointDescription.textContent = config.description;
@@ -2053,6 +2673,21 @@
             endpointMethod.textContent = config.method;
             endpointMethod.style.backgroundColor = config.method === 'POST' ? 'var(--warning)' :
                                                     config.method === 'WS' ? 'var(--accent-primary)' : 'var(--success)';
+
+            // Handle WebSocket demo differently
+            if (config.isWebSocket) {
+                wsContainer.classList.add('active');
+                restResponsePanel.style.display = 'none';
+                paramsPanel.classList.add('hidden');
+                exchangeWarning.classList.add('hidden');
+                contentActions.style.display = 'none';
+                return;
+            }
+
+            // Hide WebSocket container, show REST panels
+            wsContainer.classList.remove('active');
+            restResponsePanel.style.display = '';
+            contentActions.style.display = '';
 
             responseContent.innerHTML = config.isExchange
                 ? 'Fill in the parameters above and click "Execute Action" to send the request.'
@@ -2290,8 +2925,366 @@
             }
         });
 
+        // ============================================
+        // WebSocket Demo Implementation
+        // ============================================
+
+        let ws = null;
+        let wsMessageCount = 0;
+        let wsPaused = false;
+        let wsActiveSubscriptions = new Set();
+        let wsMessageQueue = []; // Queue messages when paused
+
+        // WebSocket DOM Elements
+        const wsConnectBtn = document.getElementById('ws-connect-btn');
+        const wsDisconnectBtn = document.getElementById('ws-disconnect-btn');
+        const wsStatusDot = document.getElementById('ws-status-dot');
+        const wsStatusText = document.getElementById('ws-status-text');
+        const wsMessages = document.getElementById('ws-messages');
+        const wsMessageCountEl = document.getElementById('ws-message-count');
+        const wsActiveSubsEl = document.getElementById('ws-active-subs');
+        const wsPauseBtn = document.getElementById('ws-pause-btn');
+        const wsClearBtn = document.getElementById('ws-clear-btn');
+        const wsCoinInput = document.getElementById('ws-coin');
+        const wsIntervalSelect = document.getElementById('ws-interval');
+        const wsUserInput = document.getElementById('ws-user');
+
+        // Update WebSocket connection status UI
+        function updateWsStatus(status, message) {
+            wsStatusDot.className = 'ws-status-dot ' + status;
+            wsStatusText.textContent = message;
+
+            if (status === 'connected') {
+                wsConnectBtn.disabled = true;
+                wsDisconnectBtn.disabled = false;
+            } else if (status === 'disconnected' || status === 'error') {
+                wsConnectBtn.disabled = false;
+                wsDisconnectBtn.disabled = true;
+                // Clear active subscriptions on disconnect
+                wsActiveSubscriptions.clear();
+                updateSubscriptionUI();
+            } else if (status === 'connecting') {
+                wsConnectBtn.disabled = true;
+                wsDisconnectBtn.disabled = true;
+            }
+        }
+
+        // Add message to the feed
+        function addWsMessage(type, content, channel = null) {
+            if (wsPaused && type === 'data') {
+                wsMessageQueue.push({ type, content, channel, time: new Date() });
+                return;
+            }
+
+            wsMessageCount++;
+            wsMessageCountEl.textContent = `${wsMessageCount} message${wsMessageCount !== 1 ? 's' : ''}`;
+
+            // Remove empty state if present
+            const emptyState = wsMessages.querySelector('.ws-empty-state');
+            if (emptyState) {
+                emptyState.remove();
+            }
+
+            const messageEl = document.createElement('div');
+            messageEl.className = `ws-message ${type}`;
+
+            const time = new Date().toLocaleTimeString('en-US', {
+                hour12: false,
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                fractionalSecondDigits: 3
+            });
+
+            // Format content
+            let formattedContent = content;
+            if (typeof content === 'object') {
+                try {
+                    formattedContent = JSON.stringify(content, null, 2);
+                } catch (e) {
+                    formattedContent = String(content);
+                }
+            }
+
+            // Determine if content should be collapsed (more than 3 lines)
+            const lineCount = formattedContent.split('\n').length;
+            const shouldCollapse = lineCount > 4;
+
+            const typeLabels = {
+                'data': channel || 'Data',
+                'subscribe': 'Subscribed',
+                'unsubscribe': 'Unsubscribed',
+                'error': 'Error',
+                'system': 'System'
+            };
+
+            messageEl.innerHTML = `
+                <div class="ws-message-header">
+                    <span class="ws-message-type">${typeLabels[type] || type}</span>
+                    <span class="ws-message-time">${time}</span>
+                </div>
+                <div class="ws-message-content${shouldCollapse ? ' collapsed' : ''}">${syntaxHighlight(formattedContent)}</div>
+                ${shouldCollapse ? '<span class="ws-expand-btn">Show more</span>' : ''}
+            `;
+
+            // Add expand/collapse functionality
+            if (shouldCollapse) {
+                const expandBtn = messageEl.querySelector('.ws-expand-btn');
+                const contentEl = messageEl.querySelector('.ws-message-content');
+                expandBtn.addEventListener('click', () => {
+                    contentEl.classList.toggle('collapsed');
+                    expandBtn.textContent = contentEl.classList.contains('collapsed') ? 'Show more' : 'Show less';
+                });
+            }
+
+            // Insert at the top
+            wsMessages.insertBefore(messageEl, wsMessages.firstChild);
+
+            // Limit messages to 500
+            while (wsMessages.children.length > 500) {
+                wsMessages.removeChild(wsMessages.lastChild);
+            }
+        }
+
+        // Connect to WebSocket
+        function connectWs() {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                return;
+            }
+
+            updateWsStatus('connecting', 'Connecting...');
+            addWsMessage('system', 'Connecting to wss://api.hyperliquid.xyz/ws');
+
+            try {
+                ws = new WebSocket('wss://api.hyperliquid.xyz/ws');
+
+                ws.onopen = () => {
+                    updateWsStatus('connected', 'Connected');
+                    addWsMessage('system', 'Connection established');
+                };
+
+                ws.onclose = (event) => {
+                    updateWsStatus('disconnected', 'Disconnected');
+                    addWsMessage('system', `Connection closed (code: ${event.code})`);
+                    ws = null;
+                };
+
+                ws.onerror = (error) => {
+                    updateWsStatus('error', 'Error');
+                    addWsMessage('error', 'WebSocket error occurred');
+                    console.error('WebSocket error:', error);
+                };
+
+                ws.onmessage = (event) => {
+                    try {
+                        const data = JSON.parse(event.data);
+                        const channel = data.channel || (data.data && data.data.channel) || 'message';
+                        addWsMessage('data', data, channel);
+                    } catch (e) {
+                        addWsMessage('data', event.data, 'raw');
+                    }
+                };
+            } catch (error) {
+                updateWsStatus('error', 'Failed to connect');
+                addWsMessage('error', `Connection failed: ${error.message}`);
+            }
+        }
+
+        // Disconnect from WebSocket
+        function disconnectWs() {
+            if (ws) {
+                ws.close();
+                ws = null;
+            }
+        }
+
+        // Build subscription payload
+        function buildSubscription(subType) {
+            const coin = wsCoinInput.value || 'BTC';
+            const interval = wsIntervalSelect.value;
+            const user = wsUserInput.value;
+
+            switch (subType) {
+                case 'allMids':
+                    return { type: 'allMids' };
+                case 'l2Book':
+                    return { type: 'l2Book', coin };
+                case 'trades':
+                    return { type: 'trades', coin };
+                case 'candle':
+                    return { type: 'candle', coin, interval };
+                case 'bbo':
+                    return { type: 'bbo', coin };
+                case 'activeAssetCtx':
+                    return { type: 'activeAssetCtx', coin };
+                case 'notification':
+                    return { type: 'notification', user };
+                case 'webData3':
+                    return { type: 'webData3', user };
+                case 'twapStates':
+                    return { type: 'twapStates', user };
+                case 'clearinghouseState':
+                    return { type: 'clearinghouseState', user };
+                case 'openOrders':
+                    return { type: 'openOrders', user };
+                case 'orderUpdates':
+                    return { type: 'orderUpdates', user };
+                case 'userEvents':
+                    return { type: 'userEvents', user };
+                case 'userFills':
+                    return { type: 'userFills', user };
+                case 'userFundings':
+                    return { type: 'userFundings', user };
+                case 'userNonFundingLedgerUpdates':
+                    return { type: 'userNonFundingLedgerUpdates', user };
+                case 'activeAssetData':
+                    return { type: 'activeAssetData', user, coin };
+                case 'userTwapSliceFills':
+                    return { type: 'userTwapSliceFills', user };
+                case 'userTwapHistory':
+                    return { type: 'userTwapHistory', user };
+                default:
+                    return null;
+            }
+        }
+
+        // Get subscription key for tracking
+        function getSubscriptionKey(subscription) {
+            return JSON.stringify(subscription);
+        }
+
+        // Toggle subscription
+        function toggleSubscription(subType, element) {
+            if (!ws || ws.readyState !== WebSocket.OPEN) {
+                addWsMessage('error', 'Not connected. Please connect first.');
+                return;
+            }
+
+            // Check if required fields are filled
+            const needs = element.dataset.needs ? element.dataset.needs.split(',') : [];
+            if (needs.includes('user') && !wsUserInput.value) {
+                addWsMessage('error', 'Please enter a user address first.');
+                return;
+            }
+            if (needs.includes('coin') && !wsCoinInput.value) {
+                addWsMessage('error', 'Please enter a coin symbol first.');
+                return;
+            }
+
+            const subscription = buildSubscription(subType);
+            if (!subscription) {
+                addWsMessage('error', `Unknown subscription type: ${subType}`);
+                return;
+            }
+
+            const subKey = getSubscriptionKey(subscription);
+            const isActive = wsActiveSubscriptions.has(subKey);
+
+            const message = {
+                method: isActive ? 'unsubscribe' : 'subscribe',
+                subscription: subscription
+            };
+
+            try {
+                ws.send(JSON.stringify(message));
+
+                if (isActive) {
+                    wsActiveSubscriptions.delete(subKey);
+                    addWsMessage('unsubscribe', subscription);
+                } else {
+                    wsActiveSubscriptions.add(subKey);
+                    addWsMessage('subscribe', subscription);
+                }
+
+                updateSubscriptionUI();
+            } catch (error) {
+                addWsMessage('error', `Failed to ${isActive ? 'unsubscribe' : 'subscribe'}: ${error.message}`);
+            }
+        }
+
+        // Update subscription UI elements
+        function updateSubscriptionUI() {
+            // Update active count
+            wsActiveSubsEl.textContent = `${wsActiveSubscriptions.size} active`;
+
+            // Update subscription item visuals
+            document.querySelectorAll('.ws-subscription-item').forEach(item => {
+                const subType = item.dataset.sub;
+                const subscription = buildSubscription(subType);
+                const subKey = getSubscriptionKey(subscription);
+
+                if (wsActiveSubscriptions.has(subKey)) {
+                    item.classList.add('active');
+                } else {
+                    item.classList.remove('active');
+                }
+            });
+        }
+
+        // Toggle pause
+        function togglePause() {
+            wsPaused = !wsPaused;
+
+            if (wsPaused) {
+                wsPauseBtn.textContent = '▶';
+                wsPauseBtn.classList.add('paused');
+                wsPauseBtn.title = 'Resume feed';
+                wsMessages.classList.add('paused');
+            } else {
+                wsPauseBtn.textContent = '⏸';
+                wsPauseBtn.classList.remove('paused');
+                wsPauseBtn.title = 'Pause feed';
+                wsMessages.classList.remove('paused');
+
+                // Flush queued messages
+                wsMessageQueue.forEach(msg => {
+                    addWsMessage(msg.type, msg.content, msg.channel);
+                });
+                wsMessageQueue = [];
+            }
+        }
+
+        // Clear messages
+        function clearMessages() {
+            wsMessages.innerHTML = `
+                <div class="ws-empty-state">
+                    <div class="ws-empty-state-icon">📡</div>
+                    <div class="ws-empty-state-title">No messages yet</div>
+                    <div class="ws-empty-state-text">
+                        Connect to the WebSocket and subscribe to channels to see live data.
+                    </div>
+                </div>
+            `;
+            wsMessageCount = 0;
+            wsMessageCountEl.textContent = '0 messages';
+            wsMessageQueue = [];
+        }
+
+        // Initialize WebSocket event listeners
+        function initWebSocket() {
+            wsConnectBtn.addEventListener('click', connectWs);
+            wsDisconnectBtn.addEventListener('click', disconnectWs);
+            wsPauseBtn.addEventListener('click', togglePause);
+            wsClearBtn.addEventListener('click', clearMessages);
+
+            // Subscription toggle handlers
+            document.querySelectorAll('.ws-subscription-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const subType = item.dataset.sub;
+                    toggleSubscription(subType, item);
+                });
+            });
+
+            // Update subscription UI when form inputs change
+            [wsCoinInput, wsIntervalSelect, wsUserInput].forEach(input => {
+                input.addEventListener('change', updateSubscriptionUI);
+                input.addEventListener('input', updateSubscriptionUI);
+            });
+        }
+
         // Initialize
         initNavigation();
+        initWebSocket();
     </script>
 </body>
 </html>

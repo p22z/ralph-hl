@@ -546,8 +546,8 @@
         "Responsive layout for different screen sizes"
       ],
       "priority": 5,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed: Bloomberg-inspired dashboard with CSS custom properties for colors, spacing, and typography. Clean white background with minimal borders. Monospace fonts (SF Mono, Monaco, Inconsolata). Professional financial aesthetic with panels, data tables, stat cards. Consistent 4px-48px spacing scale and 10px-24px typography hierarchy. Fully responsive with media queries at 1200px, 992px, 768px, 480px breakpoints."
     },
     {
       "id": "US-036",
@@ -561,8 +561,8 @@
         "Loading states and error handling"
       ],
       "priority": 5,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed: Comprehensive demo UI with 48 info endpoints organized in 10 sidebar categories. Dynamic input forms with required/optional field indicators and help text. JSON syntax highlighting using VS Code dark theme colors. Call Endpoint button with Ctrl+Enter shortcut. Loading spinner, error states, and response timing. Copy and format buttons."
     },
     {
       "id": "US-037",
@@ -576,8 +576,8 @@
         "Re-call button functionality"
       ],
       "priority": 5,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed: 27 exchange endpoints organized in 7 sidebar categories (Orders, TWAP, Leverage, Transfers, Staking Actions, Vault Actions, Approvals & Misc). Security warning banner with private key warning. Form configurations with select dropdowns for booleans, type conversion for parameters. Success/error status indicators in response panel. Orange 'Execute Action' button styling. All endpoints connect to existing backend API."
     },
     {
       "id": "US-038",
@@ -591,8 +591,8 @@
         "Clear/pause functionality"
       ],
       "priority": 5,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed: Full WebSocket demo section with connection status indicator (disconnected/connecting/connected/error states with animated dots). 19 subscription types organized in 3 categories (Market Data: 6, User Data: 5, User Events: 8). Live data feed panel with collapsible JSON messages, syntax highlighting, and timestamps with milliseconds. Message history capped at 500 with newest-first display. Pause/resume functionality queues messages when paused. Clear button resets feed. Form inputs for coin/interval/user address. Active subscription tracking with visual indicators."
     },
     {
       "id": "US-039",
